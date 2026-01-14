@@ -15,7 +15,6 @@
 from __future__ import annotations
 
 import argparse
-import logging
 import os
 import sys
 from pathlib import Path
@@ -24,12 +23,14 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[3]
 os.chdir(REPO_ROOT)
 
-from qp.research.openbb_fetch import fetch_futures_data, parse_vt_symbol
-from qp.research.ingest_vnpy import csv_to_bars, ingest_bars, verify_ingestion, EXCHANGE_MAP
-
 from vnpy.trader.constant import Interval
 
-logger = logging.getLogger(__name__)
+from qp.common import EXCHANGE_MAP, parse_vt_symbol
+from qp.common.logging import setup_logging, get_logger
+from qp.research.openbb_fetch import fetch_futures_data
+from qp.research.ingest_vnpy import csv_to_bars, ingest_bars, verify_ingestion
+
+logger = get_logger(__name__)
 
 
 def run_pipeline(vt_symbol: str, days: int) -> None:
@@ -40,11 +41,7 @@ def run_pipeline(vt_symbol: str, days: int) -> None:
         vt_symbol: 合约代码，如 "p0.DCE"
         days: 获取天数
     """
-    symbol, exchange_str = parse_vt_symbol(vt_symbol)
-    exchange = EXCHANGE_MAP.get(exchange_str.upper())
-
-    if exchange is None:
-        raise ValueError(f"未知的交易所: {exchange_str}")
+    symbol, exchange = parse_vt_symbol(vt_symbol, return_exchange_enum=True)
 
     # === Step 1: 拉取数据 ===
     logger.info("=" * 50)
@@ -152,11 +149,7 @@ def main() -> None:
     args = parser.parse_args()
 
     # 配置日志
-    logging.basicConfig(
-        level=logging.DEBUG if args.verbose else logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
+    setup_logging(verbose=args.verbose)
 
     try:
         run_pipeline(args.vt_symbol, args.days)

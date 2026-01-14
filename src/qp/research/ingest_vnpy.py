@@ -14,7 +14,6 @@ vn.py 数据库入库模块.
 from __future__ import annotations
 
 import argparse
-import logging
 import os
 import sys
 from datetime import datetime
@@ -31,54 +30,10 @@ from vnpy.trader.constant import Exchange, Interval
 from vnpy.trader.database import get_database
 from vnpy.trader.object import BarData
 
-logger = logging.getLogger(__name__)
+from qp.common import EXCHANGE_MAP, INTERVAL_MAP, parse_vt_symbol
+from qp.common.logging import setup_logging, get_logger
 
-# 交易所映射
-EXCHANGE_MAP: dict[str, Exchange] = {
-    "DCE": Exchange.DCE,
-    "SHFE": Exchange.SHFE,
-    "CZCE": Exchange.CZCE,
-    "CFFEX": Exchange.CFFEX,
-    "INE": Exchange.INE,
-    "SSE": Exchange.SSE,
-    "SZSE": Exchange.SZSE,
-}
-
-# 周期映射
-INTERVAL_MAP: dict[str, Interval] = {
-    "MINUTE": Interval.MINUTE,
-    "HOUR": Interval.HOUR,
-    "DAILY": Interval.DAILY,
-    "WEEKLY": Interval.WEEKLY,
-    "1m": Interval.MINUTE,
-    "1h": Interval.HOUR,
-    "1d": Interval.DAILY,
-    "1w": Interval.WEEKLY,
-}
-
-
-def parse_vt_symbol(vt_symbol: str) -> tuple[str, Exchange]:
-    """
-    解析 vt_symbol 为 symbol 和 Exchange 枚举.
-
-    Args:
-        vt_symbol: 如 "p0.DCE"
-
-    Returns:
-        (symbol, Exchange) 元组
-    """
-    if "." not in vt_symbol:
-        raise ValueError(f"vt_symbol 格式错误: {vt_symbol}，应为 symbol.exchange")
-
-    symbol, exchange_str = vt_symbol.rsplit(".", 1)
-
-    if exchange_str.upper() not in EXCHANGE_MAP:
-        raise ValueError(
-            f"未知的交易所: {exchange_str}，"
-            f"支持的交易所: {list(EXCHANGE_MAP.keys())}"
-        )
-
-    return symbol, EXCHANGE_MAP[exchange_str.upper()]
+logger = get_logger(__name__)
 
 
 def csv_to_bars(
@@ -252,11 +207,7 @@ def main() -> None:
     args = parser.parse_args()
 
     # 配置日志
-    logging.basicConfig(
-        level=logging.DEBUG if args.verbose else logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
+    setup_logging(verbose=args.verbose)
 
     csv_path = Path(args.csv)
     if not csv_path.exists():
