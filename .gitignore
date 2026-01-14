@@ -68,6 +68,7 @@ log/
 .vntrader/log/
 .vntrader/*.json
 .vntrader/*.log
+.vntrader/xt_lock
 
 # ===== Project Data Cache =====
 data/openbb/*.csv
