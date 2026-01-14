@@ -8,21 +8,11 @@ Trader GUI 入口模块.
 from __future__ import annotations
 
 import argparse
-import logging
 import sys
 
+from qp.common.logging import setup_logging, get_logger
 from qp.ui.launcher import start_trader_gui
 from qp.ui.profiles import VALID_PROFILES
-
-
-def setup_logging(verbose: bool = False) -> None:
-    """配置日志."""
-    level = logging.DEBUG if verbose else logging.INFO
-    logging.basicConfig(
-        level=level,
-        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
 
 
 def parse_args() -> argparse.Namespace:
@@ -51,7 +41,7 @@ def main() -> None:
     args = parse_args()
     setup_logging(verbose=args.verbose)
 
-    logger = logging.getLogger(__name__)
+    logger = get_logger(__name__)
     logger.info("QuantPlus Trader 启动，profile=%s", args.profile)
 
     # 延迟导入 Gateway，避免在 --help 时触发重量级模块加载

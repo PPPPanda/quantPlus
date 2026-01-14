@@ -15,7 +15,6 @@ vt_symbol 规范:
 from __future__ import annotations
 
 import argparse
-import logging
 import os
 import sys
 from datetime import datetime, timedelta
@@ -27,33 +26,11 @@ import pandas as pd
 REPO_ROOT = Path(__file__).resolve().parents[3]
 os.chdir(REPO_ROOT)
 
-logger = logging.getLogger(__name__)
+from qp.common import SYMBOL_MAP, parse_vt_symbol
+from qp.common.constants import CHINA_FUTURES_EXCHANGES
+from qp.common.logging import setup_logging, get_logger
 
-# 品种代码映射 (vnpy symbol -> akshare symbol)
-SYMBOL_MAP: dict[str, str] = {
-    "p0": "P0",      # 棕榈油连续
-    "p": "P0",       # 棕榈油
-    "y0": "Y0",      # 豆油连续
-    "m0": "M0",      # 豆粕连续
-    "c0": "C0",      # 玉米连续
-    "i0": "I0",      # 铁矿石连续
-}
-
-
-def parse_vt_symbol(vt_symbol: str) -> tuple[str, str]:
-    """
-    解析 vt_symbol 为 symbol 和 exchange.
-
-    Args:
-        vt_symbol: 如 "p0.DCE" 或 "p2501.DCE"
-
-    Returns:
-        (symbol, exchange) 元组
-    """
-    if "." not in vt_symbol:
-        raise ValueError(f"vt_symbol 格式错误: {vt_symbol}，应为 symbol.exchange")
-    symbol, exchange = vt_symbol.rsplit(".", 1)
-    return symbol, exchange
+logger = get_logger(__name__)
 
 
 def try_fetch_openbb(
@@ -79,7 +56,7 @@ def try_fetch_openbb(
         # 尝试查询，预期会失败或返回空数据
 
         # 对于中国期货，OpenBB 暂不支持，直接返回 None
-        if exchange in ("DCE", "SHFE", "CZCE", "CFFEX", "INE"):
+        if exchange in CHINA_FUTURES_EXCHANGES:
             logger.warning(
                 "OpenBB 暂不支持中国期货交易所 %s，将使用 akshare 降级获取",
                 exchange
@@ -209,7 +186,7 @@ def fetch_futures_data(
         标准化的 DataFrame，包含列:
         datetime, open, high, low, close, volume, open_interest, symbol, exchange, interval
     """
-    symbol, exchange = parse_vt_symbol(vt_symbol)
+    symbol, exchange = parse_vt_symbol(vt_symbol, return_exchange_enum=False)
 
     if end_date is None:
         end_date = datetime.now()
@@ -277,11 +254,7 @@ def main() -> None:
     args = parser.parse_args()
 
     # 配置日志
-    logging.basicConfig(
-        level=logging.DEBUG if args.verbose else logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
+    setup_logging(verbose=args.verbose)
 
     # 确定输出路径
     if args.out:

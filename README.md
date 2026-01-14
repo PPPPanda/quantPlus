@@ -81,17 +81,42 @@ uv run python -m qp.runtime.trader_app --help
 
 注：括号内为可选模块，依赖安装情况自动加载。
 
-## 棕榈油（DCE）一年数据回测（GUI）
+## 数据获取
 
-完整的数据拉取 → 入库 → GUI 回测闭环操作指南。
+### 支持的数据周期
 
-### 1. 安装依赖
+| 周期 | 数据条数 | 时间跨度 | 用途 |
+|------|----------|----------|------|
+| 日线 (DAILY) | ~365 | 约1年 | 中长期策略回测 |
+| 60分钟 (HOUR) | ~1023 | 约8个月 | 日内/短期策略回测 |
+| 5分钟 | ~1023 | 约16个交易日 | 高频策略研究 |
+| 1分钟 | ~1023 | 约4个交易日 | 高频策略研究 |
+
+数据来源：akshare (新浪财经)
+
+### 拉取60分钟数据（推荐）
 
 ```bash
-uv sync --extra gui --extra trade --extra research
+# 拉取60分钟数据并保存为CSV
+uv run python -c "
+import akshare as ak
+import pandas as pd
+from pathlib import Path
+
+data_dir = Path('data/openbb')
+data_dir.mkdir(parents=True, exist_ok=True)
+
+df = ak.futures_zh_minute_sina(symbol='P0', period='60')
+df = df.rename(columns={'hold': 'open_interest'})
+df.to_csv(data_dir / 'p0.DCE_1h.csv', index=False)
+print(f'数据已保存，共 {len(df)} 条')
+"
+
+# 入库到 vn.py
+uv run python -m qp.research.ingest_vnpy --csv data/openbb/p0.DCE_1h.csv --vt_symbol p0.DCE --interval HOUR
 ```
 
-### 2. 拉取数据并入库
+### 拉取日线数据
 
 一键流水线命令：
 
@@ -104,7 +129,17 @@ uv run python -m qp.research.pipeline_palm_oil --vt_symbol p0.DCE --days 365
 - 将数据写入 `.vntrader/database.db`
 - 输出 GUI 回测操作指引
 
-### 3. 启动 GUI
+## 棕榈油（DCE）回测（GUI）
+
+完整的数据拉取 → 入库 → GUI 回测闭环操作指南。
+
+### 1. 安装依赖
+
+```bash
+uv sync --extra gui --extra trade --extra research
+```
+
+### 2. 启动 GUI
 
 ```bash
 uv run python -m qp.runtime.trader_app --profile research
@@ -179,6 +214,161 @@ uv run python -m qp.backtest.run_cta_backtest --vt_symbol p0.DCE --days 365
 - 回测 61 条数据，ArrayManager size=60 → 只有最后 1-2 根 K 线能产生信号 → 0 成交
 - 修复：将 ArrayManager size 改为 `slow_window + 10`（30），数据中有足够 K 线可用于交易
 
+## 策略说明
+
+### 策略回测对比（60分钟数据，2025-05 ~ 2026-01，约8个月）
+
+| 策略 | Sharpe Ratio | 总收益率 | 年化收益 | 最大回撤 | 推荐度 |
+|------|-------------|---------|---------|---------|--------|
+| CtaTurtleEnhancedStrategy (激进) | **1.28** | **+24.41%** | **+34.07%** | -8.23% | **推荐** |
+| CtaPalmOilStrategy | -1.50 | -1.64% | -2.28% | -1.85% | 学习用 |
+
+**结论**：增强海龟策略经过激进优化后，收益率达到24%+，年化34%，远超目标。
+
+### CtaTurtleEnhancedStrategy（增强海龟策略）**推荐**
+
+改进版海龟策略，针对高收益优化，特性：
+- **趋势过滤**：MA10 > MA100 时只做多，MA10 < MA100 时只做空（超长周期过滤噪音）
+- **中轨止盈**：触及唐奇安通道中线时止盈，锁定利润
+- **极速出场**：exit_window=1，最快响应反转信号
+- **激进仓位**：risk_per_trade=6%，max_units=50
+- **快速加仓**：pyramid_atr=0.15，利润快速累积
+
+**默认参数**（2026-01 激进优化: Sharpe 1.28, 收益 +24.41%, 年化 +34.07%）:
+
+| 参数 | 默认值 | 说明 |
+|------|--------|------|
+| `entry_window` | 15 | 入场通道窗口 |
+| `exit_window` | 1 | 出场通道窗口（极速出场） |
+| `trend_ma_fast` | 10 | 快速趋势均线 |
+| `trend_ma_slow` | 100 | 慢速趋势均线（超长周期过滤） |
+| `atr_stop` | 1.5 | ATR 止损倍数 |
+| `risk_per_trade` | 0.06 | 单笔风险预算 6% |
+| `max_units` | 50 | 最大持仓手数 |
+| `pyramid_atr` | 0.15 | 加仓间隔 ATR 倍数 |
+| `use_trend_filter` | True | 趋势过滤开关 |
+| `use_mid_line_exit` | True | 中轨止盈开关 |
+| `enable_pyramid` | True | 金字塔加仓开关 |
+
+**保守版参数**（Sharpe 1.14, 收益 +6.85%, 回撤 -2.92%）:
+```python
+# 适合风险偏好较低的用户
+setting = {
+    'exit_window': 2,
+    'trend_ma_slow': 80,
+    'risk_per_trade': 0.03,
+    'max_units': 15,
+    'pyramid_atr': 0.5,
+}
+```
+
+#### GUI 回测完整流程（60分钟数据）
+
+**第一步：准备60分钟数据**
+
+```bash
+# 1. 拉取60分钟数据
+uv run python -c "
+import akshare as ak
+from pathlib import Path
+
+data_dir = Path('data/openbb')
+data_dir.mkdir(parents=True, exist_ok=True)
+
+df = ak.futures_zh_minute_sina(symbol='P0', period='60')
+df = df.rename(columns={'hold': 'open_interest'})
+df.to_csv(data_dir / 'p0.DCE_1h.csv', index=False)
+print(f'数据已保存，共 {len(df)} 条')
+"
+
+# 2. 入库到 vn.py（注意 interval 参数为 HOUR）
+uv run python -m qp.research.ingest_vnpy --csv data/openbb/p0.DCE_1h.csv --vt_symbol p0.DCE --interval HOUR
+```
+
+**第二步：启动 GUI**
+
+```bash
+uv run python -m qp.runtime.trader_app --profile research
+```
+
+**第三步：配置回测参数**
+
+菜单栏：`功能` → `CTA回测`，按下表配置：
+
+| 参数 | 值 | 说明 |
+|------|-----|------|
+| **交易策略** | `CtaTurtleEnhancedStrategy` | 在下拉框中选择，看不到点「策略重载」 |
+| **本地代码** | `p0.DCE` | 必须与入库时的 vt_symbol 一致 |
+| **K线周期** | `1h` | **重要**：60分钟数据必须填 `1h`，不是 `60` |
+| 开始日期 | `2025-05-07` | 数据起始日期 |
+| 结束日期 | `2026-01-14` | 数据结束日期 |
+| 手续费率 | `0.0001` | 万分之一 |
+| 交易滑点 | `2` | 棕榈油最小变动价位 |
+| 合约乘数 | `10` | 棕榈油合约乘数 |
+| 价格跳动 | `2` | 棕榈油最小变动价位 |
+| 回测资金 | `1000000` | 初始资金 |
+
+**K线周期对照表**：
+
+| 数据周期 | K线周期填写 | interval 参数 |
+|----------|-------------|---------------|
+| 日线 | `d` 或 `1d` | `DAILY` |
+| 60分钟 | `1h` | `HOUR` |
+| 30分钟 | `30m` | - |
+| 15分钟 | `15m` | - |
+| 5分钟 | `5m` | - |
+| 1分钟 | `1m` | `MINUTE` |
+
+**第四步：修改策略参数（可选）**
+
+如需使用保守版参数：
+
+1. 在回测界面右侧找到「策略参数」区域
+2. 点击「参数设置」按钮
+3. 在弹出窗口中修改参数：
+   ```
+   exit_window: 2
+   trend_ma_slow: 80
+   risk_per_trade: 0.03
+   max_units: 15
+   pyramid_atr: 0.5
+   ```
+4. 点击「确定」保存
+
+**第五步：运行回测**
+
+1. 点击「开始回测」按钮
+2. 等待进度条完成
+3. 查看结果：
+   - **统计指标**：右侧面板显示 Sharpe、收益率、最大回撤等
+   - **资金曲线**：点击「K线图表」查看资金变化
+   - **成交记录**：点击「成交记录」查看每笔交易详情
+   - **每日盈亏**：点击「每日盈亏」查看每日收益分布
+
+**常见问题**：
+
+| 问题 | 原因 | 解决方案 |
+|------|------|----------|
+| 回测 0 成交 | K线周期设置错误 | 60分钟数据必须填 `1h`，不是 `60` 或 `h` |
+| 找不到策略 | 桥接文件缺失 | 点击「策略重载」或检查 `.vntrader/strategies/` |
+| 数据量为 0 | vt_symbol 不匹配 | 确保本地代码填 `p0.DCE`（区分大小写） |
+| ArrayManager 未初始化 | 数据不足 | 该策略需要 > 130 条数据（trend_ma_slow=100 + buffer） |
+
+**命令行回测**（不依赖 GUI）：
+```bash
+uv run python -m qp.backtest.run_cta_backtest --strategy CtaTurtleEnhancedStrategy --interval HOUR --days 240
+```
+
+### CtaPalmOilStrategy（双均线策略）
+
+基础趋势跟踪策略，适合入门学习。
+
+| 参数 | 默认值 | 说明 |
+|------|--------|------|
+| `fast_window` | 10 | 快速均线周期 |
+| `slow_window` | 20 | 慢速均线周期 |
+| `fixed_size` | 1 | 每次交易手数 |
+
 ### 单独执行各步骤
 
 如需手动控制每个步骤：
@@ -216,7 +406,8 @@ quantPlus/
 │   ├── ui/                # GUI 启动器与 Profile 配置
 │   ├── runtime/           # 命令行入口
 │   ├── strategies/        # CTA 策略实现
-│   │   └── cta_palm_oil.py    # 双均线策略
+│   │   ├── cta_palm_oil.py            # 双均线策略（学习用）
+│   │   └── cta_turtle_enhanced.py     # 增强海龟策略（推荐）
 │   ├── research/          # 数据研究与入库
 │   │   ├── openbb_fetch.py    # 数据拉取（OpenBB/akshare）
 │   │   ├── ingest_vnpy.py     # 数据入库
@@ -260,13 +451,16 @@ uv run python -m qp.runtime.trader_app --help
 # 5. 验证策略模块
 uv run python -c "from qp.strategies.cta_palm_oil import CtaPalmOilStrategy; print('strategy-ok')"
 
-# 6. 验证数据拉取模块
+# 6. 验证增强海龟策略模块
+uv run python -c "from qp.strategies.cta_turtle_enhanced import CtaTurtleEnhancedStrategy; print('turtle-ok')"
+
+# 7. 验证数据拉取模块
 uv run python -m qp.research.openbb_fetch --help
 
-# 7. 验证数据入库模块
+# 8. 验证数据入库模块
 uv run python -m qp.research.ingest_vnpy --help
 
-# 8. 验证脚本化回测
+# 9. 验证脚本化回测
 uv run python -m qp.backtest.run_cta_backtest --help
 ```
 

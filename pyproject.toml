@@ -29,6 +29,10 @@ research = [
     "akshare>=1.15.0",
     "pandas>=2.0.0",
 ]
+test = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.0.0",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -39,3 +43,10 @@ packages = ["src/qp"]
 
 [tool.uv.sources]
 vnpy = { path = "vendor/vnpy", editable = true }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"

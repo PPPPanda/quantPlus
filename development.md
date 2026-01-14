@@ -47,7 +47,8 @@ quantPlus/
 |------|------|
 | `vendor/vnpy/` | vn.py 框架 submodule，只读引用，更新通过 git submodule update |
 | `src/qp/runtime/trader_app.py` | GUI 主入口，根据 profile 加载不同 App 组合 |
-| `src/qp/strategies/cta_palm_oil.py` | CTA 策略实现，继承 CtaTemplate |
+| `src/qp/strategies/cta_palm_oil.py` | 双均线 CTA 策略，继承 CtaTemplate（学习用） |
+| `src/qp/strategies/cta_turtle_enhanced.py` | 增强海龟策略（趋势过滤+中轨止盈）**推荐** |
 | `src/qp/research/openbb_fetch.py` | 研究层数据获取，与交易运行时隔离 |
 | `src/qp/research/ingest_vnpy.py` | 数据桥接：将 OpenBB 数据转为 vn.py 可用格式 |
 | `src/qp/backtest/run_cta_backtest.py` | 脚本化回测，用于批量参数优化或 CI 流水线；图形化回测推荐走 GUI 的 research profile |
@@ -189,7 +190,154 @@ uv run python -m qp.runtime.trader_app --help
 
 # 策略模块导入验证
 uv run python -c "from qp.strategies.cta_palm_oil import CtaPalmOilStrategy; print('strategy-ok')"
+uv run python -c "from qp.strategies.cta_turtle_enhanced import CtaTurtleEnhancedStrategy; print('turtle-ok')"
 
 # 回测脚本帮助
 uv run python -m qp.backtest.run_cta_backtest --help
+
+# 60分钟数据回测验证
+uv run python -m qp.backtest.run_cta_backtest --strategy CtaTurtleEnhancedStrategy --interval HOUR --days 240
+```
+
+---
+
+## 8. 策略开发规范
+
+### 策略文件结构
+
+所有 CTA 策略放置于 `src/qp/strategies/` 目录，命名规范：`cta_{品种}_{策略类型}.py`
+
+### 策略模板要点
+
+```python
+from vnpy.trader.utility import ArrayManager
+from vnpy_ctastrategy import CtaTemplate
+
+class MyStrategy(CtaTemplate):
+    author = "QuantPlus"
+
+    # 参数（GUI 可见）
+    param1: int = 10
+    parameters = ["param1"]
+
+    # 变量（GUI 可见）
+    var1: float = 0.0
+    variables = ["var1"]
+
+    def __init__(self, cta_engine, strategy_name, vt_symbol, setting):
+        super().__init__(cta_engine, strategy_name, vt_symbol, setting)
+        # ArrayManager size 必须覆盖所有窗口 + buffer
+        self.am = ArrayManager(size=self.param1 + 20)
+
+    def on_init(self):
+        self.load_bar(10)  # 预加载历史数据
+
+    def on_bar(self, bar):
+        self.am.update_bar(bar)
+        if not self.am.inited:
+            return  # warm-up 未完成，不交易
+        # 交易逻辑...
+```
+
+### 工程最佳实践
+
+| 要点 | 说明 |
+|------|------|
+| **Warm-up 防护** | `ArrayManager size = max(所有窗口) + 20`，防止 0 成交 |
+| **Look-ahead 防护** | 计算指标时使用 `[-window-1:-1]` 切片，避免使用当前 bar |
+| **止损单管理** | 每根 bar 调用 `cancel_all()` 后重新挂止损单 |
+| **日志记录** | 入场/出场/加仓必须 `write_log()`，便于调试 |
+| **参数校验** | `on_init()` 中校验参数合法性 |
+
+### GUI 可见性
+
+策略需要放置桥接文件才能在 GUI 中显示：
+
+```bash
+# .vntrader/strategies/{策略文件名}.py
+from qp.strategies.{策略模块} import {策略类名}
+```
+
+### 回测验证
+
+新策略必须通过脚本化回测验证：
+
+```bash
+uv run python -m qp.backtest.run_cta_backtest --strategy {策略类名} --days 365 -v
+```
+
+---
+
+## 9. 现有策略说明
+
+### 策略回测对比（60分钟数据，2025-05 ~ 2026-01，约8个月）
+
+| 策略 | Sharpe Ratio | 总收益率 | 年化收益 | 最大回撤 | 推荐度 |
+|------|-------------|---------|---------|---------|--------|
+| CtaTurtleEnhancedStrategy (激进) | **1.28** | **+24.41%** | **+34.07%** | -8.23% | **推荐** |
+| CtaPalmOilStrategy | -1.50 | -1.64% | -2.28% | -1.85% | 学习用 |
+
+### CtaTurtleEnhancedStrategy（增强海龟策略）**推荐**
+
+改进版海龟策略，经激进优化后收益率达24%+，年化34%：
+
+- **趋势过滤**：MA10 > MA100 时只做多，MA10 < MA100 时只做空（超长周期过滤噪音）
+- **中轨止盈**：触及唐奇安通道中线时止盈，锁定利润
+- **极速出场**：exit_window=1，最快响应反转信号
+- **激进仓位**：risk_per_trade=6%，max_units=50
+- **快速加仓**：pyramid_atr=0.15，利润快速累积
+
+**默认参数**（2026-01 激进优化: Sharpe 1.28, 收益 +24.41%）：
+
+| 参数 | 值 | 说明 |
+|------|-----|------|
+| entry_window | 15 | 入场通道窗口 |
+| exit_window | 1 | 出场通道窗口（极速出场） |
+| trend_ma_fast | 10 | 快速趋势均线 |
+| trend_ma_slow | 100 | 慢速趋势均线（超长周期过滤） |
+| atr_stop | 1.5 | ATR 止损倍数 |
+| risk_per_trade | 0.06 | 单笔风险预算 6% |
+| max_units | 50 | 最大持仓手数 |
+| pyramid_atr | 0.15 | 加仓间隔 ATR 倍数 |
+| use_trend_filter | True | 趋势过滤开关 |
+| use_mid_line_exit | True | 中轨止盈开关 |
+| enable_pyramid | True | 金字塔加仓开关 |
+
+**保守版参数**（Sharpe 1.14, 收益 +6.85%, 回撤 -2.92%）：
+- exit_window: 2
+- trend_ma_slow: 80
+- risk_per_trade: 0.03
+- max_units: 15
+- pyramid_atr: 0.5
+
+**回测命令**：
+```bash
+uv run python -m qp.backtest.run_cta_backtest --strategy CtaTurtleEnhancedStrategy --interval HOUR --days 240
+```
+
+### CtaPalmOilStrategy
+
+基础双均线策略，用于学习和验证框架功能。
+
+## 10. 数据获取
+
+### 支持的数据周期
+
+| 周期 | 数据条数 | 时间跨度 | 函数 |
+|------|----------|----------|------|
+| 日线 | ~365 | 约1年 | `futures_main_sina` |
+| 60分钟 | ~1023 | 约8个月 | `futures_zh_minute_sina(period='60')` |
+| 5分钟 | ~1023 | 约16个交易日 | `futures_zh_minute_sina(period='5')` |
+| 1分钟 | ~1023 | 约4个交易日 | `futures_zh_minute_sina(period='1')` |
+
+数据来源：akshare (新浪财经)
+
+### 拉取分钟数据示例
+
+```python
+import akshare as ak
+
+# 拉取60分钟数据
+df = ak.futures_zh_minute_sina(symbol='P0', period='60')
+print(df.head())
 ```
