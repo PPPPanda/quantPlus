@@ -29,6 +29,9 @@ research = [
     "akshare>=1.15.0",
     "pandas>=2.0.0",
 ]
+datafeed = [
+    "xtquant>=1.0.0",
+]
 test = [
     "pytest>=8.0.0",
     "pytest-cov>=4.0.0",

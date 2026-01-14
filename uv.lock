@@ -2352,6 +2352,9 @@ version = "0.1.0"
 source = { editable = "." }
 
 [package.optional-dependencies]
+datafeed = [
+    { name = "xtquant" },
+]
 gui = [
     { name = "pyqtgraph" },
     { name = "pyside6" },
@@ -2399,8 +2402,9 @@ requires-dist = [
     { name = "vnpy-paperaccount", marker = "extra == 'trade'", specifier = ">=1.0.0" },
     { name = "vnpy-riskmanager", marker = "extra == 'trade'", specifier = ">=2.0.0" },
     { name = "vnpy-sqlite", marker = "extra == 'trade'", specifier = ">=1.1.0" },
+    { name = "xtquant", marker = "extra == 'datafeed'", specifier = ">=1.0.0" },
 ]
-provides-extras = ["gui", "trade", "research", "test"]
+provides-extras = ["gui", "trade", "research", "datafeed", "test"]
 
 [[package]]
 name = "random-user-agent"
@@ -3180,6 +3184,21 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/39/0d/40df5be1e684bbaecdb9d1e0e40d5d482465de6b00cbb92b84ee5d243c7f/xmltodict-0.13.0.tar.gz", hash = "sha256:341595a488e3e01a85a9d8911d8912fd922ede5fecc4dce437eb4b6c8d037e56", size = 33813, upload-time = "2022-05-08T07:00:04.916Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/94/db/fd0326e331726f07ff7f40675cd86aa804bfd2e5016c727fa761c934990e/xmltodict-0.13.0-py2.py3-none-any.whl", hash = "sha256:aa89e8fd76320154a40d19a0df04a4695fb9dc5ba977cbb68ab3e4eb225e7852", size = 9971, upload-time = "2022-05-08T07:00:02.898Z" },
+]
+
+[[package]]
+name = "xtquant"
+version = "250516.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "requests" },
+    { name = "tqdm" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/74/51/73b6dcc51ae95cc82484956d80787adf98152b57b838586d4cae373e04c8/xtquant-250516.1.1.tar.gz", hash = "sha256:c243466c7af9c6c11074d1fd00f66445d5d105b70ab498e79a2c5bf7b00f3f4a", size = 34562730, upload-time = "2025-06-11T12:03:48.103Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f4/23/3c8aa2d1130aa735285fb7e18a44d67ab71ba1162e545bd488b20457d57b/xtquant-250516.1.1-py3-none-any.whl", hash = "sha256:f8461b0a295fa9b13ead33acca8675f7961fe1b4488a319b5549853142a89014", size = 34704183, upload-time = "2025-06-11T12:03:38.674Z" },
 ]
 
 [[package]]
