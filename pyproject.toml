@@ -1,0 +1,41 @@
+[project]
+name = "quantplus"
+version = "0.1.0"
+description = "A股期货量化交易框架，基于 VeighNa (vnpy)"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+gui = [
+    "pyside6>=6.8.0",
+    "qdarkstyle>=3.2.3",
+    "pyqtgraph>=0.14.0",
+]
+trade = [
+    "vnpy-ctp>=6.7.11",
+    "vnpy-ctastrategy>=1.4.0",
+    "vnpy-ctabacktester>=1.3.0",
+    "vnpy-datamanager>=1.2.0",
+    "vnpy-sqlite>=1.1.0",
+    "vnpy-datarecorder>=1.1.0",
+    "vnpy-riskmanager>=2.0.0",
+    "vnpy-chartwizard>=1.1.0",
+    "vnpy-paperaccount>=1.0.0",
+    "openbb>=4.6.0",
+]
+research = [
+    "openbb>=4.6.0",
+    "akshare>=1.15.0",
+    "pandas>=2.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/qp"]
+
+[tool.uv.sources]
+vnpy = { path = "vendor/vnpy", editable = true }

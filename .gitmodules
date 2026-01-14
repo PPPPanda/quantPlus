@@ -1,0 +1,3 @@
+[submodule "vendor/vnpy"]
+	path = vendor/vnpy
+	url = https://github.com/vnpy/vnpy

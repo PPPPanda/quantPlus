@@ -1,0 +1,90 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+wheels/
+*.egg-info/
+*.egg
+MANIFEST
+
+# ===== Virtual Environments =====
+.venv/
+venv/
+ENV/
+env/
+.env/
+.python-version
+
+# ===== IDE / Editor =====
+.idea/
+.vscode/
+.history/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# ===== OS Generated =====
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ===== Testing / Coverage =====
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# ===== Jupyter Notebook =====
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ===== Logs =====
+*.log
+logs/
+log/
+
+# ===== vnpy Data Directory =====
+# Keep .gitkeep, ignore runtime data
+.vntrader/database.db
+.vntrader/log/
+.vntrader/*.json
+.vntrader/*.log
+
+# ===== Project Data Cache =====
+data/openbb/*.csv
+
+# ===== Secrets / Environment Variables =====
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets/
+credentials.json
+
+# ===== Misc =====
+*.bak
+*.tmp
+*.temp
+.cache/
+tmpclaude-*
+.claude/

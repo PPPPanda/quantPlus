@@ -1,0 +1,53 @@
+# ===== 行尾规范化 =====
+# 默认文本文件统一用 LF（仓库内/提交时）
+* text=auto eol=lf
+
+# ===== Windows 脚本保留 CRLF =====
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# ===== 二进制文件（不做行尾转换）=====
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.tar binary
+*.7z binary
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+
+# ===== 特定文件类型显式声明 =====
+*.py text eol=lf
+*.pyx text eol=lf
+*.pxd text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+*.cfg text eol=lf
+*.sh text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.sql text eol=lf
+*.csv text eol=lf
+
+# ===== Git 相关 =====
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.gitmodules text eol=lf
+
+# ===== Lock 文件 =====
+uv.lock text eol=lf
