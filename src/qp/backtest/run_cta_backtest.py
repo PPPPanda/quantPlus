@@ -3,6 +3,7 @@ CTA 策略脚本化回测工具.
 
 用法:
     python -m qp.backtest.run_cta_backtest --vt_symbol p0.DCE --days 90
+    python -m qp.backtest.run_cta_backtest --vt_symbol p0.DCE --interval HOUR --days 180
 
 此脚本用于命令行验证策略回测结果，不依赖 GUI。
 """
@@ -31,6 +32,7 @@ def run_backtest(
     end: datetime,
     strategy_class: type,
     strategy_setting: dict | None = None,
+    interval: Interval = Interval.DAILY,
     rate: float = 0.0001,
     slippage: float = 2.0,
     size: float = 10.0,
@@ -46,6 +48,7 @@ def run_backtest(
         end: 回测结束日期
         strategy_class: 策略类
         strategy_setting: 策略参数
+        interval: 数据周期 (默认 DAILY)
         rate: 手续费率
         slippage: 滑点
         size: 合约乘数
@@ -58,7 +61,7 @@ def run_backtest(
     engine = BacktestingEngine()
     engine.set_parameters(
         vt_symbol=vt_symbol,
-        interval=Interval.DAILY,
+        interval=interval,
         start=start,
         end=end,
         rate=rate,
@@ -110,12 +113,27 @@ def main() -> None:
         help="策略类名 (默认: CtaPalmOilStrategy)",
     )
     parser.add_argument(
+        "--interval",
+        type=str,
+        default="DAILY",
+        choices=["DAILY", "HOUR", "MINUTE"],
+        help="数据周期 (默认: DAILY)",
+    )
+    parser.add_argument(
         "--verbose", "-v",
         action="store_true",
         help="详细日志输出",
     )
 
     args = parser.parse_args()
+
+    # 周期映射
+    interval_map = {
+        "DAILY": Interval.DAILY,
+        "HOUR": Interval.HOUR,
+        "MINUTE": Interval.MINUTE,
+    }
+    interval = interval_map[args.interval]
 
     # 配置日志
     logging.basicConfig(
@@ -125,18 +143,35 @@ def main() -> None:
     )
 
     # 动态导入策略
+    # 策略名到模块的映射
+    strategy_modules = {
+        "CtaPalmOilStrategy": "cta_palm_oil",
+        "CtaTurtleEnhancedStrategy": "cta_turtle_enhanced",
+    }
+
+    module_name = strategy_modules.get(args.strategy)
+    if not module_name:
+        # 尝试根据策略类名推断模块名
+        module_name = args.strategy.replace("Strategy", "").lower()
+        module_name = "cta_" + "_".join(
+            word.lower() for word in
+            args.strategy.replace("Strategy", "").split()
+        ) if " " in args.strategy else module_name
+
     try:
-        strategy_module = __import__("cta_palm_oil")
+        strategy_module = __import__(module_name)
         strategy_class = getattr(strategy_module, args.strategy)
     except (ImportError, AttributeError) as e:
-        logger.error("无法加载策略 %s: %s", args.strategy, e)
+        logger.error("无法加载策略 %s (模块: %s): %s", args.strategy, module_name, e)
+        logger.info("可用策略: %s", list(strategy_modules.keys()))
         sys.exit(1)
 
     # 计算日期范围
     end = datetime.now()
     start = end - timedelta(days=args.days + 30)  # 额外 30 天用于预热
 
-    logger.info("回测参数: vt_symbol=%s, start=%s, end=%s", args.vt_symbol, start.date(), end.date())
+    logger.info("回测参数: vt_symbol=%s, interval=%s, start=%s, end=%s",
+                args.vt_symbol, args.interval, start.date(), end.date())
 
     try:
         result = run_backtest(
@@ -144,6 +179,7 @@ def main() -> None:
             start=start,
             end=end,
             strategy_class=strategy_class,
+            interval=interval,
         )
     except Exception as e:
         logger.exception("回测失败: %s", e)
@@ -157,6 +193,7 @@ def main() -> None:
     print("=" * 60)
     print(f"""
 合约: {args.vt_symbol}
+周期: {args.interval}
 策略: {args.strategy}
 数据量: {result['history_data_count']} 条
 
