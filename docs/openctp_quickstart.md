@@ -20,7 +20,7 @@ uv run python tests/test_openctp_connection.py
 ============================================================
 OpenCTP TTS 网关连接测试
 ============================================================
-[OK] 加载配置: 用户名=16714, 交易服务器=tcp://trading.openctp.cn:30001
+[OK] 加载配置: 用户名=your_username, 交易服务器=tcp://trading.openctp.cn:30001
 
 [步骤 1] 创建事件引擎和主引擎...
 [OK] 引擎创建成功
@@ -71,8 +71,8 @@ uv run python -m qp.runtime.trader_app --gateway ctp
 
 ```json
 {
-    "用户名": "16714",
-    "密码": "123456",
+    "用户名": "your_username",
+    "密码": "your_password",
     "经纪商代码": "9999",
     "交易服务器": "tcp://trading.openctp.cn:30001",
     "行情服务器": "tcp://trading.openctp.cn:30011",
@@ -81,12 +81,14 @@ uv run python -m qp.runtime.trader_app --gateway ctp
 }
 ```
 
-### 账号信息
+### 账号申请
 
-- **用户名**: `16714`
-- **密码**: `123456`
-- **类型**: 7x24 模拟账号
-- **申请**: 通过 [OpenCTP GitHub](https://github.com/krenx1983/openctp)
+**重要提示**：以上配置中的 `your_username` 和 `your_password` 是占位符，**请替换为您自己申请的账号**。
+
+**如何申请**：
+1. 访问 [OpenCTP GitHub](https://github.com/krenx1983/openctp)
+2. 关注 OpenCTP 微信公众号，自动获取免费测试账号
+3. 账号类型：7x24 模拟账号，长期有效
 
 ---
 
@@ -198,7 +200,7 @@ uv run python -m qp.runtime.trader_app --gateway ctp  # 使用 CTP
 
 **解决**：
 1. 检查配置文件 `.vntrader/connect_tts.json`
-2. 确认用户名为 `16714`，密码为 `123456`
+2. 确认用户名为 `your_username`，密码为 `your_password`
 3. 测试网络连接：`ping trading.openctp.cn`
 
 ### Q3: 行情数据不更新
@@ -227,8 +229,8 @@ uv run python -m qp.runtime.trader_app --gateway ctp  # 使用 CTP
 
 ```json
 {
-    "用户名": "16714",
-    "密码": "123456",
+    "用户名": "your_username",
+    "密码": "your_password",
     "经纪商代码": "9999",
     "交易服务器": "tcp://122.51.136.165:20002",
     "行情服务器": "tcp://122.51.136.165:20004",

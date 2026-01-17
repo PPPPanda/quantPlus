@@ -184,6 +184,44 @@ GUI 的功能页签由加载的 App 模块决定：
 - 禁止依赖未锁定的隐式系统包
 - 所有依赖必须通过 pyproject.toml 声明，由 uv 管理
 
+### 敏感信息保护
+
+**原则**：**禁止提交任何真实的账号密码、Token、私钥等敏感信息到 Git 仓库**
+
+**自动检测**：
+- 项目已集成 `scripts/check_sensitive_info.py` 敏感信息检测脚本
+- 在 `git commit` 时通过 pre-commit hook 自动运行
+- 检测内容：
+  - 真实密码（排除 `your_password`、`123456` 等占位符）
+  - Token/API Key（长度 ≥ 32 字符的随机字符串）
+  - 私钥（PEM 格式）
+  - 数据库连接字符串（包含真实密码）
+  - 不应提交的文件类型（`.vntrader/*.json`、`*.pem`、`*.key` 等）
+
+**配置文件保护**：
+- `.vntrader/connect_ctp.json`（SimNow 配置）
+- `.vntrader/connect_tts.json`（OpenCTP 配置）
+- 所有 `.vntrader/*.json` 文件已在 `.gitignore` 中
+
+**文档中的示例**：
+- 必须使用占位符：`your_username`、`your_password`、`your_token`
+- **禁止**在文档中写入任何真实账号密码（包括测试账号）
+- 用户需自行申请：[SimNow 官网](https://www.simnow.com.cn) / [OpenCTP GitHub](https://github.com/krenx1983/openctp)
+
+**手动测试**：
+```bash
+# 测试敏感信息检测
+python scripts/check_sensitive_info.py
+
+# 强制提交（不推荐，仅用于紧急情况）
+git commit --no-verify
+```
+
+**如何修复检测失败**：
+1. 移除暂存区中包含敏感信息的文件：`git restore --staged <file>`
+2. 使用占位符替换敏感信息
+3. 确保敏感配置文件已在 `.gitignore` 中
+
 ---
 
 ## 7. Smoke Tests

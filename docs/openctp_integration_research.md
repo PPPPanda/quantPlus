@@ -164,8 +164,8 @@ thostmduserapi_se.dll
 
 ```json
 {
-    "用户名": "16714",
-    "密码": "123456",
+    "用户名": "your_username",
+    "密码": "your_password",
     "经纪商代码": "9999",
     "交易服务器": "tcp://trading.openctp.cn:30001",
     "行情服务器": "tcp://trading.openctp.cn:30011",
@@ -249,8 +249,8 @@ parser.add_argument(
 ```bash
 # .vntrader/connect_tts.json
 {
-    "用户名": "16714",
-    "密码": "123456",
+    "用户名": "your_username",
+    "密码": "your_password",
     "经纪商代码": "9999",
     "交易服务器": "tcp://trading.openctp.cn:30001",
     "行情服务器": "tcp://trading.openctp.cn:30011",
@@ -332,8 +332,8 @@ else:
 3. 获取 7x24 测试账号
 
 **当前账号**：
-- 用户名：16714
-- 密码：123456
+- 用户名：your_username
+- 密码：your_password
 - 类型：7x24 模拟账号
 
 ### Q5: TTS 是否提供历史数据下载？
