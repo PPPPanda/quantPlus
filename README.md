@@ -68,7 +68,7 @@ uv run python -m qp.runtime.trader_app --profile research
 # 实盘交易模式（CtaStrategy + RiskManager + K线图）
 uv run python -m qp.runtime.trader_app --profile trade
 
-# 使用 OpenCTP TTS (7x24 模拟环境)
+# 使用 OpenCTP TTS
 uv run python -m qp.runtime.trader_app --gateway tts
 
 # 使用 CTP (SimNow，默认)
@@ -90,15 +90,12 @@ uv run python -m qp.runtime.trader_app --help
 
 ### 网关说明
 
-| 网关 | 服务时间 | 数据类型 | 适用场景 |
-|------|---------|---------|---------|
-| `ctp` | 交易时段 | 实时行情 | 实盘交易、SimNow 测试（默认） |
-| `tts` | 7x24 小时 | 历史轮播行情 | 策略测试、教学演示、开发调试 |
+| 网关 | 服务商 | 数据类型 |
+|------|---------|---------|
+| `ctp` | simNow | 实时行情或者7*24轮播 |
+| `tts` | openCTP | 实时行情或者7*24轮播 |
 
-**OpenCTP TTS 优势**：
-- 全天候可用，不受交易时段限制
-- 不受 SimNow 停服影响
-- 支持期货、期权、股票全品种模拟交易
+如何接入网关请查看常见问题模块
 
 ## 数据获取
 
@@ -509,7 +506,7 @@ A: SimNow 是上期技术官方提供的 CTP 仿真环境，支持期货和期�
 1. 访问 [SimNow 官网](https://www.simnow.com.cn/product.action)
 2. 点击「SimNow 注册」（仅工作日白天开放注册）
 3. 记录您的**账号**、**密码**和**经纪商代码**（固定为 `9999`）
-（备注：第一次注册需要修改密码之后才能登录）
+（备注：第一次注册需要修改密码之后才能登录CTP）
 
 **第二步：获取服务器地址**
 
@@ -556,7 +553,7 @@ uv run python -m qp.runtime.trader_app --gateway ctp
 
 **重要提示**：
 - SimNow **仅在交易时段可用**，经常维护停服
-- 如遇 SimNow 不可用，建议使用 **OpenCTP (7x24 可用)** 作为替代方案
+- 如遇 SimNow 不可用，建议使用 **OpenCTP** 作为替代方案
 
 **参考资料**：
 - [SimNow 官网](https://www.simnow.com.cn/product.action)
@@ -567,7 +564,7 @@ uv run python -m qp.runtime.trader_app --gateway ctp
 
 ### Q: 如何配置 OpenCTP 账号？（SimNow 替代方案）
 
-A: 如果 SimNow 停服或不可用，推荐使用 **OpenCTP TTS (7x24 可用)**。
+A: 如果 SimNow 停服或不可用，推荐使用 **OpenCTP TTS **。
 
 创建配置文件 `.vntrader/connect_tts.json`：
 
@@ -584,11 +581,6 @@ A: 如果 SimNow 停服或不可用，推荐使用 **OpenCTP TTS (7x24 可用)**
 ```
 
 **获取账号**：访问 [OpenCTP GitHub](https://github.com/krenx1983/openctp) 申请测试账号。
-
-**OpenCTP 优势**：
-- **7x24 小时可用**，不受交易时段限制
-- **稳定性更好**，很少停服维护
-- 支持期货、期权、股票全品种模拟交易
 
 **连接测试**：
 ```bash
