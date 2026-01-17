@@ -61,8 +61,6 @@ ALLOWED_PLACEHOLDERS = [
     'your_simnow_password',
     '<your_',
     '...',
-    '16714',  # OpenCTP public test account
-    '123456', # OpenCTP public test password
 ]
 
 
