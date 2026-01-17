@@ -61,6 +61,9 @@ def _get_trade_apps() -> list[type[BaseApp]]:
     # 必需：CTA 策略
     apps.append(_try_import_app("vnpy_ctastrategy", "CtaStrategyApp"))
 
+    # 必需：K线图表
+    apps.append(_try_import_app("vnpy_chartwizard", "ChartWizardApp"))
+
     # 可选：数据记录
     apps.append(_try_import_app("vnpy_datarecorder", "DataRecorderApp"))
 
