@@ -8,6 +8,7 @@ A 股期货量化交易工程，基于 [VeighNa (vnpy)](https://github.com/vnpy/
 
 - **模块化架构**：策略、回测、研究、运行时分层解耦
 - **双数据源**：OpenBB 用于研究分析，vn.py 数据库用于实盘/回测
+- **双网关支持**：CTP (SimNow) + TTS (OpenCTP 7x24)，灵活切换
 - **GUI 支持**：VeighNa Trader 图形界面，支持实盘交易、回测、数据管理
 - **Profile 模式**：trade（实盘）、research（投研回测）、all（全功能）
 - **uv 管理**：统一依赖锁定，可复现环境
@@ -64,8 +65,14 @@ uv run python -m qp.runtime.trader_app --profile all
 # 投研/回测模式（CtaBacktester + DataManager）
 uv run python -m qp.runtime.trader_app --profile research
 
-# 实盘交易模式（CtaStrategy + RiskManager）
+# 实盘交易模式（CtaStrategy + RiskManager + K线图）
 uv run python -m qp.runtime.trader_app --profile trade
+
+# 使用 OpenCTP TTS (7x24 模拟环境)
+uv run python -m qp.runtime.trader_app --gateway tts
+
+# 使用 CTP (SimNow，默认)
+uv run python -m qp.runtime.trader_app --gateway ctp
 
 # 查看帮助
 uv run python -m qp.runtime.trader_app --help
@@ -75,11 +82,23 @@ uv run python -m qp.runtime.trader_app --help
 
 | Profile | 用途 | 加载的 App |
 |---------|------|-----------|
-| `trade` | 实盘交易 | CtaStrategy, RiskManager, (DataRecorder) |
-| `research` | 投研回测 | CtaBacktester, DataManager, (ChartWizard) |
+| `trade` | 实盘交易 | CtaStrategy, **ChartWizard**, DataRecorder, RiskManager |
+| `research` | 投研回测 | CtaBacktester, DataManager, ChartWizard |
 | `all` | 全功能调试 | 以上全部 + PaperAccount |
 
-注：括号内为可选模块，依赖安装情况自动加载。
+注：ChartWizard（K线图）为必需模块，DataRecorder（数据录制）为可选模块。
+
+### 网关说明
+
+| 网关 | 服务时间 | 数据类型 | 适用场景 |
+|------|---------|---------|---------|
+| `ctp` | 交易时段 | 实时行情 | 实盘交易、SimNow 测试（默认） |
+| `tts` | 7x24 小时 | 历史轮播行情 | 策略测试、教学演示、开发调试 |
+
+**OpenCTP TTS 优势**：
+- 全天候可用，不受交易时段限制
+- 不受 SimNow 停服影响
+- 支持期货、期权、股票全品种模拟交易
 
 ## 数据获取
 
@@ -462,6 +481,9 @@ uv run python -m qp.research.ingest_vnpy --help
 
 # 9. 验证脚本化回测
 uv run python -m qp.backtest.run_cta_backtest --help
+
+# 10. 测试 OpenCTP 连接（需要配置 .vntrader/connect_tts.json）
+uv run python tests/test_openctp_connection.py
 ```
 
 ## 常见问题
@@ -478,9 +500,126 @@ uv add vnpy-spreadtrading
 
 A: 终端编码问题，不影响功能。可尝试设置 `chcp 65001` 或使用 Windows Terminal。
 
+### Q: 如何配置 CTP (SimNow) 账号？
+
+A: SimNow 是上期技术官方提供的 CTP 仿真环境，支持期货和期权模拟交易。
+
+**第一步：注册账号**
+
+1. 访问 [SimNow 官网](https://www.simnow.com.cn/product.action)
+2. 点击「SimNow 注册」（仅工作日白天开放注册）
+3. 记录您的**账号**、**密码**和**经纪商代码**（固定为 `9999`）
+（备注：第一次注册需要修改密码之后才能登录）
+
+**第二步：获取服务器地址**
+
+SimNow 提供多组服务器，可通过以下方式获取：
+
+**方法 1：网页查看**
+- 访问 [SimNow 官网](https://www.simnow.com.cn/product.action) → 环境介绍 → 查看服务器地址列表
+
+**方法 2：软件测速（推荐）**
+1. 下载 [快期新一代交易终端V2](https://www.simnow.com.cn/product.action)（SimNow 官网「常用下载」）
+2. 打开软件，点击「代理/测速」按钮
+3. 选择延迟最低的一组**交易前置**和**行情前置**地址
+
+**常用服务器地址示例**：
+```
+交易前置: 182.254.243.31:30001
+行情前置: 182.254.243.31:30011
+```
+
+**第三步：配置文件**
+
+创建或修改 `.vntrader/connect_ctp.json`：
+
+```json
+{
+    "用户名": "your_simnow_account",
+    "密码": "your_simnow_password",
+    "经纪商代码": "9999",
+    "交易服务器": "182.254.243.31:30001",
+    "行情服务器": "182.254.243.31:30011",
+    "产品名称": "simnow_client_test",
+    "授权编码": "0000000000000000"
+}
+```
+
+**第四步：连接测试**
+
+```bash
+# 启动 GUI（默认使用 CTP）
+uv run python -m qp.runtime.trader_app --gateway ctp
+
+# 在 GUI 中：系统 → 连接CTP
+```
+
+**重要提示**：
+- SimNow **仅在交易时段可用**，经常维护停服
+- 如遇 SimNow 不可用，建议使用 **OpenCTP (7x24 可用)** 作为替代方案
+
+**参考资料**：
+- [SimNow 官网](https://www.simnow.com.cn/product.action)
+- [SimNow 配置教程（知乎）](https://zhuanlan.zhihu.com/p/75786439)
+- [vnpy 社区讨论](https://www.vnpy.com/forum/topic/5519-jin-ru-vn-trade-prodian-ji-lian-jie-ctp-pei-zhi-simnowzhang-hao-deng-lu-dan-yi-zhi-deng-lu-bu-shang-qu)
+
+---
+
+### Q: 如何配置 OpenCTP 账号？（SimNow 替代方案）
+
+A: 如果 SimNow 停服或不可用，推荐使用 **OpenCTP TTS (7x24 可用)**。
+
+创建配置文件 `.vntrader/connect_tts.json`：
+
+```json
+{
+    "用户名": "your_username",
+    "密码": "your_password",
+    "经纪商代码": "9999",
+    "交易服务器": "tcp://trading.openctp.cn:30001",
+    "行情服务器": "tcp://trading.openctp.cn:30011",
+    "产品名称": "",
+    "授权编码": ""
+}
+```
+
+**获取账号**：访问 [OpenCTP GitHub](https://github.com/krenx1983/openctp) 申请测试账号。
+
+**OpenCTP 优势**：
+- **7x24 小时可用**，不受交易时段限制
+- **稳定性更好**，很少停服维护
+- 支持期货、期权、股票全品种模拟交易
+
+**连接测试**：
+```bash
+# 启动 GUI（使用 TTS 网关）
+uv run python -m qp.runtime.trader_app --gateway tts
+
+# 在 GUI 中：系统 → 连接TTS
+```
+
+### Q: OpenCTP 连接失败，报错 4097
+
+A: 常见原因：
+1. **同时运行多个 CTP 程序**：关闭其他 CTP/TTS 程序
+2. **GUI 同时勾选 CTP 和 TTS**：只勾选一个网关
+3. **账号密码错误**：检查 `.vntrader/connect_tts.json` 配置
+
+**测试方法**：
+```bash
+uv run python tests/test_openctp_connection.py
+```
+
 ## 文档
 
-详细开发规范请参阅 [development.md](./development.md)
+### 核心文档
+
+- **开发规范**：[docs/development.md](./docs/development.md) - 项目架构、开发规范、策略开发指南（必读）
+- **OpenCTP 快速上手**：[docs/openctp_quickstart.md](./docs/openctp_quickstart.md) - OpenCTP 连接配置和使用指南
+- **OpenCTP 技术调研**：[docs/openctp_integration_research.md](./docs/openctp_integration_research.md) - 技术架构和方案对比
+- **Trade 模式功能说明**：[docs/trade_all_features.md](./docs/trade_all_features.md) - K线图和数据录制模块详解
+- **K线图和数据录制快速上手**：[docs/quickstart_chart_recorder.md](./docs/quickstart_chart_recorder.md) - 实时行情监控和数据录制教程
+- **Data 目录说明**：[docs/data_directory_guide.md](./docs/data_directory_guide.md) - 数据目录结构和文件格式
 
 ## License
 

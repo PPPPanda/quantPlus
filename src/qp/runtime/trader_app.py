@@ -29,6 +29,13 @@ def parse_args() -> argparse.Namespace:
         help="启动配置: trade=实盘, research=投研回测, all=全功能 (默认: all)",
     )
     parser.add_argument(
+        "--gateway",
+        type=str,
+        choices=["ctp", "tts"],
+        default="ctp",
+        help="交易网关: ctp=CTP/SimNow, tts=OpenCTP 7x24 (默认: ctp)",
+    )
+    parser.add_argument(
         "--verbose", "-v",
         action="store_true",
         help="启用详细日志输出",
@@ -42,21 +49,35 @@ def main() -> None:
     setup_logging(verbose=args.verbose)
 
     logger = get_logger(__name__)
-    logger.info("QuantPlus Trader 启动，profile=%s", args.profile)
+    logger.info("QuantPlus Trader 启动，profile=%s, gateway=%s", args.profile, args.gateway)
 
     # 延迟导入 Gateway，避免在 --help 时触发重量级模块加载
-    try:
-        from vnpy_ctp import CtpGateway
-    except ImportError as e:
-        logger.error("无法导入 vnpy_ctp.CtpGateway: %s", e)
-        logger.error("请确保已安装 vnpy_ctp 模块")
-        sys.exit(1)
+    if args.gateway == "tts":
+        try:
+            from vnpy_tts import TtsGateway
+            gateway_cls = TtsGateway
+            gateway_name = "TTS (OpenCTP 7x24)"
+        except ImportError as e:
+            logger.error("无法导入 vnpy_tts.TtsGateway: %s", e)
+            logger.error("请确保已安装 vnpy_tts 模块: pip install vnpy_tts")
+            sys.exit(1)
+    else:  # ctp
+        try:
+            from vnpy_ctp import CtpGateway
+            gateway_cls = CtpGateway
+            gateway_name = "CTP"
+        except ImportError as e:
+            logger.error("无法导入 vnpy_ctp.CtpGateway: %s", e)
+            logger.error("请确保已安装 vnpy_ctp 模块")
+            sys.exit(1)
+
+    logger.info("使用网关: %s", gateway_name)
 
     try:
         start_trader_gui(
-            gateway_cls=CtpGateway,
+            gateway_cls=gateway_cls,
             profile=args.profile,
-            title="QuantPlus Trader",
+            title=f"QuantPlus Trader ({gateway_name})",
         )
     except ValueError as e:
         logger.error("启动失败: %s", e)

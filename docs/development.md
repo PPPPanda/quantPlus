@@ -12,6 +12,7 @@
 
 - **vendor/vnpy 只做 submodule + editable install**：原则上不直接修改 vendor/vnpy 源码；如需定制，通过继承/包装在 src/qp 中实现。
 - **业务代码只允许放在 src/qp 目录**：禁止在 vendor/vnpy 下开发任何业务逻辑。
+- **双网关支持**：CTP (SimNow) 和 TTS (OpenCTP) 灵活切换，策略代码完全兼容。
 - **研究与执行解耦**：
   - OpenBB 用于研究层（因子计算、数据抓取、探索性分析）
   - 实盘/回测数据以 vn.py 数据库/CSV 导入为准
@@ -28,17 +29,29 @@ quantPlus/
 ├── src/
 │   └── qp/
 │       ├── runtime/
-│       │   └── trader_app.py          # 实盘启动 + GUI 显示入口（支持 profile 参数）
+│       │   └── trader_app.py          # 实盘启动 + GUI 显示入口（支持 profile 和 gateway 参数）
+│       ├── ui/
+│       │   ├── launcher.py            # GUI 启动器
+│       │   └── profiles.py            # Profile 配置（trade/research/all）
 │       ├── strategies/
-│       │   └── cta_palm_oil.py        # 双均线策略（棕榈油），先跑起来的基础策略
+│       │   ├── cta_palm_oil.py        # 双均线策略（学习用）
+│       │   └── cta_turtle_enhanced.py # 增强海龟策略（推荐）
 │       ├── research/
 │       │   ├── openbb_fetch.py        # OpenBB 数据拉取 / 因子计算
 │       │   └── ingest_vnpy.py         # OpenBB 数据 -> vn.py 数据库/CSV 转换入库
 │       └── backtest/
 │           └── run_cta_backtest.py    # 脚本化回测入口（批处理/CI 场景）
+├── tests/
+│   └── test_openctp_connection.py     # OpenCTP 连接测试脚本
+├── docs/
+│   ├── development.md                 # 本文件
+│   ├── openctp_quickstart.md          # OpenCTP 快速上手指南
+│   ├── openctp_integration_research.md # OpenCTP 技术调研报告
+│   ├── trade_all_features.md          # Trade 模式功能说明
+│   ├── quickstart_chart_recorder.md   # K线图和数据录制快速上手
+│   └── data_directory_guide.md        # Data 目录说明
 ├── pyproject.toml                     # uv 依赖管理
-├── uv.lock                            # 锁定依赖版本
-└── development.md                     # 本文件
+└── uv.lock                            # 锁定依赖版本
 ```
 
 ### 职责说明
@@ -46,7 +59,7 @@ quantPlus/
 | 路径 | 职责 |
 |------|------|
 | `vendor/vnpy/` | vn.py 框架 submodule，只读引用，更新通过 git submodule update |
-| `src/qp/runtime/trader_app.py` | GUI 主入口，根据 profile 加载不同 App 组合 |
+| `src/qp/runtime/trader_app.py` | GUI 主入口，支持 `--profile` (trade/research/all) 和 `--gateway` (ctp/tts) 参数 |
 | `src/qp/strategies/cta_palm_oil.py` | 双均线 CTA 策略，继承 CtaTemplate（学习用） |
 | `src/qp/strategies/cta_turtle_enhanced.py` | 增强海龟策略（趋势过滤+中轨止盈）**推荐** |
 | `src/qp/research/openbb_fetch.py` | 研究层数据获取，与交易运行时隔离 |
@@ -79,7 +92,7 @@ uv sync --all-extras
 ### 运行 Trader GUI
 
 ```bash
-# 全功能模式（实盘 + 回测 + 数据管理）
+# 全功能模式（实盘 + 回测 + 数据管理），默认 CTP 网关
 uv run python -m qp.runtime.trader_app --profile all
 
 # 仅投研/回测（加载 CtaBacktesterApp, DataManagerApp）
@@ -87,6 +100,12 @@ uv run python -m qp.runtime.trader_app --profile research
 
 # 仅实盘交易（加载 CtaStrategyApp, RiskManagerApp）
 uv run python -m qp.runtime.trader_app --profile trade
+
+# 使用 OpenCTP TTS 网关（7x24 模拟环境）
+uv run python -m qp.runtime.trader_app --gateway tts
+
+# 组合使用：TTS 网关 + 投研模式
+uv run python -m qp.runtime.trader_app --gateway tts --profile research
 ```
 
 ### 脚本化回测
@@ -180,6 +199,9 @@ uv run python -c "from openbb import obb; print('openbb-ok')"
 
 # 验证 PySide6/Qt 可用
 uv run python -c "from PySide6.QtWidgets import QApplication; print('pyside6-ok')"
+
+# 测试 OpenCTP 连接（需要配置 .vntrader/connect_tts.json）
+uv run python tests/test_openctp_connection.py
 ```
 
 ### 待 src/qp 模块就绪后可跑
