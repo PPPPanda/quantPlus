@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "A股期货量化交易框架，基于 VeighNa (vnpy)"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "pillow>=12.1.0",
+]
 
 [project.optional-dependencies]
 gui = [
@@ -28,6 +30,9 @@ research = [
     "openbb>=4.6.0",
     "akshare>=1.15.0",
     "pandas>=2.0.0",
+]
+datafeed = [
+    "xtquant>=1.0.0",
 ]
 test = [
     "pytest>=8.0.0",

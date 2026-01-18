@@ -66,11 +66,14 @@ log/
 # Keep .gitkeep, ignore runtime data
 .vntrader/database.db
 .vntrader/log/
+.vntrader/ctp/
 .vntrader/*.json
 .vntrader/*.log
+.vntrader/xt_lock
 
 # ===== Project Data Cache =====
 data/openbb/*.csv
+data/datadir/increase/*
 
 # ===== Secrets / Environment Variables =====
 .env
