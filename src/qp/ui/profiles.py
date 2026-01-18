@@ -54,6 +54,24 @@ def _try_import_app(module_name: str, class_name: str) -> type[BaseApp] | None:
         return None
 
 
+def _try_import_enhanced_chart() -> type[BaseApp] | None:
+    """
+    尝试导入增强K线图表 App，失败时回退到官方版本.
+
+    Returns:
+        EnhancedChartWizardApp 或 ChartWizardApp 或 None
+    """
+    # 优先尝试加载增强版
+    try:
+        from qp.apps.enhanced_chart import EnhancedChartWizardApp
+        logger.info("成功加载增强K线图表: EnhancedChartWizardApp")
+        return EnhancedChartWizardApp
+    except Exception as e:
+        logger.warning("加载增强K线图表失败: %s，回退到官方版本", e)
+        # 回退到官方版本
+        return _try_import_app("vnpy_chartwizard", "ChartWizardApp")
+
+
 def _get_trade_apps() -> list[type[BaseApp]]:
     """获取 trade profile 的 App 列表."""
     apps: list[type[BaseApp] | None] = []
@@ -61,8 +79,8 @@ def _get_trade_apps() -> list[type[BaseApp]]:
     # 必需：CTA 策略
     apps.append(_try_import_app("vnpy_ctastrategy", "CtaStrategyApp"))
 
-    # 必需：K线图表
-    apps.append(_try_import_app("vnpy_chartwizard", "ChartWizardApp"))
+    # 必需：K线图表（使用增强版）
+    apps.append(_try_import_enhanced_chart())
 
     # 可选：数据记录
     apps.append(_try_import_app("vnpy_datarecorder", "DataRecorderApp"))
@@ -84,8 +102,8 @@ def _get_research_apps() -> list[type[BaseApp]]:
     # 必需：数据管理
     apps.append(_try_import_app("vnpy_datamanager", "DataManagerApp"))
 
-    # 可选：图表向导
-    apps.append(_try_import_app("vnpy_chartwizard", "ChartWizardApp"))
+    # 可选：图表向导（使用增强版）
+    apps.append(_try_import_enhanced_chart())
 
     # 过滤掉 None
     return [app for app in apps if app is not None]
@@ -103,7 +121,7 @@ def _get_all_apps() -> list[type[BaseApp]]:
     # === Research 相关 ===
     apps.append(_try_import_app("vnpy_ctabacktester", "CtaBacktesterApp"))
     apps.append(_try_import_app("vnpy_datamanager", "DataManagerApp"))
-    apps.append(_try_import_app("vnpy_chartwizard", "ChartWizardApp"))
+    apps.append(_try_import_enhanced_chart())  # 使用增强版
 
     # === 额外可选 ===
     apps.append(_try_import_app("vnpy_paperaccount", "PaperAccountApp"))
