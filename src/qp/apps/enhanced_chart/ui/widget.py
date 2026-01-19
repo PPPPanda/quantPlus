@@ -16,7 +16,7 @@ from vnpy.trader.object import ContractData
 from vnpy_chartwizard.ui.widget import ChartWizardWidget
 
 # 导入自定义 Item 和对话框
-from ..items import MAItem, MACDItem
+from ..items import MAItem, MACDItem, OpenInterestItem
 from .dialogs import MAConfigDialog
 
 # 导入官方的 Item
@@ -246,7 +246,7 @@ class EnhancedChartWizardWidget(ChartWizardWidget):
 
         布局顺序：
         1. candle (K线图) - 隐藏x轴
-        2. volume (成交量) - 隐藏x轴，上移
+        2. volume (成交量 + 持仓量曲线) - 隐藏x轴，上移
         3. macd (MACD指标) - 显示x轴，新增
 
         Returns:
@@ -261,6 +261,8 @@ class EnhancedChartWizardWidget(ChartWizardWidget):
         # 2. 成交量区域（上移，隐藏x轴）
         chart.add_plot("volume", maximum_height=150, hide_x_axis=True)
         chart.add_item(VolumeItem, "volume", "volume")
+        # 叠加持仓量曲线（橙色线条）
+        chart.add_item(OpenInterestItem, "open_interest", "volume")
 
         # 3. MACD 区域（新增，显示x轴）
         chart.add_plot("macd", maximum_height=150, hide_x_axis=False)
@@ -269,7 +271,7 @@ class EnhancedChartWizardWidget(ChartWizardWidget):
         # 添加光标
         chart.add_cursor()
 
-        print("[DEBUG] 创建增强图表: candle + volume + macd")
+        print("[DEBUG] 创建增强图表: candle + volume(+OI) + macd")
         return chart
 
     def close_tab(self, index: int) -> None:

@@ -10,6 +10,7 @@
 |------|------|------|
 | MACD 指标 | DIF/DEA 线 + 红绿柱状图 | ✅ 完成 |
 | MA 均线指标 | 多周期、多颜色支持 | ✅ 完成 |
+| 持仓量曲线 | 叠加在成交量图表上 | ✅ 完成 |
 | 图例显示 | K线图和MACD区域的图例 | ✅ 完成 |
 | 中文颜色选择 | 12种高对比度颜色 | ✅ 完成 |
 | 自定义图标 | 增强版专属图标 | ✅ 完成 |
@@ -28,7 +29,9 @@
 │                       │━ MA20  │     │
 │                       └────────┘     │
 ├──────────────────────────────────────┤
-│ 成交量（中间位置）                   │
+│ 成交量 + 持仓量（中间位置）          │
+│ ▅▃▂▃▅ 成交量柱状图 (红绿)           │
+│ ━━━━━ 持仓量曲线 (橙色)             │
 ├──────────────────────────────────────┤
 │ MACD（最下方）                       │
 │              ┌────────┐              │  ← MACD图例
@@ -140,7 +143,61 @@ COLOR_MAP = {
 
 ---
 
-## 四、模块结构
+## 四、持仓量曲线
+
+### 4.1 功能说明
+
+市场持仓量（Open Interest）曲线叠加显示在成交量图表上，用于分析市场参与热度和资金流向。
+
+**注意**：这里显示的是市场总持仓量，不区分多空方向。
+
+### 4.2 视觉设计
+
+| 元素 | 颜色 | 说明 |
+|------|------|------|
+| 持仓量曲线 | 橙色 | 宽度 2px |
+| 成交量柱状图 | 红绿 | 阳线红色，阴线绿色 |
+
+### 4.3 Y轴缩放
+
+持仓量与成交量数值范围差异大，采用自动缩放：
+
+```python
+# 缩放公式
+normalized = (oi - oi_min) / (oi_max - oi_min)
+scaled = normalized * (vol_max - vol_min) + vol_min
+```
+
+- 持仓量归一化到 [0, 1] 区间
+- 映射到成交量 Y 轴范围
+- 保持曲线形态，便于观察趋势
+
+**边界情况处理**：
+- 持仓量 ≤ 0：不绘制该点
+- 所有持仓量相同：画在成交量范围中间
+- 成交量范围无效：使用原始持仓量值
+
+### 4.4 光标信息
+
+鼠标悬停时显示原始持仓量数值：
+
+```
+持仓: 125,680
+```
+
+### 4.5 数据来源
+
+```python
+# vnpy BarData 结构
+class BarData:
+    open_interest: float  # 市场持仓量
+    volume: float         # 成交量
+    turnover: float       # 成交额
+```
+
+---
+
+## 五、模块结构
 
 ```
 src/qp/apps/enhanced_chart/
@@ -148,7 +205,8 @@ src/qp/apps/enhanced_chart/
 ├── items/
 │   ├── __init__.py          # 指标项导出
 │   ├── ma_item.py           # MA 均线指标 (4.5KB)
-│   └── macd_item.py         # MACD 指标 (12KB)
+│   ├── macd_item.py         # MACD 指标 (12KB)
+│   └── oi_item.py           # 持仓量曲线 (7KB)
 └── ui/
     ├── __init__.py          # UI 模块导出
     ├── widget.py            # 增强图表 Widget (11KB)
@@ -159,9 +217,9 @@ src/qp/apps/enhanced_chart/
 
 ---
 
-## 五、集成方式
+## 六、集成方式
 
-### 5.1 Profile 配置
+### 6.1 Profile 配置
 
 在 `src/qp/ui/profiles.py` 中添加：
 
@@ -175,7 +233,7 @@ def _try_import_enhanced_chart() -> type[BaseApp] | None:
         return _try_import_app("vnpy_chartwizard", "ChartWizardApp")
 ```
 
-### 5.2 App 注册
+### 6.2 App 注册
 
 ```python
 # src/qp/apps/enhanced_chart/__init__.py
@@ -187,32 +245,32 @@ class EnhancedChartWizardApp(BaseApp):
 
 ---
 
-## 六、使用指南
+## 七、使用指南
 
-### 6.1 启动应用
+### 7.1 启动应用
 
 ```bash
 cd E:\work\quant\quantPlus
 uv run python -m qp.runtime.trader_app --gateway tts --profile all
 ```
 
-### 6.2 创建图表
+### 7.2 创建图表
 
 1. 菜单：功能 → 增强K线图表
 2. 输入合约代码：`p2605.DCE`
 3. 点击"新建图表"
 
-### 6.3 添加 MA 指标
+### 7.3 添加 MA 指标
 
 1. 点击"添加指标" → "均线 MA"
 2. 设置周期（如 20）和颜色（如"青色"）
 3. 点击确定
 4. 验证：K线图显示 MA 线，右上角显示图例
 
-### 6.4 预期控制台输出
+### 7.4 预期控制台输出
 
 ```
-[DEBUG] 创建增强图表: candle + volume + macd
+[DEBUG] 创建增强图表: candle + volume(+OI) + macd
 [DEBUG] 为 p2605.DCE 创建MACD图例 (DIF/DEA)
 [DEBUG] 为 p2605.DCE 创建K线图例 (offset=180)
 [DEBUG] 已添加 MA20 到图例
@@ -220,9 +278,9 @@ uv run python -m qp.runtime.trader_app --gateway tts --profile all
 
 ---
 
-## 七、测试验证
+## 八、测试验证
 
-### 7.1 单元测试
+### 8.1 单元测试
 
 ```bash
 # MACD 指标测试
@@ -241,7 +299,7 @@ uv run python tests/test_color_dialog.py
 uv run python tests/test_legend.py
 ```
 
-### 7.2 手动测试清单
+### 8.2 手动测试清单
 
 **MACD 指标**：
 - [ ] 黄色 DIF 线显示正常
@@ -256,11 +314,17 @@ uv run python tests/test_legend.py
 - [ ] 多条 MA 线可同时显示
 - [ ] 颜色选择框显示中文
 
+**持仓量曲线**：
+- [x] 橙色持仓量曲线显示正常
+- [x] 持仓量与成交量叠加显示
+- [x] Y轴缩放正确（与成交量同范围）
+- [x] 鼠标移动显示原始持仓量数值
+
 ---
 
-## 八、依赖说明
+## 九、依赖说明
 
-### 8.1 新增依赖
+### 9.1 新增依赖
 
 ```toml
 # pyproject.toml
@@ -269,7 +333,7 @@ dependencies = [
 ]
 ```
 
-### 8.2 图标转换工具
+### 9.2 图标转换工具
 
 ```bash
 # 将 PNG 转换为 ICO（去除灰色背景）
@@ -278,7 +342,7 @@ uv run python scripts/convert_png_to_ico.py
 
 ---
 
-## 九、版本历史
+## 十、版本历史
 
 | 日期 | 版本 | 改动 |
 |------|------|------|
@@ -288,10 +352,11 @@ uv run python scripts/convert_png_to_ico.py
 | 2026-01-17 | 1.0.3 | 柱状图去描边 + MACD 图例 |
 | 2026-01-17 | 1.0.4 | MA 图例位置优化 + 中文颜色 |
 | 2026-01-18 | 1.0.5 | 自定义图标 |
+| 2026-01-19 | 1.1.0 | 持仓量曲线叠加显示 |
 
 ---
 
-## 十、已知限制
+## 十一、已知限制
 
 1. MACD 参数暂不支持自定义（固定 12/26/9）
 2. 零轴线暂未显示
@@ -299,16 +364,17 @@ uv run python scripts/convert_png_to_ico.py
 
 ---
 
-## 十一、后续计划
+## 十二、后续计划
 
 - [ ] MACD 参数配置对话框
 - [ ] 零轴线显示
 - [ ] 金叉死叉标记
 - [ ] BOLL 布林带指标
 - [ ] RSI/KDJ 等更多指标
+- [ ] 持仓量图例显示
 
 ---
 
-**文档版本**: 1.0
-**最后更新**: 2026-01-18
+**文档版本**: 1.1
+**最后更新**: 2026-01-19
 **状态**: ✅ 生产就绪
