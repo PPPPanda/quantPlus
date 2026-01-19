@@ -72,8 +72,7 @@ log/
 .vntrader/xt_lock
 
 # ===== Project Data Cache =====
-data/openbb/*.csv
-data/datadir/increase/*
+data/
 
 # ===== Secrets / Environment Variables =====
 .env
