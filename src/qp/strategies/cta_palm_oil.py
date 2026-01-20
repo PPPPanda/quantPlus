@@ -3,6 +3,12 @@
 
 基于快慢均线交叉的趋势跟踪策略，适用于大商所棕榈油期货。
 
+K线周期说明：
+- 回测时：直接使用数据库中对应周期的 K 线数据
+- 实盘时：通过 BarGenerator 将 Tick 合成为指定周期的 K 线
+- bar_window: K线窗口大小（1=1分钟, 15=15分钟, 60=60分钟）
+- bar_interval: K线周期类型 ("MINUTE" 或 "HOUR")
+
 ================================================================================
 如何在 GUI 的 CTA 策略页添加该策略
 ================================================================================
@@ -53,8 +59,11 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from vnpy.trader.object import BarData, TradeData
-from vnpy.trader.utility import ArrayManager
+from typing import Optional
+
+from vnpy.trader.object import BarData, OrderData, TickData, TradeData
+from vnpy.trader.utility import ArrayManager, BarGenerator
+from vnpy.trader.constant import Interval
 from vnpy_ctastrategy import CtaTemplate
 
 logger = logging.getLogger(__name__)
@@ -77,11 +86,17 @@ class CtaPalmOilStrategy(CtaTemplate):
     slow_window: int = 20
     fixed_size: int = 1
 
+    # K线周期参数（实盘使用）
+    bar_window: int = 1             # K线窗口大小（1=1分钟, 15=15分钟）
+    bar_interval: str = "MINUTE"    # K线周期类型 ("MINUTE" 或 "HOUR")
+
     # 参数列表（GUI 显示用）
     parameters: list[str] = [
         "fast_window",
         "slow_window",
         "fixed_size",
+        "bar_window",
+        "bar_interval",
     ]
 
     # 策略变量（运行时状态）
@@ -109,6 +124,9 @@ class CtaPalmOilStrategy(CtaTemplate):
         # 初始化 K 线管理器，用于计算技术指标
         # 修复：使用 slow_window + 10，避免 size 过大导致 am.inited 无法初始化
         self.am: ArrayManager = ArrayManager(size=self.slow_window + 10)
+
+        # K线生成器（实盘时将 Tick 转换为 Bar）
+        self.bg: Optional[BarGenerator] = None
 
         logger.info(
             "策略初始化: %s, 合约: %s, 快线: %d, 慢线: %d, 手数: %d",
@@ -139,8 +157,26 @@ class CtaPalmOilStrategy(CtaTemplate):
             logger.error(error_msg)
             raise ValueError(error_msg)
 
-        # 加载历史数据用于初始化均线
-        self.load_bar(days=10)
+        # 创建 K 线生成器（实盘时 Tick -> Bar）
+        interval = Interval.HOUR if self.bar_interval == "HOUR" else Interval.MINUTE
+        if self.bar_window <= 1 and interval == Interval.MINUTE:
+            # 1 分钟线：直接使用 on_bar 作为回调
+            self.bg = BarGenerator(self.on_bar)
+        else:
+            # N 分钟/小时线：先生成 1 分钟线，再合成目标周期
+            self.bg = BarGenerator(
+                self.on_bar,  # 1 分钟线回调（用于预热历史数据）
+                window=self.bar_window,
+                on_window_bar=self.on_bar,  # 目标周期回调
+                interval=interval,
+            )
+        self.write_log(
+            f"K线生成器: window={self.bar_window}, interval={self.bar_interval}"
+        )
+
+        # 加载历史数据用于初始化均线（周期需与 bar_interval 匹配）
+        load_interval = Interval.HOUR if self.bar_interval == "HOUR" else Interval.MINUTE
+        self.load_bar(days=10, interval=load_interval)
 
         self.write_log("策略初始化完成")
         logger.info("策略 %s 初始化完成", self.strategy_name)
@@ -156,6 +192,11 @@ class CtaPalmOilStrategy(CtaTemplate):
         self.write_log("策略停止")
         logger.info("策略 %s 已停止", self.strategy_name)
         self.put_event()
+
+    def on_tick(self, tick: TickData) -> None:
+        """Tick 数据回调（实盘时由 CTA 引擎调用）."""
+        if self.bg:
+            self.bg.update_tick(tick)
 
     def on_bar(self, bar: BarData) -> None:
         """K 线数据更新回调."""
@@ -255,3 +296,12 @@ class CtaPalmOilStrategy(CtaTemplate):
         # 同步数据到磁盘（用于断点恢复）
         self.sync_data()
         self.put_event()
+
+    def on_order(self, order: OrderData) -> None:
+        """订单状态更新回调."""
+        self.write_log(
+            f"订单: {order.vt_orderid} "
+            f"{order.direction.value} {order.offset.value} "
+            f"{order.volume}@{order.price:.0f} -> {order.status.value}"
+        )
+        self.put_event()  # 刷新 GUI 显示

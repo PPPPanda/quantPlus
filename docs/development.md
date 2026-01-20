@@ -270,7 +270,10 @@ uv run python -m qp.backtest.run_cta_backtest --strategy CtaTurtleEnhancedStrate
 ### 策略模板要点
 
 ```python
-from vnpy.trader.utility import ArrayManager
+from typing import Optional
+from vnpy.trader.object import BarData, TickData
+from vnpy.trader.utility import ArrayManager, BarGenerator
+from vnpy.trader.constant import Interval
 from vnpy_ctastrategy import CtaTemplate
 
 class MyStrategy(CtaTemplate):
@@ -278,7 +281,9 @@ class MyStrategy(CtaTemplate):
 
     # 参数（GUI 可见）
     param1: int = 10
-    parameters = ["param1"]
+    bar_window: int = 1           # K线窗口（1=1分钟, 15=15分钟）
+    bar_interval: str = "MINUTE"  # K线周期类型
+    parameters = ["param1", "bar_window", "bar_interval"]
 
     # 变量（GUI 可见）
     var1: float = 0.0
@@ -288,21 +293,66 @@ class MyStrategy(CtaTemplate):
         super().__init__(cta_engine, strategy_name, vt_symbol, setting)
         # ArrayManager size 必须覆盖所有窗口 + buffer
         self.am = ArrayManager(size=self.param1 + 20)
+        # K线生成器（实盘使用）
+        self.bg: Optional[BarGenerator] = None
 
     def on_init(self):
+        # 创建 K 线生成器（实盘时 Tick -> Bar）
+        interval = Interval.HOUR if self.bar_interval == "HOUR" else Interval.MINUTE
+        if self.bar_window <= 1 and interval == Interval.MINUTE:
+            self.bg = BarGenerator(self.on_bar)
+        else:
+            self.bg = BarGenerator(
+                self.on_bar,
+                window=self.bar_window,
+                on_window_bar=self.on_bar,
+                interval=interval,
+            )
         self.load_bar(10)  # 预加载历史数据
 
-    def on_bar(self, bar):
+    def on_tick(self, tick: TickData):
+        """实盘时由 CTA 引擎调用，将 Tick 转换为 Bar"""
+        if self.bg:
+            self.bg.update_tick(tick)
+
+    def on_bar(self, bar: BarData):
         self.am.update_bar(bar)
         if not self.am.inited:
             return  # warm-up 未完成，不交易
         # 交易逻辑...
 ```
 
+### K 线生成机制（重要）
+
+**回测与实盘的数据流差异**：
+
+| 场景 | 数据流 | 说明 |
+|------|--------|------|
+| 回测 | 数据库 → BacktestingEngine → `on_bar()` | 引擎直接推送历史 Bar 数据 |
+| 实盘 | 交易所 → CTA Engine → `on_tick()` → BarGenerator → `on_bar()` | 需要手动转换 Tick → Bar |
+
+**关键点**：
+- 回测时 `on_bar()` 由引擎直接调用，`on_tick()` 不会被调用
+- 实盘时 CTA 引擎只推送 `on_tick()`，**不会自动调用 `on_bar()`**
+- 因此策略**必须**实现 `BarGenerator` 来支持实盘交易
+
+**BarGenerator 工作原理**：
+```
+Tick 数据 → BarGenerator.update_tick() → 1 分钟 Bar → on_bar()
+                                       ↓
+                                   （可选）合成 N 分钟/小时 Bar → on_window_bar()
+```
+
+**K 线周期配置**：
+- `bar_window=1, bar_interval="MINUTE"`: 1 分钟线（默认）
+- `bar_window=15, bar_interval="MINUTE"`: 15 分钟线
+- `bar_window=1, bar_interval="HOUR"`: 1 小时线
+
 ### 工程最佳实践
 
 | 要点 | 说明 |
 |------|------|
+| **BarGenerator 必需** | 实盘交易必须在 `on_tick()` 中调用 `bg.update_tick()` |
 | **Warm-up 防护** | `ArrayManager size = max(所有窗口) + 20`，防止 0 成交 |
 | **Look-ahead 防护** | 计算指标时使用 `[-window-1:-1]` 切片，避免使用当前 bar |
 | **止损单管理** | 每根 bar 调用 `cancel_all()` 后重新挂止损单 |
@@ -317,6 +367,27 @@ class MyStrategy(CtaTemplate):
 # .vntrader/strategies/{策略文件名}.py
 from qp.strategies.{策略模块} import {策略类名}
 ```
+
+### 实盘运行检查清单
+
+**启动前确认**：
+- [ ] 网关连接成功（日志: "行情服务器登录成功" + "交易服务器登录成功"）
+- [ ] 合约信息已加载（日志: "行情订阅" 无失败警告）
+- [ ] 策略初始化完成（日志: "策略初始化完成"）
+- [ ] ArrayManager 已初始化（通常需要 max_window + buffer_size 根 K 线）
+- [ ] 策略已启动（`strategy.trading = True`）
+- [ ] Tick 数据正常推送（日志: on_tick 调用）
+- [ ] K 线成功生成（日志: on_bar 调用）
+
+**常见问题排查**：
+
+| 问题 | 可能原因 | 解决方法 |
+|------|---------|---------|
+| 策略不交易 | `trading=False` | 确认已点击"启动"按钮 |
+| 没有收到行情 | 合约未订阅/网关断开 | 检查日志中的行情订阅记录 |
+| 历史数据加载失败 | 数据源不可用 | 在 `load_bar()` 中设置 `use_database=True` |
+| K 线不生成 | BarGenerator 配置错误 | 检查 `bar_window` 和 `bar_interval` 参数 |
+| ArrayManager 不初始化 | 历史数据不足 | 增加 `load_bar()` 的天数 |
 
 ### 回测验证
 

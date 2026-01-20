@@ -9,6 +9,12 @@
 4. 双系统切换：根据市场波动率自动切换长短周期
 5. 更激进的仓位管理：提高风险预算
 
+K线周期说明：
+- 回测时：直接使用数据库中对应周期的 K 线数据
+- 实盘时：通过 BarGenerator 将 Tick 合成为指定周期的 K 线
+- bar_window: K线窗口大小（1=1分钟, 15=15分钟, 60=60分钟）
+- bar_interval: K线周期类型 ("MINUTE" 或 "HOUR")
+
 参考来源：
 - 增强版唐奇安通道策略 (CSDN)
 - 海龟交易法则优化 (知乎/掘金量化)
@@ -24,7 +30,8 @@ from typing import Any, Optional
 import numpy as np
 
 from vnpy.trader.object import BarData, TickData, TradeData, OrderData
-from vnpy.trader.utility import ArrayManager
+from vnpy.trader.utility import ArrayManager, BarGenerator
+from vnpy.trader.constant import Interval
 from vnpy_ctastrategy import CtaTemplate
 from vnpy_ctastrategy.base import StopOrder
 
@@ -87,6 +94,10 @@ class CtaTurtleEnhancedStrategy(CtaTemplate):
     enable_short: bool = True
     debug: bool = False
 
+    # K线周期参数（实盘使用）
+    bar_window: int = 1             # K线窗口大小（1=1分钟, 15=15分钟）
+    bar_interval: str = "MINUTE"    # K线周期类型 ("MINUTE" 或 "HOUR")
+
     parameters: list[str] = [
         "entry_window", "exit_window",
         "trend_ma_fast", "trend_ma_slow", "use_trend_filter",
@@ -98,6 +109,7 @@ class CtaTurtleEnhancedStrategy(CtaTemplate):
         "use_dual_system", "s2_entry_window", "s2_exit_window",
         "contract_size", "base_capital",
         "enable_short", "debug",
+        "bar_window", "bar_interval",
     ]
 
     # -------------------------
@@ -145,6 +157,9 @@ class CtaTurtleEnhancedStrategy(CtaTemplate):
 
         self.am = ArrayManager(size=self._am_size)
 
+        # K线生成器（实盘时将 Tick 转换为 Bar）
+        self.bg: Optional[BarGenerator] = None
+
         # 交易状态
         self._entry_price: float = 0.0
         self._last_pyramid_price: Optional[float] = None
@@ -159,7 +174,28 @@ class CtaTurtleEnhancedStrategy(CtaTemplate):
 
     def on_init(self) -> None:
         self.write_log(f"策略初始化: {self.strategy_name}")
-        self.load_bar(max(10, self._am_size // 20))
+
+        # 创建 K 线生成器（实盘时 Tick -> Bar）
+        interval = Interval.HOUR if self.bar_interval == "HOUR" else Interval.MINUTE
+        if self.bar_window <= 1 and interval == Interval.MINUTE:
+            # 1 分钟线：直接使用 on_bar 作为回调
+            self.bg = BarGenerator(self.on_bar)
+        else:
+            # N 分钟/小时线：先生成 1 分钟线，再合成目标周期
+            self.bg = BarGenerator(
+                self.on_bar,  # 1 分钟线回调（用于预热历史数据）
+                window=self.bar_window,
+                on_window_bar=self.on_bar,  # 目标周期回调
+                interval=interval,
+            )
+        self.write_log(
+            f"K线生成器: window={self.bar_window}, interval={self.bar_interval}"
+        )
+
+        # 加载历史数据（周期需与 bar_interval 匹配）
+        # 注意：load_bar 的 interval 参数决定从数据库加载的 K 线周期
+        load_interval = Interval.HOUR if self.bar_interval == "HOUR" else Interval.MINUTE
+        self.load_bar(max(10, self._am_size // 20), interval=load_interval)
         self.write_log("策略初始化完成")
 
     def on_start(self) -> None:
@@ -171,7 +207,9 @@ class CtaTurtleEnhancedStrategy(CtaTemplate):
         self.put_event()
 
     def on_tick(self, tick: TickData) -> None:
-        pass
+        """Tick 数据回调（实盘时由 CTA 引擎调用）."""
+        if self.bg:
+            self.bg.update_tick(tick)
 
     def on_bar(self, bar: BarData) -> None:
         self._bar_count += 1
@@ -454,7 +492,13 @@ class CtaTurtleEnhancedStrategy(CtaTemplate):
         self.put_event()
 
     def on_order(self, order: OrderData) -> None:
-        pass
+        """订单状态更新回调."""
+        self.write_log(
+            f"订单: {order.vt_orderid} "
+            f"{order.direction.value} {order.offset.value} "
+            f"{order.volume}@{order.price:.0f} -> {order.status.value}"
+        )
+        self.put_event()  # 刷新 GUI 显示
 
     def on_stop_order(self, stop_order: StopOrder) -> None:
         pass
