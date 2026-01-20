@@ -364,17 +364,101 @@ uv run python scripts/convert_png_to_ico.py
 
 ---
 
-## 十二、后续计划
+## 十二、CTA回测K线图表集成
 
-- [ ] MACD 参数配置对话框
-- [ ] 零轴线显示
-- [ ] 金叉死叉标记
-- [ ] BOLL 布林带指标
-- [ ] RSI/KDJ 等更多指标
-- [ ] 持仓量图例显示
+### 12.1 功能概述
+
+将增强K线图表集成到 CTA 回测模块，替换原有的 `CandleChartDialog`。回测完成后点击"K线图表"按钮，显示增强版图表（含 MACD、持仓量、交易信号）。
+
+### 12.2 功能特性
+
+| 功能 | 说明 | 状态 |
+|------|------|------|
+| 增强图表布局 | K线 + MACD + 成交量+持仓量 | ✅ 完成 |
+| 交易标记 | 箭头显示买入/卖出点位 | ✅ 完成 |
+| 盈亏连线 | 虚线连接开仓/平仓点 | ✅ 完成 |
+| 交易图例 | 顶部图例说明各类标记含义 | ✅ 完成 |
+| 实盘信号 | 实时显示策略交易信号 | 📋 待开发 |
+
+### 12.3 视觉设计
+
+| 元素 | 颜色 | 符号 | 说明 |
+|------|------|------|------|
+| 买入开仓 (BUY) | 黄色 | ↑ 向上箭头 | K线低点下方 |
+| 卖出平仓 (SELL) | 黄色 | ↓ 向下箭头 | K线高点上方 |
+| 卖出开仓 (SHORT) | 品红 | ↓ 向下箭头 | K线高点上方 |
+| 买入平仓 (COVER) | 品红 | ↑ 向上箭头 | K线低点下方 |
+| 盈利交易连线 | 红色 | 虚线 | 连接开仓和平仓点 |
+| 亏损交易连线 | 绿色 | 虚线 | 连接开仓和平仓点 |
+
+### 12.4 模块结构
+
+```
+src/qp/apps/enhanced_chart/
+└── ui/
+    └── backtest_dialog.py   # 增强版回测K线对话框
+
+src/qp/ui/
+└── profiles.py              # 集成：替换 CandleChartDialog
+```
+
+### 12.5 集成方式
+
+通过 monkey patch 在启动时替换 `vnpy_ctabacktester` 的 `CandleChartDialog`：
+
+```python
+# profiles.py
+def _patch_ctabacktester_chart() -> None:
+    """替换回测K线图表为增强版"""
+    from qp.apps.enhanced_chart.ui import EnhancedCandleChartDialog
+    import vnpy_ctabacktester.ui.widget as backtester_widget
+
+    backtester_widget.CandleChartDialog = EnhancedCandleChartDialog
+```
+
+### 12.6 接口兼容性
+
+`EnhancedCandleChartDialog` 完全兼容原有 `CandleChartDialog` 接口：
+
+```python
+class EnhancedCandleChartDialog(QDialog):
+    def is_updated(self) -> bool: ...
+    def update_history(self, history: list[BarData]) -> None: ...
+    def update_trades(self, trades: list[TradeData]) -> None: ...
+    def clear(self) -> None: ...
+```
+
+### 12.7 用户操作流程
+
+1. 在 CTA 回测模块中配置并运行回测
+2. 回测完成后点击"K线图表"按钮
+3. 系统显示增强版K线图表，包含：
+   - K线 + MA 均线（可添加）
+   - MACD 指标（DIF/DEA + 柱状图）
+   - 成交量 + 持仓量曲线
+   - 交易信号标记（买卖点、盈亏连线）
 
 ---
 
-**文档版本**: 1.1
-**最后更新**: 2026-01-19
+## 十三、后续计划
+
+### 近期计划
+- [ ] MACD 参数配置对话框
+- [ ] 零轴线显示
+- [ ] 持仓量图例显示
+
+### 中期计划
+- [ ] 实盘交易信号实时显示
+- [ ] 金叉死叉标记
+- [ ] BOLL 布林带指标
+
+### 远期计划
+- [ ] RSI/KDJ 等更多指标
+- [ ] 自定义指标支持
+- [ ] 图表截图/导出功能
+
+---
+
+**文档版本**: 1.3
+**最后更新**: 2026-01-20
 **状态**: ✅ 生产就绪

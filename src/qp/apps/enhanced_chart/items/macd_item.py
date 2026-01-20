@@ -297,13 +297,27 @@ class MACDItem(ChartItem):
         Returns:
             (最小值, 最大值)
         """
-        if not self._dif_values and not self._dea_values and not self._macd_values:
-            return 0.0, 1.0
+        # 确定范围
+        all_bars = self._manager.get_all_bars()
+        if not all_bars:
+            return -1.0, 1.0
+
+        start_ix = min_ix if min_ix is not None else 0
+        end_ix = max_ix if max_ix is not None else len(all_bars) - 1
 
         # 收集可见范围内的所有值
         values = []
 
-        for ix in range(min_ix or 0, (max_ix or len(self._manager.get_all_bars())) + 1):
+        for ix in range(start_ix, end_ix + 1):
+            # 如果缓存中没有，主动计算
+            if ix not in self._dif_values:
+                bar = self._manager.get_bar(ix)
+                if bar:
+                    dif, dea, macd = self._calculate_macd(ix)
+                    self._dif_values[ix] = dif
+                    self._dea_values[ix] = dea
+                    self._macd_values[ix] = macd
+
             dif = self._dif_values.get(ix)
             dea = self._dea_values.get(ix)
             macd = self._macd_values.get(ix)
@@ -316,13 +330,23 @@ class MACDItem(ChartItem):
                 values.append(macd)
 
         if not values:
-            return 0.0, 1.0
+            return -1.0, 1.0
 
         min_value = min(values)
         max_value = max(values)
 
-        # 添加一些边距
-        margin = (max_value - min_value) * 0.1
+        # 确保范围有效且包含0轴
+        if min_value > 0:
+            min_value = 0
+        if max_value < 0:
+            max_value = 0
+
+        # 添加边距（至少10%）
+        range_val = max_value - min_value
+        if range_val < 0.001:
+            range_val = 1.0
+        margin = range_val * 0.15
+
         return min_value - margin, max_value + margin
 
     def get_info_text(self, ix: int) -> str:

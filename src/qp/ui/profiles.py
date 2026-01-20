@@ -72,6 +72,23 @@ def _try_import_enhanced_chart() -> type[BaseApp] | None:
         return _try_import_app("vnpy_chartwizard", "ChartWizardApp")
 
 
+def _patch_ctabacktester_chart() -> None:
+    """
+    替换 vnpy_ctabacktester 的 CandleChartDialog 为增强版.
+
+    这样在回测结果中点击"K线图表"按钮时，会显示增强版图表（含MACD、持仓量等）。
+    """
+    try:
+        from qp.apps.enhanced_chart.ui import EnhancedCandleChartDialog
+        import vnpy_ctabacktester.ui.widget as backtester_widget
+
+        # 替换 CandleChartDialog
+        backtester_widget.CandleChartDialog = EnhancedCandleChartDialog
+        logger.info("已替换回测K线图表为增强版: EnhancedCandleChartDialog")
+    except Exception as e:
+        logger.warning("替换回测K线图表失败: %s，使用原版", e)
+
+
 def _get_trade_apps() -> list[type[BaseApp]]:
     """获取 trade profile 的 App 列表."""
     apps: list[type[BaseApp] | None] = []
@@ -99,6 +116,9 @@ def _get_research_apps() -> list[type[BaseApp]]:
     # 必需：CTA 回测
     apps.append(_try_import_app("vnpy_ctabacktester", "CtaBacktesterApp"))
 
+    # 替换回测K线图表为增强版
+    _patch_ctabacktester_chart()
+
     # 必需：数据管理
     apps.append(_try_import_app("vnpy_datamanager", "DataManagerApp"))
 
@@ -120,6 +140,10 @@ def _get_all_apps() -> list[type[BaseApp]]:
 
     # === Research 相关 ===
     apps.append(_try_import_app("vnpy_ctabacktester", "CtaBacktesterApp"))
+
+    # 替换回测K线图表为增强版
+    _patch_ctabacktester_chart()
+
     apps.append(_try_import_app("vnpy_datamanager", "DataManagerApp"))
     apps.append(_try_import_enhanced_chart())  # 使用增强版
 
