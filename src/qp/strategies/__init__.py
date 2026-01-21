@@ -4,10 +4,12 @@ from qp.strategies.base import QuantPlusCtaStrategy
 from qp.strategies.cta_palm_oil import CtaPalmOilStrategy
 from qp.strategies.cta_turtle_enhanced import CtaTurtleEnhancedStrategy
 from qp.strategies.cta_chan_v1 import CtaChanV1Strategy
+from qp.strategies.cta_chan_pivot import CtaChanPivotStrategy
 
 __all__ = [
     "QuantPlusCtaStrategy",
     "CtaPalmOilStrategy",
     "CtaTurtleEnhancedStrategy",
     "CtaChanV1Strategy",
+    "CtaChanPivotStrategy",
 ]
