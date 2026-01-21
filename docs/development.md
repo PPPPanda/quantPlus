@@ -348,6 +348,70 @@ Tick 数据 → BarGenerator.update_tick() → 1 分钟 Bar → on_bar()
 - `bar_window=15, bar_interval="MINUTE"`: 15 分钟线
 - `bar_window=1, bar_interval="HOUR"`: 1 小时线
 
+### K 线合成时间戳对齐（重要）
+
+**问题背景**：
+
+VNPY 原生 `BarGenerator` 与 pandas `resample` 的 K 线时间戳对齐方式不同，导致策略在不同环境下结果不一致。
+
+| 方式 | 时间戳风格 | 09:01-09:05 数据的时间戳 | 说明 |
+|------|-----------|------------------------|------|
+| VNPY BarGenerator | `label='left'` | **09:00** | 窗口开始时间 |
+| pandas resample | `label='right'` | **09:05** | 窗口结束时间 |
+
+**影响**：时间戳差异会导致分型检测、MACD 对齐等逻辑在相同数据上产生不同结果。
+
+**解决方案：PandasStyleBarGenerator**
+
+为保证回测与研究代码（pandas）结果一致，项目提供 `PandasStyleBarGenerator`：
+
+```python
+class PandasStyleBarGenerator:
+    """
+    pandas 风格的 K 线合成器.
+
+    与 pandas resample('5min', label='right', closed='right') 一致：
+    - 09:01-09:05 的数据合成为时间戳 09:05 的 K 线
+    """
+
+    def __init__(self, window: int, on_window_bar, on_bar=None):
+        self.window = window
+        self.on_window_bar = on_window_bar
+        # ...
+
+    def _get_window_end(self, dt: datetime) -> datetime:
+        """计算窗口结束时间（用作 K 线时间戳）"""
+        minute = dt.minute
+        window_start_minute = (minute // self.window) * self.window
+        window_end = dt.replace(minute=window_start_minute, second=0, microsecond=0)
+        window_end += timedelta(minutes=self.window)
+        return window_end
+
+    def update_bar(self, bar: BarData) -> None:
+        """从 1 分钟 K 线合成 N 分钟 K 线（回测用）"""
+        window_end = self._get_window_end(bar.datetime)
+        # 使用窗口结束时间作为时间戳
+        self._current_bar = BarData(datetime=window_end, ...)
+
+    def update_tick(self, tick: TickData) -> None:
+        """从 Tick 合成 K 线（实盘用）"""
+        # Tick → 1m Bar → Nm Bar
+```
+
+**使用场景**：
+
+| 场景 | 推荐方式 | 原因 |
+|------|---------|------|
+| 与 pandas 研究代码对比验证 | `PandasStyleBarGenerator` | 时间戳一致，结果可复现 |
+| 纯 VNPY 环境 | 原生 `BarGenerator` | 兼容性好 |
+| 多周期策略（如 5m + 15m MACD） | `PandasStyleBarGenerator` | 避免周期对齐偏差 |
+
+**注意事项**：
+
+1. **回测与实盘一致性**：`PandasStyleBarGenerator` 同时实现了 `update_bar()`（回测）和 `update_tick()`（实盘），确保两者 K 线合成逻辑一致
+2. **输入必须是 1 分钟 K 线**：策略的 `on_bar()` 接收 1 分钟数据，由合成器生成 N 分钟 K 线
+3. **VNPY BarGenerator 已知问题**：小时线合成存在边界 bug（GitHub Issue #2775），建议使用自定义合成器
+
 ### 工程最佳实践
 
 | 要点 | 说明 |
@@ -361,12 +425,44 @@ Tick 数据 → BarGenerator.update_tick() → 1 分钟 Bar → on_bar()
 
 ### GUI 可见性
 
-策略需要放置桥接文件才能在 GUI 中显示：
+策略需要放置桥接文件才能在 GUI 中显示。
+
+**重要**：vnpy_ctastrategy 从 `Path.cwd().joinpath("strategies")` 加载策略，即**项目根目录下的 `strategies/` 文件夹**，而不是 `.vntrader/strategies/`。
 
 ```bash
-# .vntrader/strategies/{策略文件名}.py
+# strategies/{策略文件名}.py （项目根目录）
 from qp.strategies.{策略模块} import {策略类名}
 ```
+
+**示例**：
+```
+quantPlus/
+├── strategies/                    # vnpy_ctastrategy 加载策略的目录
+│   ├── cta_palm_oil.py           # 桥接文件
+│   ├── cta_turtle_enhanced.py    # 桥接文件
+│   └── cta_chan_v1.py            # 桥接文件
+└── src/qp/strategies/            # 策略源码目录
+    ├── cta_palm_oil.py           # 策略实现
+    ├── cta_turtle_enhanced.py    # 策略实现
+    └── cta_chan_v1.py            # 策略实现
+```
+
+**桥接文件内容**（只需一行导入）：
+```python
+from qp.strategies.cta_chan_v1 import CtaChanV1Strategy
+```
+
+**注意**：修改桥接文件后，需要重启 GUI 才能生效。如果仍不显示，尝试删除 `strategies/__pycache__/` 缓存目录。
+
+**关于 `.vntrader/` 目录**：
+
+`.vntrader/` 目录是 vnpy 的**配置文件目录**，**不是策略加载目录**。它用于存储：
+- 网关连接配置：`connect_ctp.json`、`connect_tts.json`
+- 策略运行配置：`cta_strategy_setting.json`
+- 策略运行数据：`cta_strategy_data.json`
+- 全局设置：`vt_setting.json`
+
+**实盘和回测都从同一个 `strategies/` 目录加载策略**，没有区分。
 
 ### 实盘运行检查清单
 
@@ -459,18 +555,166 @@ uv run python -m qp.backtest.run_cta_backtest --strategy CtaTurtleEnhancedStrate
 | 迅投研 (XTQuant) | **主数据源** | Tick/分钟数据，支持 Token 连接 |
 | akshare (新浪) | 备用 | 有限历史深度，无 Tick |
 
-### 迅投研配置
+### 迅投研 Token 模式配置
 
-使用 vnpy_xt 包进行数据获取，支持 Token 连接（无需 QMT 客户端）：
+迅投研支持两种连接方式：
+1. **QMT 客户端模式**：需要启动 QMT 客户端
+2. **Token 模式**：无需客户端，直接使用 Token 连接（推荐）
 
-```python
-# 配置 settings.json
+**Token 配置文件**：`.vntrader/vt_setting.json`
+
+```json
 {
     "datafeed.name": "xt",
-    "datafeed.username": "client",  # Token 模式
-    "datafeed.password": "<your_token>"
+    "datafeed.username": "token",
+    "datafeed.password": "<your_xtquant_token>"
 }
 ```
+
+**Token 获取**：登录迅投研官网或 QMT 客户端获取 API Token。
+
+### 迅投研数据下载方法
+
+#### 方法一：使用 xtdatacenter Token 模式（推荐）
+
+适用于**无 QMT 客户端环境**，直接使用 Token 下载数据。
+
+```python
+from xtquant import xtdatacenter as xtdc
+from xtquant import xtdata
+import json
+import time
+
+# 1. 读取 Token 配置
+with open(".vntrader/vt_setting.json") as f:
+    settings = json.load(f)
+token = settings.get("datafeed.password", "")
+
+# 2. 初始化 xtdatacenter
+xtdc.set_token(token)
+xtdc.set_future_realtime_mode(True)  # 期货实时模式
+xtdc.init(False)                      # False = 不启动 GUI
+xtdc.listen(port=58610)               # 启动本地服务
+
+# 3. 等待服务启动
+time.sleep(2)
+
+# 4. 连接 xtdata
+xtdata.enable_hello = False
+xtdata.connect('127.0.0.1', 58610)
+
+# 5. 下载历史数据到本地缓存
+xt_symbol = "p2505.DF"  # 合约代码.交易所（DCE=DF, SHFE=SF, CZCE=ZF）
+xtdata.download_history_data(
+    stock_code=xt_symbol,
+    period='1m',           # 周期: tick, 1m, 5m, 15m, 30m, 1h, 1d
+    start_time='20241101', # 开始日期 YYYYMMDD
+    end_time='20250430',   # 结束日期 YYYYMMDD
+)
+
+# 6. 获取数据
+data = xtdata.get_market_data(
+    field_list=[],          # 空列表=所有字段
+    stock_list=[xt_symbol],
+    period='1m',
+    start_time='20241101',
+    end_time='20250430',
+    fill_data=True,         # 填充缺失数据
+)
+
+# 7. 数据格式说明
+# data 返回格式: {field_name: DataFrame}
+# DataFrame 的列是时间戳（如 '20250120213900'），行是股票代码
+# 示例: data['open'].loc['p2505.DF'] 获取开盘价序列
+
+# 8. 关闭服务
+try:
+    xtdc.shutdown()
+except Exception:
+    pass
+```
+
+**交易所代码映射**：
+
+| 交易所 | vnpy Exchange | xtquant 代码 |
+|--------|---------------|--------------|
+| 大连商品交易所 | DCE | DF |
+| 上海期货交易所 | SHFE | SF |
+| 郑州商品交易所 | CZCE | ZF |
+| 中国金融期货交易所 | CFFEX | IF |
+| 上海国际能源交易中心 | INE | INE |
+
+**数据周期**：
+
+| 周期参数 | 说明 |
+|----------|------|
+| `tick` | Tick 数据 |
+| `1m` | 1 分钟 K 线 |
+| `5m` | 5 分钟 K 线 |
+| `15m` | 15 分钟 K 线 |
+| `30m` | 30 分钟 K 线 |
+| `1h` | 1 小时 K 线 |
+| `1d` | 日 K 线 |
+
+#### 方法二：使用项目封装的下载脚本
+
+项目提供了封装好的下载脚本：
+
+```bash
+# 下载棕榈油期货分钟数据
+uv run python scripts/download_p2505.py
+
+# 使用 CLI 工具下载（需要 QMT 客户端或配置好 Token）
+uv run python -m qp.datafeed.download_palm_oil --symbol p2505 --days 365 --interval 1m --output data/analyse
+```
+
+**脚本位置**：
+- `scripts/download_p2505.py` - 直接使用 xtdatacenter Token 模式
+- `src/qp/datafeed/download_palm_oil.py` - CLI 工具（Tick → K 线合成）
+- `src/qp/datafeed/xtquant_feed.py` - XTQuantDatafeed 类封装
+
+#### 方法三：使用 XTQuantDatafeed 类
+
+适用于程序化调用：
+
+```python
+from qp.datafeed.xtquant_feed import XTQuantDatafeed
+from vnpy.trader.object import HistoryRequest
+from vnpy.trader.constant import Exchange, Interval
+from datetime import datetime
+
+# 初始化数据源
+feed = XTQuantDatafeed()
+feed.init()
+
+# 创建请求
+req = HistoryRequest(
+    symbol="p2505",
+    exchange=Exchange.DCE,
+    start=datetime(2024, 11, 1),
+    end=datetime(2025, 4, 30),
+    interval=Interval.MINUTE,
+)
+
+# 查询 K 线数据
+bars = feed.query_bar_history(req)
+print(f"获取到 {len(bars)} 条 K 线数据")
+
+# 查询 Tick 数据
+ticks = feed.query_tick_history(req)
+print(f"获取到 {len(ticks)} 条 Tick 数据")
+
+feed.close()
+```
+
+### 数据缓存
+
+xtquant 下载的数据会缓存在本地：
+
+| 缓存位置 | 说明 |
+|----------|------|
+| `.venv/Lib/site-packages/xtquant/config/` | xtquant 配置 |
+| `data/datadir/DF/60/` | 期货分钟数据缓存（.DAT 文件） |
 
 ### 支持的数据周期
 
@@ -568,29 +812,37 @@ synthesizer = SessionBarSynthesizer(sessions=custom_sessions)
 
 ---
 
-## 12. 数据获取示例
+## 12. 数据获取示例（快速参考）
 
-### 迅投研分钟数据（推荐）
+> 详细说明见第 10 节「数据获取」。
+
+### 迅投研分钟数据（Token 模式）
+
+```bash
+# 使用项目封装的下载脚本
+uv run python scripts/download_p2505.py
+```
+
+### 程序化调用
 
 ```python
-from vnpy_xt import Datafeed
+from qp.datafeed.xtquant_feed import XTQuantDatafeed
 from vnpy.trader.object import HistoryRequest
 from vnpy.trader.constant import Exchange, Interval
 from datetime import datetime
 
-# 初始化
-datafeed = Datafeed()
-datafeed.init()
+feed = XTQuantDatafeed()
+feed.init()
 
-# 查询分钟数据
 req = HistoryRequest(
-    symbol="p00",
+    symbol="p2505",
     exchange=Exchange.DCE,
-    start=datetime(2024, 1, 1),
-    end=datetime(2025, 1, 1),
-    interval=Interval.MINUTE
+    start=datetime(2025, 1, 1),
+    end=datetime(2025, 4, 30),
+    interval=Interval.MINUTE,
 )
-bars = datafeed.query_bar_history(req)
+bars = feed.query_bar_history(req)
+feed.close()
 ```
 
 ### akshare 备用数据源
@@ -598,7 +850,7 @@ bars = datafeed.query_bar_history(req)
 ```python
 import akshare as ak
 
-# 拉取60分钟数据
+# 拉取60分钟数据（有限历史深度）
 df = ak.futures_zh_minute_sina(symbol='P0', period='60')
 print(df.head())
 ```
