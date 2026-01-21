@@ -366,7 +366,7 @@ uv run python -m qp.runtime.trader_app --profile research
 | 问题 | 原因 | 解决方案 |
 |------|------|----------|
 | 回测 0 成交 | K线周期设置错误 | 60分钟数据必须填 `1h`，不是 `60` 或 `h` |
-| 找不到策略 | 桥接文件缺失 | 点击「策略重载」或检查 `.vntrader/strategies/` |
+| 找不到策略 | 桥接文件缺失 | 检查 `strategies/` 目录（项目根目录）是否有桥接文件 |
 | 数据量为 0 | vt_symbol 不匹配 | 确保本地代码填 `p0.DCE`（区分大小写） |
 | ArrayManager 未初始化 | 数据不足 | 该策略需要 > 130 条数据（trend_ma_slow=100 + buffer） |
 
