@@ -854,3 +854,126 @@ import akshare as ak
 df = ak.futures_zh_minute_sina(symbol='P0', period='60')
 print(df.head())
 ```
+
+---
+
+## 13. 数据清洗规范（重要）
+
+### 问题背景
+
+迅投研下载数据时使用 `fill_data=True` 参数会自动填充非交易时段的数据，导致：
+
+1. **K线数量虚增** - 非交易时段被填充了假K线
+2. **技术指标失真** - 零成交K线参与MA/MACD计算
+3. **回测结果偏差** - 策略可能在"假K线"上产生信号
+4. **K线图错位** - GUI中显示大量平直的假K线
+
+### 问题示例
+
+以 rb2505（螺纹钢）为例，原始下载数据：
+
+| 指标 | 原始数据 | 清理后 |
+|------|----------|--------|
+| 数据量 | 35,369 条 | 22,080 条 |
+| 填充数据占比 | 38% | 0% |
+| 零成交K线 | 13,650 条 | 极少 |
+
+填充数据特征：
+- 时间戳在 0:00-2:00、23:01-23:59 等非交易时段
+- OHLC 四价相同（等于前一交易时段收盘价）
+- 成交量和持仓量为 0
+
+### 各交易所交易时段
+
+#### 上期所 SHFE（螺纹钢 rb、热卷等）
+
+| 时段 | 时间 |
+|------|------|
+| 日盘1 | 09:00 - 10:15 |
+| 日盘2 | 10:30 - 11:30 |
+| 日盘3 | 13:30 - 15:00 |
+| 夜盘 | 21:00 - 23:00 |
+
+#### 大商所 DCE（棕榈油 p、豆粕等）
+
+| 时段 | 时间 |
+|------|------|
+| 日盘1 | 09:00 - 10:15 |
+| 日盘2 | 10:30 - 11:30 |
+| 日盘3 | 13:30 - 15:00 |
+| 夜盘 | 21:00 - 23:00 |
+
+#### 郑商所 CZCE（纯碱 SA、甲醇 MA、玻璃 FG）
+
+| 时段 | 时间 |
+|------|------|
+| 日盘1 | 09:00 - 10:15 |
+| 日盘2 | 10:30 - 11:30 |
+| 日盘3 | 13:30 - 15:00 |
+| 夜盘 | 21:00 - 23:00 |
+
+### 数据清洗方法
+
+使用项目提供的清洗脚本：
+
+```bash
+# 清洗所有数据
+uv run python scripts/clean_trading_hours.py
+```
+
+或在代码中手动清洗：
+
+```python
+import pandas as pd
+
+def is_trading_time(row):
+    """判断是否为交易时段."""
+    h, m = row['hour'], row['minute']
+    # 09:00-10:15
+    if h == 9: return True
+    if h == 10 and m <= 15: return True
+    # 10:30-11:30
+    if h == 10 and m >= 30: return True
+    if h == 11 and m <= 30: return True
+    # 13:30-15:00
+    if h == 13 and m >= 30: return True
+    if h == 14: return True
+    if h == 15 and m == 0: return True
+    # 21:00-23:00
+    if h == 21: return True
+    if h == 22: return True
+    if h == 23 and m == 0: return True
+    return False
+
+df['datetime'] = pd.to_datetime(df['datetime'])
+df['hour'] = df['datetime'].dt.hour
+df['minute'] = df['datetime'].dt.minute
+df['is_trading'] = df.apply(is_trading_time, axis=1)
+df_clean = df[df['is_trading']].drop(columns=['hour', 'minute', 'is_trading'])
+```
+
+### 实盘 vs 回测数据对比
+
+| 特征 | 填充数据 | 清理后数据 | 实盘数据 |
+|------|----------|------------|----------|
+| 非交易时段K线 | 有（填充） | 无 | **无** |
+| 零成交K线占比 | 高 | 极低 | **极低** |
+| K线时间连续性 | 0:00-23:59 | 只有交易时段 | **只有交易时段** |
+| 技术指标准确性 | 失真 | 准确 | **准确** |
+
+**结论**：清理后的数据更接近实盘，回测结果更可靠。
+
+### 下载数据时避免填充
+
+在调用 `xtdata.get_market_data()` 时设置 `fill_data=False`：
+
+```python
+data = xtdata.get_market_data(
+    field_list=[],
+    stock_list=[xt_symbol],
+    period='1m',
+    start_time=start_str,
+    end_time=end_str,
+    fill_data=False,  # 关键：不填充非交易时段
+)
+```
