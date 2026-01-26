@@ -16,6 +16,7 @@ gui = [
 ]
 trade = [
     "vnpy-ctp>=6.7.11",
+    "vnpy-ctptest>=6.7.2",
     "vnpy-ctastrategy>=1.4.0",
     "vnpy-ctabacktester>=1.3.0",
     "vnpy-datamanager>=1.2.0",

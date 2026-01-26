@@ -31,9 +31,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--gateway",
         type=str,
-        choices=["ctp", "tts"],
+        choices=["ctp", "tts", "ctptest"],
         default="ctp",
-        help="交易网关: ctp=CTP/SimNow, tts=OpenCTP 7x24 (默认: ctp)",
+        help="交易网关: ctp=实盘/SimNow, tts=OpenCTP 7x24, ctptest=穿透式测试 (默认: ctp)",
     )
     parser.add_argument(
         "--verbose", "-v",
@@ -60,6 +60,15 @@ def main() -> None:
         except ImportError as e:
             logger.error("无法导入 vnpy_tts.TtsGateway: %s", e)
             logger.error("请确保已安装 vnpy_tts 模块: pip install vnpy_tts")
+            sys.exit(1)
+    elif args.gateway == "ctptest":
+        try:
+            from vnpy_ctptest import CtptestGateway
+            gateway_cls = CtptestGateway
+            gateway_name = "CTPTEST (穿透式测试)"
+        except ImportError as e:
+            logger.error("无法导入 vnpy_ctptest.CtptestGateway: %s", e)
+            logger.error("请确保已安装 vnpy_ctptest 模块: pip install vnpy-ctptest")
             sys.exit(1)
     else:  # ctp
         try:

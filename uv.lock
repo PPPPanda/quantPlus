@@ -2465,6 +2465,7 @@ trade = [
     { name = "vnpy-ctabacktester" },
     { name = "vnpy-ctastrategy" },
     { name = "vnpy-ctp" },
+    { name = "vnpy-ctptest" },
     { name = "vnpy-datamanager" },
     { name = "vnpy-datarecorder" },
     { name = "vnpy-paperaccount" },
@@ -2488,6 +2489,7 @@ requires-dist = [
     { name = "vnpy-ctabacktester", marker = "extra == 'trade'", specifier = ">=1.3.0" },
     { name = "vnpy-ctastrategy", marker = "extra == 'trade'", specifier = ">=1.4.0" },
     { name = "vnpy-ctp", marker = "extra == 'trade'", specifier = ">=6.7.11" },
+    { name = "vnpy-ctptest", marker = "extra == 'trade'", specifier = ">=6.7.2" },
     { name = "vnpy-datamanager", marker = "extra == 'trade'", specifier = ">=1.2.0" },
     { name = "vnpy-datarecorder", marker = "extra == 'trade'", specifier = ">=1.1.0" },
     { name = "vnpy-paperaccount", marker = "extra == 'trade'", specifier = ">=1.0.0" },
@@ -3137,6 +3139,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/0f/b1/8d46fa23164f9e859ea2dce88dfb693e9031d156f52c3e7a7e26b60a4d3c/vnpy_ctp-6.7.11.2.tar.gz", hash = "sha256:f9c0b9c183a2896d8b0cb2825ba2154909d7f476b1456eed8f7a5976a6ef133d", size = 12580621, upload-time = "2025-12-23T02:46:00.827Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3d/55/5f5e664b0d3f858d0f64aebbb8a4535eb5571713421d9d571aeb9feaaeca/vnpy_ctp-6.7.11.2-cp313-cp313-win_amd64.whl", hash = "sha256:254c6607f482eb7bd554a213a2ae8bd9b5ca3aeca88efe93a056804ad7519478", size = 3582240, upload-time = "2025-12-23T02:45:45.073Z" },
+]
+
+[[package]]
+name = "vnpy-ctptest"
+version = "6.7.2.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "vnpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/2b/22/d6c0823605b4e4c54bf1970f1e85dd5582fa939bf7d36d128cf61d0cf455/vnpy_ctptest-6.7.2.1.tar.gz", hash = "sha256:6cef379db9b9aff375e45889699667320658b786677d25ed075b82fcf4d55c5a", size = 6261838, upload-time = "2025-06-17T06:55:35.226Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8c/fc/097811ed920a41a15d230f7cb6aab84f08dc1fea4486544f8277c704a832/vnpy_ctptest-6.7.2.1-cp313-cp313-win_amd64.whl", hash = "sha256:29434c25f4ba20b60077cf14f3f29339293ede95ea4e89a6a0f56eed21b79122", size = 3495987, upload-time = "2025-06-17T06:55:28.369Z" },
 ]
 
 [[package]]
