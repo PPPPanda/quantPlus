@@ -33,6 +33,8 @@ from vnpy.trader.constant import Interval
 from vnpy_ctastrategy import CtaTemplate
 from vnpy_ctastrategy.base import StopOrder
 
+from qp.utils.chan_debugger import ChanDebugger
+
 logger = logging.getLogger(__name__)
 
 
@@ -77,11 +79,14 @@ class CtaChanPivotStrategy(CtaTemplate):
 
     # 调试
     debug: bool = False
+    debug_enabled: bool = True      # 是否启用Debug记录
+    debug_log_console: bool = True  # 是否输出到控制台
 
     parameters: list[str] = [
         "macd_fast", "macd_slow", "macd_signal",
         "atr_window", "atr_trailing_mult", "atr_activate_mult", "atr_entry_filter",
-        "min_bi_gap", "pivot_valid_range", "fixed_volume", "debug",
+        "min_bi_gap", "pivot_valid_range", "fixed_volume",
+        "debug", "debug_enabled", "debug_log_console",
     ]
 
     # -------------------------
@@ -160,6 +165,10 @@ class CtaChanPivotStrategy(CtaTemplate):
         # 5m bar 计数
         self._bar_5m_count: int = 0
 
+        # Debug工具
+        self._debugger: Optional[ChanDebugger] = None
+        self._signal_type: str = ""  # 当前信号类型(用于debug)
+
         logger.info("策略初始化: %s", strategy_name)
 
     def on_init(self) -> None:
@@ -167,6 +176,31 @@ class CtaChanPivotStrategy(CtaTemplate):
 
         # 创建 BarGenerator（实盘 Tick -> 1m Bar）
         self.bg = BarGenerator(self._on_1m_bar)
+
+        # 初始化Debug工具
+        if self.debug_enabled:
+            self._debugger = ChanDebugger(
+                strategy_name=self.strategy_name,
+                base_dir="data/debug",
+                enabled=True,
+                log_level="DEBUG",
+                log_console=self.debug_log_console
+            )
+            # 保存配置
+            self._debugger.save_config({
+                "strategy_name": self.strategy_name,
+                "vt_symbol": self.vt_symbol,
+                "macd_fast": self.macd_fast,
+                "macd_slow": self.macd_slow,
+                "macd_signal": self.macd_signal,
+                "atr_window": self.atr_window,
+                "atr_trailing_mult": self.atr_trailing_mult,
+                "atr_activate_mult": self.atr_activate_mult,
+                "atr_entry_filter": self.atr_entry_filter,
+                "min_bi_gap": self.min_bi_gap,
+                "pivot_valid_range": self.pivot_valid_range,
+                "fixed_volume": self.fixed_volume,
+            })
 
         # 加载历史数据（1 分钟）
         self.load_bar(60)
@@ -179,6 +213,9 @@ class CtaChanPivotStrategy(CtaTemplate):
 
     def on_stop(self) -> None:
         self.write_log("策略停止")
+        # 保存debug摘要
+        if self._debugger:
+            self._debugger.close()
         self.put_event()
 
     def on_tick(self, tick: TickData) -> None:
@@ -203,6 +240,10 @@ class CtaChanPivotStrategy(CtaTemplate):
             'close': bar.close_price,
             'volume': bar.volume,
         }
+
+        # Debug: 记录1分钟K线
+        if self._debugger:
+            self._debugger.log_kline_1m(bar_dict)
 
         # 1. 持仓管理：检查止损（1分钟级别）
         if self._position != 0:
@@ -376,6 +417,17 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._update_macd_5m(bar['close'])
         self._update_atr(bar)
 
+        # Debug: 记录5分钟K线和指标
+        if self._debugger:
+            self._debugger.log_kline_5m(
+                bar,
+                diff_5m=self.diff_5m,
+                dea_5m=self.dea_5m,
+                atr=self.atr,
+                diff_15m=self._prev_diff_15m,
+                dea_15m=self._prev_dea_15m
+            )
+
         # 构建当前 bar 数据（包含指标）
         bar_data = {
             'datetime': bar['datetime'],
@@ -405,6 +457,25 @@ class CtaChanPivotStrategy(CtaTemplate):
         # 更新显示变量
         self.bi_count = len(self._bi_points)
         self.pivot_count = len(self._pivots)
+
+        # Debug: 记录缠论状态
+        if self._debugger:
+            self._debugger.log_chan_state(
+                k_lines_count=len(self._k_lines),
+                bi_count=len(self._bi_points),
+                pivot_count=len(self._pivots),
+                bi_points=self._bi_points,
+                pivots=self._pivots
+            )
+            # 记录持仓状态
+            if self._position != 0:
+                self._debugger.log_position_status(
+                    position=self._position,
+                    entry_price=self._entry_price,
+                    stop_price=self._stop_price,
+                    current_price=bar_data['close'],
+                    trailing_active=self._trailing_active
+                )
 
     def _process_inclusion(self, new_bar: dict) -> None:
         """包含处理."""
@@ -436,6 +507,16 @@ class CtaChanPivotStrategy(CtaTemplate):
             else:  # 向下包含
                 merged['high'] = min(last['high'], new_bar['high'])
                 merged['low'] = min(last['low'], new_bar['low'])
+
+            # Debug: 记录包含处理
+            if self._debugger:
+                self._debugger.log_inclusion(
+                    before_high=last['high'],
+                    before_low=last['low'],
+                    after_high=merged['high'],
+                    after_low=merged['low'],
+                    direction=self._inclusion_dir
+                )
 
             self._k_lines[-1] = merged
         else:
@@ -495,6 +576,13 @@ class CtaChanPivotStrategy(CtaTemplate):
             # 异向成笔（严格笔要求间隔 >= min_bi_gap）
             if cand['idx'] - last['idx'] >= self.min_bi_gap:
                 self._bi_points.append(cand)
+                # Debug: 记录新笔
+                if self._debugger:
+                    self._debugger.log_bi(
+                        cand,
+                        bi_idx=len(self._bi_points),
+                        k_lines_count=len(self._k_lines)
+                    )
                 return cand
             return None
 
@@ -526,6 +614,13 @@ class CtaChanPivotStrategy(CtaTemplate):
                 'end_bi_idx': len(self._bi_points) - 1
             }
             self._pivots.append(new_pivot)
+            # Debug: 记录新中枢
+            if self._debugger:
+                self._debugger.log_pivot(
+                    new_pivot,
+                    pivot_idx=len(self._pivots),
+                    status="confirmed"
+                )
 
     def _check_signal(self, curr_bar: dict, new_bi: dict) -> None:
         """检查交易信号."""
@@ -546,12 +641,12 @@ class CtaChanPivotStrategy(CtaTemplate):
         sig = None
         stop_base = 0.0
         trigger_price = 0.0
+        last_pivot = self._pivots[-1] if self._pivots else None
 
         # --------------------------------------------------------
         # 核心逻辑：Pivot 3B/3S
         # --------------------------------------------------------
-        if self._pivots:
-            last_pivot = self._pivots[-1]
+        if last_pivot:
 
             # --- 3B 买点 ---
             # 场景：向上离开中枢 + 回踩不破中枢高点 (ZG)
@@ -603,12 +698,39 @@ class CtaChanPivotStrategy(CtaTemplate):
             # 入场过滤：触发价与止损距离不超过 N 倍 ATR
             distance = abs(trigger_price - stop_base)
             if distance < self.atr_entry_filter * self.atr:
+                # 判断信号类型
+                if self._pivots and last_pivot:
+                    if p_now['type'] == 'bottom' and p_now['price'] > last_pivot['zg']:
+                        self._signal_type = "3B"
+                        reason = f"3B买点: 回踩不破中枢ZG={last_pivot['zg']:.0f}"
+                    elif p_now['type'] == 'top' and p_now['price'] < last_pivot['zd']:
+                        self._signal_type = "3S"
+                        reason = f"3S卖点: 回抽不破中枢ZD={last_pivot['zd']:.0f}"
+                    else:
+                        self._signal_type = "2B" if sig == 'Buy' else "2S"
+                        reason = f"{self._signal_type}: 背驰确认"
+                else:
+                    self._signal_type = "2B" if sig == 'Buy' else "2S"
+                    reason = f"{self._signal_type}: 背驰确认"
+
                 self._pending_signal = {
                     'type': sig,
                     'trigger_price': trigger_price,
                     'stop_base': stop_base
                 }
                 self.signal = f"待触发{sig}"
+
+                # Debug: 记录信号
+                if self._debugger:
+                    self._debugger.log_signal(
+                        signal_type=self._signal_type,
+                        direction=sig,
+                        trigger_price=trigger_price,
+                        stop_price=stop_base,
+                        atr=self.atr,
+                        reason=reason
+                    )
+
                 if self.debug:
                     self.write_log(f"[DEBUG] 信号生成: {sig}, trigger={trigger_price:.0f}, stop={stop_base:.0f}")
 
@@ -651,16 +773,29 @@ class CtaChanPivotStrategy(CtaTemplate):
             self._stop_price = stop_base - 1
             self.signal = "3B/2B买入"
             self.write_log(f"开多: price={price:.0f}, stop={self._stop_price:.0f}")
+            action = "OPEN_LONG"
         else:
             self.short(price, self.fixed_volume)
             self._stop_price = stop_base + 1
             self.signal = "3S/2S卖出"
             self.write_log(f"开空: price={price:.0f}, stop={self._stop_price:.0f}")
+            action = "OPEN_SHORT"
 
         self._position = direction
         self._entry_price = price
         self._trailing_active = False
         self._pending_signal = None
+
+        # Debug: 记录开仓
+        if self._debugger:
+            self._debugger.log_trade(
+                action=action,
+                price=price,
+                volume=self.fixed_volume,
+                position=direction,
+                pnl=0,
+                signal_type=self._signal_type
+            )
 
     def _check_stop_loss_1m(self, bar: dict) -> bool:
         """1分钟级别检查止损."""
@@ -677,12 +812,28 @@ class CtaChanPivotStrategy(CtaTemplate):
                 exit_price = bar['open'] if bar['open'] > self._stop_price else self._stop_price
 
         if sl_hit:
+            # 计算盈亏
             if self._position == 1:
+                pnl = exit_price - self._entry_price
                 self.sell(exit_price, abs(self.pos))
-                self.write_log(f"多头止损: price={exit_price:.0f}")
+                self.write_log(f"多头止损: price={exit_price:.0f}, pnl={pnl:.0f}")
+                action = "CLOSE_LONG"
             else:
+                pnl = self._entry_price - exit_price
                 self.cover(exit_price, abs(self.pos))
-                self.write_log(f"空头止损: price={exit_price:.0f}")
+                self.write_log(f"空头止损: price={exit_price:.0f}, pnl={pnl:.0f}")
+                action = "CLOSE_SHORT"
+
+            # Debug: 记录平仓
+            if self._debugger:
+                self._debugger.log_trade(
+                    action=action,
+                    price=exit_price,
+                    volume=self.fixed_volume,
+                    position=0,
+                    pnl=pnl,
+                    signal_type=self._signal_type
+                )
 
             self._position = 0
             self._trailing_active = False
