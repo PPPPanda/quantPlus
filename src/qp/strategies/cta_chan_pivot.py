@@ -241,18 +241,18 @@ class CtaChanPivotStrategy(CtaTemplate):
             'volume': bar.volume,
         }
 
-        # Debug: 记录1分钟K线
-        if self._debugger:
+        # Debug: 记录1分钟K线（仅实盘模式）
+        if self._debugger and self.trading:
             self._debugger.log_kline_1m(bar_dict)
 
-        # 1. 持仓管理：检查止损（1分钟级别）
-        if self._position != 0:
+        # 1. 持仓管理：检查止损（1分钟级别，仅实盘模式）
+        if self.trading and self._position != 0:
             if self._check_stop_loss_1m(bar_dict):
                 self.put_event()
                 return
 
-        # 2. 进场管理：检查待触发信号（1分钟级别）
-        if self._position == 0 and self._pending_signal:
+        # 2. 进场管理：检查待触发信号（1分钟级别，仅实盘模式）
+        if self.trading and self._position == 0 and self._pending_signal:
             self._check_entry_1m(bar_dict)
 
         # 3. 增量更新 15m K 线
@@ -417,8 +417,8 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._update_macd_5m(bar['close'])
         self._update_atr(bar)
 
-        # Debug: 记录5分钟K线和指标
-        if self._debugger:
+        # Debug: 记录5分钟K线和指标（仅实盘模式）
+        if self._debugger and self.trading:
             self._debugger.log_kline_5m(
                 bar,
                 diff_5m=self.diff_5m,
@@ -446,20 +446,20 @@ class CtaChanPivotStrategy(CtaTemplate):
         # 2. 严格笔处理
         new_bi = self._process_bi()
 
-        # 3. 更新移动止损（5分钟级别）
-        if self._position != 0:
+        # 3. 更新移动止损（5分钟级别，仅实盘模式）
+        if self.trading and self._position != 0:
             self._update_trailing_stop(bar_data)
 
-        # 4. 信号检查（只在新笔形成时）
-        if new_bi:
+        # 4. 信号检查（只在新笔形成时，仅实盘模式）
+        if self.trading and new_bi:
             self._check_signal(bar_data, new_bi)
 
         # 更新显示变量
         self.bi_count = len(self._bi_points)
         self.pivot_count = len(self._pivots)
 
-        # Debug: 记录缠论状态
-        if self._debugger:
+        # Debug: 记录缠论状态（仅实盘模式）
+        if self._debugger and self.trading:
             self._debugger.log_chan_state(
                 k_lines_count=len(self._k_lines),
                 bi_count=len(self._bi_points),
@@ -508,8 +508,8 @@ class CtaChanPivotStrategy(CtaTemplate):
                 merged['high'] = min(last['high'], new_bar['high'])
                 merged['low'] = min(last['low'], new_bar['low'])
 
-            # Debug: 记录包含处理
-            if self._debugger:
+            # Debug: 记录包含处理（仅实盘模式）
+            if self._debugger and self.trading:
                 self._debugger.log_inclusion(
                     before_high=last['high'],
                     before_low=last['low'],
@@ -576,8 +576,8 @@ class CtaChanPivotStrategy(CtaTemplate):
             # 异向成笔（严格笔要求间隔 >= min_bi_gap）
             if cand['idx'] - last['idx'] >= self.min_bi_gap:
                 self._bi_points.append(cand)
-                # Debug: 记录新笔
-                if self._debugger:
+                # Debug: 记录新笔（仅实盘模式）
+                if self._debugger and self.trading:
                     self._debugger.log_bi(
                         cand,
                         bi_idx=len(self._bi_points),
@@ -614,8 +614,8 @@ class CtaChanPivotStrategy(CtaTemplate):
                 'end_bi_idx': len(self._bi_points) - 1
             }
             self._pivots.append(new_pivot)
-            # Debug: 记录新中枢
-            if self._debugger:
+            # Debug: 记录新中枢（仅实盘模式）
+            if self._debugger and self.trading:
                 self._debugger.log_pivot(
                     new_pivot,
                     pivot_idx=len(self._pivots),
@@ -720,8 +720,8 @@ class CtaChanPivotStrategy(CtaTemplate):
                 }
                 self.signal = f"待触发{sig}"
 
-                # Debug: 记录信号
-                if self._debugger:
+                # Debug: 记录信号（仅实盘模式）
+                if self._debugger and self.trading:
                     self._debugger.log_signal(
                         signal_type=self._signal_type,
                         direction=sig,
@@ -786,8 +786,8 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._trailing_active = False
         self._pending_signal = None
 
-        # Debug: 记录开仓
-        if self._debugger:
+        # Debug: 记录开仓（仅实盘模式）
+        if self._debugger and self.trading:
             self._debugger.log_trade(
                 action=action,
                 price=price,
@@ -824,8 +824,8 @@ class CtaChanPivotStrategy(CtaTemplate):
                 self.write_log(f"空头止损: price={exit_price:.0f}, pnl={pnl:.0f}")
                 action = "CLOSE_SHORT"
 
-            # Debug: 记录平仓
-            if self._debugger:
+            # Debug: 记录平仓（仅实盘模式）
+            if self._debugger and self.trading:
                 self._debugger.log_trade(
                     action=action,
                     price=exit_price,
