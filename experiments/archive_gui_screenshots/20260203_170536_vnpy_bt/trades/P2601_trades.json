@@ -1,0 +1,1885 @@
+[
+  {
+    "datetime": "2025-07-02 10:07:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8378.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-03 09:14:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8490.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-03 09:15:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8490.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-03 09:47:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8472.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-03 13:43:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8470.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-03 14:20:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8484.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-03 22:22:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8524.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-03 22:34:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8512.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-04 22:17:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8452.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-04 23:00:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8468.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-07 10:12:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8456.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-07 10:55:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8460.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-07 13:53:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8478.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-08 21:01:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8626.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-08 21:23:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8626.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-09 09:42:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8626.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-09 09:44:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8626.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-09 11:28:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8658.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-09 21:02:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8630.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-10 09:07:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8608.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-10 14:32:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8612.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-10 21:02:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8594.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-10 22:47:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8616.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-11 09:30:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8628.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-11 09:31:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8628.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-11 14:43:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8668.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-11 21:04:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8674.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-07-11 21:57:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8660.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-11 22:23:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8678.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-14 10:04:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8652.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-14 10:55:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8672.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-14 13:31:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8710.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-14 14:22:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8704.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-15 09:02:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8732.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-07-15 09:57:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8742.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-15 22:37:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8678.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-15 22:37:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8682.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-16 10:36:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8700.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-16 11:12:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8712.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-16 14:07:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8706.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-16 22:15:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8726.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-16 22:32:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8712.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-17 10:47:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8730.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-18 10:03:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8880.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-18 10:04:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8880.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-18 21:25:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8908.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-18 21:26:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8898.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-21 22:18:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8852.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-21 22:33:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8864.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-07-22 09:08:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8950.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-22 09:57:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8926.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-22 10:07:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8912.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-07-22 14:45:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8890.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-22 14:54:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8900.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-23 10:02:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8938.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-23 13:46:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8970.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-23 21:27:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8992.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-23 21:35:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9012.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-23 22:17:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8986.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-23 22:26:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8976.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-24 09:57:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8990.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-24 13:34:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9004.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-24 21:22:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9028.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-24 22:07:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8988.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-25 14:47:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8936.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-25 21:02:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8938.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-28 13:37:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8918.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-29 09:02:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8914.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-29 11:07:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8872.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-29 14:47:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8966.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-30 09:11:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9004.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-07-30 11:07:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8996.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-30 22:02:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8976.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-31 09:09:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8956.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-07-31 09:10:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8958.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-31 09:46:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8896.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-07-31 11:03:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8930.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-08-01 21:22:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8914.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-01 21:34:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8894.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-01 22:47:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8822.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-04 11:18:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8820.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-04 21:12:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8820.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-05 13:33:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8978.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-05 21:17:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9024.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-08-05 21:18:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9024.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-06 21:34:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9010.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-07 09:42:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9010.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-07 09:58:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9022.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-07 14:32:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8966.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-08 10:38:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9020.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-08 14:14:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9028.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-08-08 21:01:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8980.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-08 22:50:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9004.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-11 09:15:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8996.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-08-11 11:22:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9030.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-12 21:02:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9378.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-12 21:03:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9374.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-13 10:12:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9480.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-13 11:22:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9476.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-13 13:35:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9504.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-13 22:52:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9492.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-14 09:07:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9512.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-14 21:01:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9376.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-14 21:09:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9396.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-15 13:32:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9396.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-18 09:04:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9620.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-18 11:05:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9606.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-08-18 11:06:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9590.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-18 13:54:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9592.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-18 14:26:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9608.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-08-19 11:30:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9712.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-19 13:39:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9690.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-20 13:48:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9514.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-08-20 14:57:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9556.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-20 21:02:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9536.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-21 21:47:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9502.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-21 21:48:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9506.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-22 09:51:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9574.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-22 10:48:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9560.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-22 22:08:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9568.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-25 09:01:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9652.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-25 10:53:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9634.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-08-26 10:32:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9540.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-26 10:38:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9544.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-26 22:52:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9490.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-27 14:02:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9518.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-27 22:22:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9526.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-28 09:37:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9508.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-28 10:47:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9516.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-29 09:25:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9380.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-29 14:27:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9302.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-08-29 22:34:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9274.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-01 10:12:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9332.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-01 10:48:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9312.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-01 22:59:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9476.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-02 09:05:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9456.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-02 11:17:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9428.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-02 22:38:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9424.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-03 10:32:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9450.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-03 10:59:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9432.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-03 14:51:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9382.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-03 22:36:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9358.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-04 14:47:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9412.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-04 21:03:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9380.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-05 09:57:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9430.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-05 21:02:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9508.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-08 09:52:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9440.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-08 14:38:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9428.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-08 22:12:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9444.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-09 10:42:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9460.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-09 13:58:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9482.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-10 09:57:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9314.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-10 13:47:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9334.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-10 21:02:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9274.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-10 21:32:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9272.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-10 23:00:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9292.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-11 22:57:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9350.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-12 10:37:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9394.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-12 21:27:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9322.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-12 21:55:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9344.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-15 09:17:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9354.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-15 22:46:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9458.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-15 22:55:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9466.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-16 09:32:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9482.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-17 14:47:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9420.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-17 14:55:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9428.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-18 11:20:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9322.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-09-18 13:49:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9300.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-18 21:02:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9318.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-18 22:07:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9358.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-19 14:29:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9328.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-22 09:21:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9292.0,
+    "volume": 2
+  },
+  {
+    "datetime": "2025-09-22 11:12:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9344.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-22 14:57:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9360.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-23 13:53:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8962.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-23 14:11:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8972.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-23 21:52:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9054.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-24 09:15:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9054.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-24 22:02:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9170.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-25 09:07:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9218.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-25 14:42:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9226.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-25 21:02:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9242.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-26 10:12:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9288.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-26 10:45:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9272.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-26 11:17:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9280.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-26 22:13:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9264.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-26 22:27:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9260.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-29 09:01:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9244.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-29 09:53:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9238.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-29 10:13:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9244.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-29 14:30:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9236.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-29 14:50:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9224.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-29 14:52:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9222.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-29 22:07:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9214.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-30 09:27:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9190.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-30 10:31:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9184.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-30 10:32:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9200.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-09-30 14:35:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9198.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-09 14:41:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9554.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-10 10:32:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9564.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-10 14:22:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9440.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-10 22:54:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9416.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-13 14:32:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9362.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-10-13 21:10:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9388.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-13 22:37:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9386.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-14 10:32:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9392.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-10-15 13:47:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9308.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-15 21:02:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9334.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-15 21:47:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9316.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-16 10:33:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9338.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-16 14:22:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9322.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-16 21:02:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9330.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-17 13:47:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9318.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-17 14:02:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9326.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-17 22:32:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9362.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-20 14:21:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9372.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-20 22:24:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9286.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-21 09:02:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9306.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-22 10:54:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9210.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-22 11:19:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9224.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-22 22:52:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9086.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-23 09:02:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9100.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-23 10:37:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9114.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-23 21:24:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9128.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-23 21:26:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9128.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-24 10:35:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9120.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-24 14:32:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9140.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-24 14:41:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9134.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-24 22:22:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9100.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-27 09:03:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9128.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-27 10:07:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 9126.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-27 11:29:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 9098.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-27 22:27:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9016.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-28 09:02:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 9032.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-28 13:57:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 9000.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-29 09:39:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8806.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-29 10:07:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8830.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-29 14:37:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8838.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-29 14:38:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8836.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-29 21:02:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8800.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-30 10:32:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8848.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-30 10:40:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8828.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-30 22:00:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8820.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-30 22:29:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8812.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-10-31 14:27:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8778.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-03 09:08:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8684.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-03 09:42:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8718.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-03 10:33:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8734.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-03 10:37:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8730.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-03 10:45:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8712.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-03 21:07:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8618.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-04 09:47:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8696.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-04 09:52:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8688.0,
+    "volume": 0
+  },
+  {
+    "datetime": "2025-11-04 10:07:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8676.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-04 21:31:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8618.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-04 21:42:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8602.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-04 22:05:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8632.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-04 22:05:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8626.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-05 10:31:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8616.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-05 13:56:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8608.0,
+    "volume": 2
+  },
+  {
+    "datetime": "2025-11-05 21:47:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8614.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-05 22:19:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8622.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-05 22:52:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8626.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-06 09:04:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8616.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-06 21:17:00",
+    "direction": "多",
+    "offset": "开",
+    "price": 8728.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-06 21:43:00",
+    "direction": "空",
+    "offset": "平",
+    "price": 8712.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-07 09:58:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8680.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-07 10:32:00",
+    "direction": "多",
+    "offset": "平",
+    "price": 8702.0,
+    "volume": 1
+  },
+  {
+    "datetime": "2025-11-07 22:52:00",
+    "direction": "空",
+    "offset": "开",
+    "price": 8630.0,
+    "volume": 1
+  }
+]

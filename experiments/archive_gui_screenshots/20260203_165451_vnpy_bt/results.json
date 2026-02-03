@@ -1,0 +1,30 @@
+{
+  "timestamp": "20260203_165451",
+  "strategy": "CtaChanPivotStrategy",
+  "params": "S6 defaults",
+  "total_vnpy_pnl": 0.0,
+  "total_rt_pnl": 0.0,
+  "contracts": {
+    "P2201": {
+      "error": "CSV not found: E:\\clawdbot_bridge\\clawdbot_workspace\\work\\quant\\quantPlus\\data\\analyse\\p2201_1min_202107-202112.csv"
+    },
+    "P2205": {
+      "error": "CSV not found: E:\\clawdbot_bridge\\clawdbot_workspace\\work\\quant\\quantPlus\\data\\analyse\\p2205_1min_202111-202204.csv"
+    },
+    "P2401": {
+      "error": "CSV not found: E:\\clawdbot_bridge\\clawdbot_workspace\\work\\quant\\quantPlus\\data\\analyse\\p2401_1min_202307-202312.csv"
+    },
+    "P2405": {
+      "error": "CSV not found: E:\\clawdbot_bridge\\clawdbot_workspace\\work\\quant\\quantPlus\\data\\analyse\\p2405_1min_202311-202404.csv"
+    },
+    "P2505": {
+      "error": "CSV not found: E:\\clawdbot_bridge\\clawdbot_workspace\\work\\quant\\quantPlus\\data\\analyse\\p2505_1min_202411-202504.csv"
+    },
+    "P2509": {
+      "error": "Error binding parameter 4: type 'Timestamp' is not supported"
+    },
+    "P2601": {
+      "error": "Error binding parameter 4: type 'Timestamp' is not supported"
+    }
+  }
+}

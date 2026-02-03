@@ -1,0 +1,135 @@
+{
+  "timestamp": "20260203_170536",
+  "strategy": "CtaChanPivotStrategy",
+  "params": "S6 defaults",
+  "total_vnpy_pnl": 25930.908000000003,
+  "total_rt_pnl": 5792.0,
+  "contracts": {
+    "P2201": {
+      "contract": "P2201",
+      "vnpy_stats": {
+        "total_net_pnl": -9826.301999999998,
+        "total_trade_count": "262",
+        "max_drawdown": -9826.302000000025,
+        "sharpe_ratio": -1.9233474634525929,
+        "total_return": -0.9826302000000009
+      },
+      "round_trip": {
+        "count": 124,
+        "total_pnl": -330.0,
+        "win_rate": 29.03225806451613
+      },
+      "bars_count": 28068,
+      "trades_count": 262,
+      "trades_file": "experiments\\20260203_170536_vnpy_bt\\trades\\P2201_trades.json"
+    },
+    "P2205": {
+      "contract": "P2205",
+      "vnpy_stats": {
+        "total_net_pnl": 13801.468000000003,
+        "total_trade_count": "257",
+        "max_drawdown": -8104.25,
+        "sharpe_ratio": 1.3446026096831327,
+        "total_return": 1.380146800000004
+      },
+      "round_trip": {
+        "count": 120,
+        "total_pnl": 1664.0,
+        "win_rate": 31.666666666666664
+      },
+      "bars_count": 27369,
+      "trades_count": 257,
+      "trades_file": "experiments\\20260203_170536_vnpy_bt\\trades\\P2205_trades.json"
+    },
+    "P2401": {
+      "contract": "P2401",
+      "vnpy_stats": {
+        "total_net_pnl": -10572.132,
+        "total_trade_count": "246",
+        "max_drawdown": -10572.131999999983,
+        "sharpe_ratio": -4.694358176218678,
+        "total_return": -1.0572131999999956
+      },
+      "round_trip": {
+        "count": 116,
+        "total_pnl": -590.0,
+        "win_rate": 29.310344827586203
+      },
+      "bars_count": 28016,
+      "trades_count": 246,
+      "trades_file": "experiments\\20260203_170536_vnpy_bt\\trades\\P2401_trades.json"
+    },
+    "P2405": {
+      "contract": "P2405",
+      "vnpy_stats": {
+        "total_net_pnl": 2227.0620000000004,
+        "total_trade_count": "276",
+        "max_drawdown": -4623.675999999978,
+        "sharpe_ratio": 0.6905162872988396,
+        "total_return": 0.2227062000000002
+      },
+      "round_trip": {
+        "count": 130,
+        "total_pnl": 638.0,
+        "win_rate": 33.84615384615385
+      },
+      "bars_count": 28860,
+      "trades_count": 276,
+      "trades_file": "experiments\\20260203_170536_vnpy_bt\\trades\\P2405_trades.json"
+    },
+    "P2505": {
+      "contract": "P2505",
+      "vnpy_stats": {
+        "total_net_pnl": 7166.914000000001,
+        "total_trade_count": "174",
+        "max_drawdown": -7045.761999999988,
+        "sharpe_ratio": 2.20560510002597,
+        "total_return": 0.7166913999999913
+      },
+      "round_trip": {
+        "count": 81,
+        "total_pnl": 1364.0,
+        "win_rate": 39.50617283950617
+      },
+      "bars_count": 22387,
+      "trades_count": 174,
+      "trades_file": "experiments\\20260203_170536_vnpy_bt\\trades\\P2505_trades.json"
+    },
+    "P2509": {
+      "contract": "P2509",
+      "vnpy_stats": {
+        "total_net_pnl": 9768.274,
+        "total_trade_count": "370",
+        "max_drawdown": -3892.2320000000764,
+        "sharpe_ratio": 1.6976356836054436,
+        "total_return": 0.9768274000000021
+      },
+      "round_trip": {
+        "count": 176,
+        "total_pnl": 1522.0,
+        "win_rate": 33.52272727272727
+      },
+      "bars_count": 43125,
+      "trades_count": 370,
+      "trades_file": "experiments\\20260203_170536_vnpy_bt\\trades\\P2509_trades.json"
+    },
+    "P2601": {
+      "contract": "P2601",
+      "vnpy_stats": {
+        "total_net_pnl": 13365.624,
+        "total_trade_count": "269",
+        "max_drawdown": -3167.9459999999963,
+        "sharpe_ratio": 3.2584874194720737,
+        "total_return": 1.3365623999999965
+      },
+      "round_trip": {
+        "count": 123,
+        "total_pnl": 1524.0,
+        "win_rate": 39.02439024390244
+      },
+      "bars_count": 30360,
+      "trades_count": 269,
+      "trades_file": "experiments\\20260203_170536_vnpy_bt\\trades\\P2601_trades.json"
+    }
+  }
+}
