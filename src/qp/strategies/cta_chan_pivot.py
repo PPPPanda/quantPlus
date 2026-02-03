@@ -33,6 +33,7 @@ from vnpy.trader.constant import Interval
 from vnpy_ctastrategy import CtaTemplate
 from vnpy_ctastrategy.base import StopOrder
 
+from qp.datafeed.normalizer import PALM_OIL_SESSIONS, compute_window_end, get_session_key
 from qp.utils.chan_debugger import ChanDebugger
 
 logger = logging.getLogger(__name__)
@@ -64,26 +65,18 @@ class CtaChanPivotStrategy(CtaTemplate):
 
     # ATR 参数
     atr_window: int = 14
-    atr_trailing_mult: float = 2.0   # ATR 移动止损倍数 (S6: 2.0)
+    atr_trailing_mult: float = 3.0   # ATR 移动止损倍数
     atr_activate_mult: float = 1.5   # 激活移动止损的浮盈 ATR 倍数
-    atr_entry_filter: float = 1.5    # 入场过滤：触发价与止损距离不超过 N 倍 ATR (S6: 1.5)
+    atr_entry_filter: float = 2.0    # 入场过滤：触发价与止损距离不超过 N 倍 ATR
 
     # 笔构建参数
-    min_bi_gap: int = 5              # 严格笔端点最小间隔 (S6: 5)
+    min_bi_gap: int = 4              # 严格笔端点最小间隔（包含处理后的K线数）
 
     # 中枢参数
     pivot_valid_range: int = 6       # 中枢有效范围（笔端点数）
 
     # 合约参数
     fixed_volume: int = 1            # 固定手数
-
-    # --- S6 (Iter3-6) 新增参数 ---
-    trend_filter: bool = True        # Iter3: 5m MACD方向一致性过滤
-    disable_3s_short: bool = True    # Iter3: 禁用3S做空(改为平多退出)
-    bi_amp_filter: bool = True       # Iter4: 笔幅度过滤
-    bi_amp_min_atr: float = 1.5      # Iter4: 最小笔幅度(ATR倍数)
-    macd_consistency: int = 3        # Iter4: MACD方向连续一致K线数
-    macd15_mag_cap_atr: float = 3.0  # Iter6: 15m MACD幅度上限(ATR倍数)
 
     # 调试
     debug: bool = False
@@ -94,9 +87,6 @@ class CtaChanPivotStrategy(CtaTemplate):
         "macd_fast", "macd_slow", "macd_signal",
         "atr_window", "atr_trailing_mult", "atr_activate_mult", "atr_entry_filter",
         "min_bi_gap", "pivot_valid_range", "fixed_volume",
-        "trend_filter", "disable_3s_short",
-        "bi_amp_filter", "bi_amp_min_atr", "macd_consistency",
-        "macd15_mag_cap_atr",
         "debug", "debug_enabled", "debug_log_console",
     ]
 
@@ -124,11 +114,14 @@ class CtaChanPivotStrategy(CtaTemplate):
         # 实盘用 BarGenerator (Tick -> 1m Bar)
         self.bg: Optional[BarGenerator] = None
 
-        # K 线合成缓存（增量方式）
+        # K 线合成缓存（session-aware 增量方式）
+        self._sessions = PALM_OIL_SESSIONS
         self._window_bar_5m: Optional[dict] = None
         self._last_window_end_5m: Optional[datetime] = None
+        self._last_session_key_5m: Optional[tuple] = None
         self._window_bar_15m: Optional[dict] = None
         self._last_window_end_15m: Optional[datetime] = None
+        self._last_session_key_15m: Optional[tuple] = None
 
         # 包含处理后的 K 线
         self._k_lines: list[dict] = []
@@ -152,9 +145,6 @@ class CtaChanPivotStrategy(CtaTemplate):
         # 用于 shift(1) 效果的延迟 MACD
         self._prev_diff_15m: float = 0.0
         self._prev_dea_15m: float = 0.0
-
-        # S6: 最近 N 根 5m MACD diff (用于 macd_consistency 检查)
-        self._recent_diffs: list[float] = []
 
         # ATR 增量计算缓存
         self._tr_values: deque = deque(maxlen=14)
@@ -260,15 +250,16 @@ class CtaChanPivotStrategy(CtaTemplate):
             self._debugger.log_kline_1m(bar_dict)
 
         # 1. 持仓管理：检查止损（1分钟级别，仅实盘模式）
-        stop_hit = False
         if self.trading and self._position != 0:
-            stop_hit = self._check_stop_loss_1m(bar_dict)
+            if self._check_stop_loss_1m(bar_dict):
+                self.put_event()
+                return
 
-        # 2. 进场管理：检查待触发信号（只在未触发止损时，仅实盘模式）
-        if not stop_hit and self.trading and self._position == 0 and self._pending_signal:
+        # 2. 进场管理：检查待触发信号（1分钟级别，仅实盘模式）
+        if self.trading and self._position == 0 and self._pending_signal:
             self._check_entry_1m(bar_dict)
 
-        # 3. 增量更新 15m K 线（始终执行，不因止损而跳过）
+        # 3. 增量更新 15m K 线
         bar_15m = self._update_15m_bar(bar_dict)
         if bar_15m:
             self._on_15m_bar(bar_15m)
@@ -284,76 +275,83 @@ class CtaChanPivotStrategy(CtaTemplate):
         """1 分钟 K 线回调（来自 BarGenerator）."""
         self.on_bar(bar)
 
-    def _get_window_end(self, dt: datetime, window: int) -> datetime:
-        """计算窗口结束时间."""
-        total_minutes = dt.hour * 60 + dt.minute
-        window_end_minutes = math.ceil(total_minutes / window) * window
-
-        hours = window_end_minutes // 60
-        minutes = window_end_minutes % 60
-
-        result = dt.replace(hour=0, minute=0, second=0, microsecond=0)
-        result += pd.Timedelta(hours=hours, minutes=minutes)
-
-        return result
-
     def _update_5m_bar(self, bar: dict) -> Optional[dict]:
-        """增量更新 5 分钟 K 线."""
-        window_end = self._get_window_end(bar['datetime'], 5)
+        """Session-aware 5 分钟 K 线合成（窗口切换时 emit 上一个窗口）."""
+        dt = bar['datetime']
+        window_end = compute_window_end(dt, self._sessions, 5)
+        if window_end is None:
+            return None
 
-        # 更新当前窗口 bar
-        if self._window_bar_5m is None or window_end != self._last_window_end_5m:
-            # 新窗口开始
+        session_key = get_session_key(dt, self._sessions)
+        result = None
+
+        # session 或窗口变了 → emit 上一个已累积的 bar
+        if self._window_bar_5m is not None:
+            session_changed = (self._last_session_key_5m != session_key)
+            window_changed = (self._last_window_end_5m != window_end)
+            if session_changed or window_changed:
+                result = self._window_bar_5m.copy()
+                self._window_bar_5m = None
+
+        self._last_session_key_5m = session_key
+
+        # 初始化或更新当前窗口
+        if self._window_bar_5m is None:
             self._window_bar_5m = {
                 'datetime': window_end,
                 'open': bar['open'],
                 'high': bar['high'],
                 'low': bar['low'],
                 'close': bar['close'],
-                'volume': bar['volume']
+                'volume': bar['volume'],
             }
+            self._last_window_end_5m = window_end
         else:
-            # 同一窗口，更新
-            self._window_bar_5m['high'] = max(self._window_bar_5m['high'], bar['high'])
-            self._window_bar_5m['low'] = min(self._window_bar_5m['low'], bar['low'])
-            self._window_bar_5m['close'] = bar['close']
-            self._window_bar_5m['volume'] += bar['volume']
+            wb = self._window_bar_5m
+            wb['high'] = max(wb['high'], bar['high'])
+            wb['low'] = min(wb['low'], bar['low'])
+            wb['close'] = bar['close']
+            wb['volume'] += bar['volume']
 
-        self._last_window_end_5m = window_end
-
-        # 在边界分钟（与 pandas resample closed='right' 一致）输出完成的 bar
-        if bar['datetime'].minute % 5 == 0:
-            return self._window_bar_5m.copy()
-        return None
+        return result
 
     def _update_15m_bar(self, bar: dict) -> Optional[dict]:
-        """增量更新 15 分钟 K 线."""
-        window_end = self._get_window_end(bar['datetime'], 15)
+        """Session-aware 15 分钟 K 线合成（窗口切换时 emit）."""
+        dt = bar['datetime']
+        window_end = compute_window_end(dt, self._sessions, 15)
+        if window_end is None:
+            return None
 
-        # 更新当前窗口 bar
-        if self._window_bar_15m is None or window_end != self._last_window_end_15m:
-            # 新窗口开始
+        session_key = get_session_key(dt, self._sessions)
+        result = None
+
+        if self._window_bar_15m is not None:
+            session_changed = (self._last_session_key_15m != session_key)
+            window_changed = (self._last_window_end_15m != window_end)
+            if session_changed or window_changed:
+                result = self._window_bar_15m.copy()
+                self._window_bar_15m = None
+
+        self._last_session_key_15m = session_key
+
+        if self._window_bar_15m is None:
             self._window_bar_15m = {
                 'datetime': window_end,
                 'open': bar['open'],
                 'high': bar['high'],
                 'low': bar['low'],
                 'close': bar['close'],
-                'volume': bar['volume']
+                'volume': bar['volume'],
             }
+            self._last_window_end_15m = window_end
         else:
-            # 同一窗口，更新
-            self._window_bar_15m['high'] = max(self._window_bar_15m['high'], bar['high'])
-            self._window_bar_15m['low'] = min(self._window_bar_15m['low'], bar['low'])
-            self._window_bar_15m['close'] = bar['close']
-            self._window_bar_15m['volume'] += bar['volume']
+            wb = self._window_bar_15m
+            wb['high'] = max(wb['high'], bar['high'])
+            wb['low'] = min(wb['low'], bar['low'])
+            wb['close'] = bar['close']
+            wb['volume'] += bar['volume']
 
-        self._last_window_end_15m = window_end
-
-        # 在边界分钟输出完成的 bar
-        if bar['datetime'].minute % 15 == 0:
-            return self._window_bar_15m.copy()
-        return None
+        return result
 
     def _update_macd_5m(self, close: float) -> None:
         """增量更新 5 分钟 MACD."""
@@ -440,11 +438,6 @@ class CtaChanPivotStrategy(CtaTemplate):
                 diff_15m=self._prev_diff_15m,
                 dea_15m=self._prev_dea_15m
             )
-
-        # S6: 记录最近 MACD diff 用于 macd_consistency
-        self._recent_diffs.append(self.diff_5m)
-        if len(self._recent_diffs) > 10:
-            self._recent_diffs.pop(0)
 
         # 构建当前 bar 数据（包含指标）
         bar_data = {
@@ -591,12 +584,6 @@ class CtaChanPivotStrategy(CtaTemplate):
                 self._bi_points[-1] = cand
             return None
         else:
-            # S6/Iter4: 笔幅度过滤
-            if self.bi_amp_filter and self.atr > 0:
-                amp = abs(cand['price'] - last['price'])
-                if amp < self.bi_amp_min_atr * self.atr:
-                    return None
-
             # 异向成笔（严格笔要求间隔 >= min_bi_gap）
             if cand['idx'] - last['idx'] >= self.min_bi_gap:
                 self._bi_points.append(cand)
@@ -662,23 +649,7 @@ class CtaChanPivotStrategy(CtaTemplate):
         is_bull = self._prev_diff_15m > self._prev_dea_15m
         is_bear = self._prev_diff_15m < self._prev_dea_15m
 
-        # S6/Iter3: 趋势过滤 — 要求 5m MACD 方向与信号一致
-        if self.trend_filter:
-            if self.diff_5m <= 0:
-                is_bull = False
-            if self.diff_5m >= 0:
-                is_bear = False
-
-        # S6/Iter4: MACD 一致性 — 要求最近 N 根 MACD 方向连续一致
-        if self.macd_consistency > 0 and len(self._recent_diffs) >= self.macd_consistency:
-            recent = self._recent_diffs[-self.macd_consistency:]
-            if is_bull and not all(d > 0 for d in recent):
-                is_bull = False
-            if is_bear and not all(d < 0 for d in recent):
-                is_bear = False
-
         sig = None
-        sig_type = None
         stop_base = 0.0
         trigger_price = 0.0
         last_pivot = self._pivots[-1] if self._pivots else None
@@ -699,7 +670,6 @@ class CtaChanPivotStrategy(CtaTemplate):
                         if last_pivot['end_bi_idx'] >= len(self._bi_points) - self.pivot_valid_range:
                             if is_bull:
                                 sig = 'Buy'
-                                sig_type = '3B'
                                 trigger_price = p_now['data']['high']
                                 stop_base = p_now['price']
 
@@ -710,26 +680,9 @@ class CtaChanPivotStrategy(CtaTemplate):
                     if p_last['price'] < last_pivot['zd']:
                         if last_pivot['end_bi_idx'] >= len(self._bi_points) - self.pivot_valid_range:
                             if is_bear:
-                                # S6/Iter3: 禁用 3S 做空，改为平多退出
-                                if self.disable_3s_short:
-                                    if self._position == 1:
-                                        exit_px = p_now['data']['low']
-                                        pnl = exit_px - self._entry_price
-                                        if self.trading:
-                                            self.cancel_all()  # 取消未成交单
-                                            vol = abs(self.pos) if self.pos > 0 else self.fixed_volume
-                                            self.sell(exit_px, vol)
-                                            self.write_log(
-                                                f"3S平多退出: price={exit_px:.0f}, pnl={pnl:.0f}"
-                                            )
-                                        self._position = 0
-                                        self._trailing_active = False
-                                        self.signal = "3S平多"
-                                else:
-                                    sig = 'Sell'
-                                    sig_type = '3S'
-                                    trigger_price = p_now['data']['low']
-                                    stop_base = p_now['price']
+                                sig = 'Sell'
+                                trigger_price = p_now['data']['low']
+                                stop_base = p_now['price']
 
         # --------------------------------------------------------
         # 辅助逻辑：保留 2B/2S（作为趋势延续补充）
@@ -739,7 +692,6 @@ class CtaChanPivotStrategy(CtaTemplate):
                 div = p_now['data']['diff'] > p_prev['data']['diff']
                 if p_now['price'] > p_prev['price'] and div and is_bull:
                     sig = 'Buy'  # 2B
-                    sig_type = '2B'
                     trigger_price = p_now['data']['high']
                     stop_base = p_now['price']
 
@@ -747,15 +699,8 @@ class CtaChanPivotStrategy(CtaTemplate):
                 div = p_now['data']['diff'] < p_prev['data']['diff']
                 if p_now['price'] < p_prev['price'] and div and is_bear:
                     sig = 'Sell'  # 2S
-                    sig_type = '2S'
                     trigger_price = p_now['data']['low']
                     stop_base = p_now['price']
-
-        # S6/Iter6: 15m MACD 幅度上限过滤（过滤趋势过热末端的信号）
-        if sig and self.macd15_mag_cap_atr > 0 and self.atr > 0:
-            mag = abs(self._prev_diff_15m) / self.atr
-            if mag > self.macd15_mag_cap_atr:
-                sig = None  # 过滤掉
 
         # --------------------------------------------------------
         # 信号过滤与设置
@@ -764,9 +709,20 @@ class CtaChanPivotStrategy(CtaTemplate):
             # 入场过滤：触发价与止损距离不超过 N 倍 ATR
             distance = abs(trigger_price - stop_base)
             if distance < self.atr_entry_filter * self.atr:
-                # 使用已确定的信号类型
-                self._signal_type = sig_type or ("2B" if sig == 'Buy' else "2S")
-                reason = f"{self._signal_type}: 信号确认"
+                # 判断信号类型
+                if self._pivots and last_pivot:
+                    if p_now['type'] == 'bottom' and p_now['price'] > last_pivot['zg']:
+                        self._signal_type = "3B"
+                        reason = f"3B买点: 回踩不破中枢ZG={last_pivot['zg']:.0f}"
+                    elif p_now['type'] == 'top' and p_now['price'] < last_pivot['zd']:
+                        self._signal_type = "3S"
+                        reason = f"3S卖点: 回抽不破中枢ZD={last_pivot['zd']:.0f}"
+                    else:
+                        self._signal_type = "2B" if sig == 'Buy' else "2S"
+                        reason = f"{self._signal_type}: 背驰确认"
+                else:
+                    self._signal_type = "2B" if sig == 'Buy' else "2S"
+                    reason = f"{self._signal_type}: 背驰确认"
 
                 self._pending_signal = {
                     'type': sig,
@@ -823,8 +779,6 @@ class CtaChanPivotStrategy(CtaTemplate):
 
     def _open_position(self, direction: int, price: float, stop_base: float) -> None:
         """开仓."""
-        self.cancel_all()  # 取消之前的未成交单
-
         if direction == 1:
             self.buy(price, self.fixed_volume)
             self._stop_price = stop_base - 1
@@ -869,19 +823,15 @@ class CtaChanPivotStrategy(CtaTemplate):
                 exit_price = bar['open'] if bar['open'] > self._stop_price else self._stop_price
 
         if sl_hit:
-            self.cancel_all()  # 先取消未成交单
-
             # 计算盈亏
             if self._position == 1:
                 pnl = exit_price - self._entry_price
-                vol = abs(self.pos) if self.pos > 0 else self.fixed_volume
-                self.sell(exit_price, vol)
+                self.sell(exit_price, abs(self.pos))
                 self.write_log(f"多头止损: price={exit_price:.0f}, pnl={pnl:.0f}")
                 action = "CLOSE_LONG"
             else:
                 pnl = self._entry_price - exit_price
-                vol = abs(self.pos) if self.pos < 0 else self.fixed_volume
-                self.cover(exit_price, vol)
+                self.cover(exit_price, abs(self.pos))
                 self.write_log(f"空头止损: price={exit_price:.0f}, pnl={pnl:.0f}")
                 action = "CLOSE_SHORT"
 
@@ -928,16 +878,7 @@ class CtaChanPivotStrategy(CtaTemplate):
                     self._stop_price = new_stop
 
     def on_trade(self, trade: TradeData) -> None:
-        """成交回调 — 用实际成交价更新状态."""
-        from vnpy.trader.constant import Offset
-
-        if trade.offset == Offset.OPEN:
-            # 开仓成交：用实际成交价覆盖下单价
-            self._entry_price = trade.price
-        elif trade.offset in (Offset.CLOSE, Offset.CLOSETODAY, Offset.CLOSEYESTERDAY):
-            # 平仓成交：可在此记录实际平仓价用于日志
-            pass
-
+        """成交回调."""
         self.write_log(
             f"成交: {trade.direction.value} {trade.offset.value} "
             f"{trade.volume}手 @ {trade.price:.0f}"
