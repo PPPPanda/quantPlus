@@ -1,0 +1,4 @@
+Running 64 configurations across 7 contracts...
+(vnpy-compatible delayed execution model)
+
+  ... 20/64 done

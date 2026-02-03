@@ -260,16 +260,15 @@ class CtaChanPivotStrategy(CtaTemplate):
             self._debugger.log_kline_1m(bar_dict)
 
         # 1. 持仓管理：检查止损（1分钟级别，仅实盘模式）
+        stop_hit = False
         if self.trading and self._position != 0:
-            if self._check_stop_loss_1m(bar_dict):
-                self.put_event()
-                return
+            stop_hit = self._check_stop_loss_1m(bar_dict)
 
-        # 2. 进场管理：检查待触发信号（1分钟级别，仅实盘模式）
-        if self.trading and self._position == 0 and self._pending_signal:
+        # 2. 进场管理：检查待触发信号（只在未触发止损时，仅实盘模式）
+        if not stop_hit and self.trading and self._position == 0 and self._pending_signal:
             self._check_entry_1m(bar_dict)
 
-        # 3. 增量更新 15m K 线
+        # 3. 增量更新 15m K 线（始终执行，不因止损而跳过）
         bar_15m = self._update_15m_bar(bar_dict)
         if bar_15m:
             self._on_15m_bar(bar_15m)
@@ -717,7 +716,9 @@ class CtaChanPivotStrategy(CtaTemplate):
                                         exit_px = p_now['data']['low']
                                         pnl = exit_px - self._entry_price
                                         if self.trading:
-                                            self.sell(exit_px, abs(self.pos))
+                                            self.cancel_all()  # 取消未成交单
+                                            vol = abs(self.pos) if self.pos > 0 else self.fixed_volume
+                                            self.sell(exit_px, vol)
                                             self.write_log(
                                                 f"3S平多退出: price={exit_px:.0f}, pnl={pnl:.0f}"
                                             )
@@ -822,6 +823,8 @@ class CtaChanPivotStrategy(CtaTemplate):
 
     def _open_position(self, direction: int, price: float, stop_base: float) -> None:
         """开仓."""
+        self.cancel_all()  # 取消之前的未成交单
+
         if direction == 1:
             self.buy(price, self.fixed_volume)
             self._stop_price = stop_base - 1
@@ -866,15 +869,19 @@ class CtaChanPivotStrategy(CtaTemplate):
                 exit_price = bar['open'] if bar['open'] > self._stop_price else self._stop_price
 
         if sl_hit:
+            self.cancel_all()  # 先取消未成交单
+
             # 计算盈亏
             if self._position == 1:
                 pnl = exit_price - self._entry_price
-                self.sell(exit_price, abs(self.pos))
+                vol = abs(self.pos) if self.pos > 0 else self.fixed_volume
+                self.sell(exit_price, vol)
                 self.write_log(f"多头止损: price={exit_price:.0f}, pnl={pnl:.0f}")
                 action = "CLOSE_LONG"
             else:
                 pnl = self._entry_price - exit_price
-                self.cover(exit_price, abs(self.pos))
+                vol = abs(self.pos) if self.pos < 0 else self.fixed_volume
+                self.cover(exit_price, vol)
                 self.write_log(f"空头止损: price={exit_price:.0f}, pnl={pnl:.0f}")
                 action = "CLOSE_SHORT"
 
@@ -921,7 +928,16 @@ class CtaChanPivotStrategy(CtaTemplate):
                     self._stop_price = new_stop
 
     def on_trade(self, trade: TradeData) -> None:
-        """成交回调."""
+        """成交回调 — 用实际成交价更新状态."""
+        from vnpy.trader.constant import Offset
+
+        if trade.offset == Offset.OPEN:
+            # 开仓成交：用实际成交价覆盖下单价
+            self._entry_price = trade.price
+        elif trade.offset in (Offset.CLOSE, Offset.CLOSETODAY, Offset.CLOSEYESTERDAY):
+            # 平仓成交：可在此记录实际平仓价用于日志
+            pass
+
         self.write_log(
             f"成交: {trade.direction.value} {trade.offset.value} "
             f"{trade.volume}手 @ {trade.price:.0f}"
