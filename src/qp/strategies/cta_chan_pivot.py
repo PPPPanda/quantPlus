@@ -64,18 +64,26 @@ class CtaChanPivotStrategy(CtaTemplate):
 
     # ATR 参数
     atr_window: int = 14
-    atr_trailing_mult: float = 3.0   # ATR 移动止损倍数
+    atr_trailing_mult: float = 2.0   # ATR 移动止损倍数 (S6: 2.0)
     atr_activate_mult: float = 1.5   # 激活移动止损的浮盈 ATR 倍数
-    atr_entry_filter: float = 2.0    # 入场过滤：触发价与止损距离不超过 N 倍 ATR
+    atr_entry_filter: float = 1.5    # 入场过滤：触发价与止损距离不超过 N 倍 ATR (S6: 1.5)
 
     # 笔构建参数
-    min_bi_gap: int = 4              # 严格笔端点最小间隔（包含处理后的K线数）
+    min_bi_gap: int = 5              # 严格笔端点最小间隔 (S6: 5)
 
     # 中枢参数
     pivot_valid_range: int = 6       # 中枢有效范围（笔端点数）
 
     # 合约参数
     fixed_volume: int = 1            # 固定手数
+
+    # --- S6 (Iter3-6) 新增参数 ---
+    trend_filter: bool = True        # Iter3: 5m MACD方向一致性过滤
+    disable_3s_short: bool = True    # Iter3: 禁用3S做空(改为平多退出)
+    bi_amp_filter: bool = True       # Iter4: 笔幅度过滤
+    bi_amp_min_atr: float = 1.5      # Iter4: 最小笔幅度(ATR倍数)
+    macd_consistency: int = 3        # Iter4: MACD方向连续一致K线数
+    macd15_mag_cap_atr: float = 3.0  # Iter6: 15m MACD幅度上限(ATR倍数)
 
     # 调试
     debug: bool = False
@@ -86,6 +94,9 @@ class CtaChanPivotStrategy(CtaTemplate):
         "macd_fast", "macd_slow", "macd_signal",
         "atr_window", "atr_trailing_mult", "atr_activate_mult", "atr_entry_filter",
         "min_bi_gap", "pivot_valid_range", "fixed_volume",
+        "trend_filter", "disable_3s_short",
+        "bi_amp_filter", "bi_amp_min_atr", "macd_consistency",
+        "macd15_mag_cap_atr",
         "debug", "debug_enabled", "debug_log_console",
     ]
 
@@ -141,6 +152,9 @@ class CtaChanPivotStrategy(CtaTemplate):
         # 用于 shift(1) 效果的延迟 MACD
         self._prev_diff_15m: float = 0.0
         self._prev_dea_15m: float = 0.0
+
+        # S6: 最近 N 根 5m MACD diff (用于 macd_consistency 检查)
+        self._recent_diffs: list[float] = []
 
         # ATR 增量计算缓存
         self._tr_values: deque = deque(maxlen=14)
@@ -428,6 +442,11 @@ class CtaChanPivotStrategy(CtaTemplate):
                 dea_15m=self._prev_dea_15m
             )
 
+        # S6: 记录最近 MACD diff 用于 macd_consistency
+        self._recent_diffs.append(self.diff_5m)
+        if len(self._recent_diffs) > 10:
+            self._recent_diffs.pop(0)
+
         # 构建当前 bar 数据（包含指标）
         bar_data = {
             'datetime': bar['datetime'],
@@ -573,6 +592,12 @@ class CtaChanPivotStrategy(CtaTemplate):
                 self._bi_points[-1] = cand
             return None
         else:
+            # S6/Iter4: 笔幅度过滤
+            if self.bi_amp_filter and self.atr > 0:
+                amp = abs(cand['price'] - last['price'])
+                if amp < self.bi_amp_min_atr * self.atr:
+                    return None
+
             # 异向成笔（严格笔要求间隔 >= min_bi_gap）
             if cand['idx'] - last['idx'] >= self.min_bi_gap:
                 self._bi_points.append(cand)
@@ -638,7 +663,23 @@ class CtaChanPivotStrategy(CtaTemplate):
         is_bull = self._prev_diff_15m > self._prev_dea_15m
         is_bear = self._prev_diff_15m < self._prev_dea_15m
 
+        # S6/Iter3: 趋势过滤 — 要求 5m MACD 方向与信号一致
+        if self.trend_filter:
+            if self.diff_5m <= 0:
+                is_bull = False
+            if self.diff_5m >= 0:
+                is_bear = False
+
+        # S6/Iter4: MACD 一致性 — 要求最近 N 根 MACD 方向连续一致
+        if self.macd_consistency > 0 and len(self._recent_diffs) >= self.macd_consistency:
+            recent = self._recent_diffs[-self.macd_consistency:]
+            if is_bull and not all(d > 0 for d in recent):
+                is_bull = False
+            if is_bear and not all(d < 0 for d in recent):
+                is_bear = False
+
         sig = None
+        sig_type = None
         stop_base = 0.0
         trigger_price = 0.0
         last_pivot = self._pivots[-1] if self._pivots else None
@@ -659,6 +700,7 @@ class CtaChanPivotStrategy(CtaTemplate):
                         if last_pivot['end_bi_idx'] >= len(self._bi_points) - self.pivot_valid_range:
                             if is_bull:
                                 sig = 'Buy'
+                                sig_type = '3B'
                                 trigger_price = p_now['data']['high']
                                 stop_base = p_now['price']
 
@@ -669,9 +711,24 @@ class CtaChanPivotStrategy(CtaTemplate):
                     if p_last['price'] < last_pivot['zd']:
                         if last_pivot['end_bi_idx'] >= len(self._bi_points) - self.pivot_valid_range:
                             if is_bear:
-                                sig = 'Sell'
-                                trigger_price = p_now['data']['low']
-                                stop_base = p_now['price']
+                                # S6/Iter3: 禁用 3S 做空，改为平多退出
+                                if self.disable_3s_short:
+                                    if self._position == 1:
+                                        exit_px = p_now['data']['low']
+                                        pnl = exit_px - self._entry_price
+                                        if self.trading:
+                                            self.sell(exit_px, abs(self.pos))
+                                            self.write_log(
+                                                f"3S平多退出: price={exit_px:.0f}, pnl={pnl:.0f}"
+                                            )
+                                        self._position = 0
+                                        self._trailing_active = False
+                                        self.signal = "3S平多"
+                                else:
+                                    sig = 'Sell'
+                                    sig_type = '3S'
+                                    trigger_price = p_now['data']['low']
+                                    stop_base = p_now['price']
 
         # --------------------------------------------------------
         # 辅助逻辑：保留 2B/2S（作为趋势延续补充）
@@ -681,6 +738,7 @@ class CtaChanPivotStrategy(CtaTemplate):
                 div = p_now['data']['diff'] > p_prev['data']['diff']
                 if p_now['price'] > p_prev['price'] and div and is_bull:
                     sig = 'Buy'  # 2B
+                    sig_type = '2B'
                     trigger_price = p_now['data']['high']
                     stop_base = p_now['price']
 
@@ -688,8 +746,15 @@ class CtaChanPivotStrategy(CtaTemplate):
                 div = p_now['data']['diff'] < p_prev['data']['diff']
                 if p_now['price'] < p_prev['price'] and div and is_bear:
                     sig = 'Sell'  # 2S
+                    sig_type = '2S'
                     trigger_price = p_now['data']['low']
                     stop_base = p_now['price']
+
+        # S6/Iter6: 15m MACD 幅度上限过滤（过滤趋势过热末端的信号）
+        if sig and self.macd15_mag_cap_atr > 0 and self.atr > 0:
+            mag = abs(self._prev_diff_15m) / self.atr
+            if mag > self.macd15_mag_cap_atr:
+                sig = None  # 过滤掉
 
         # --------------------------------------------------------
         # 信号过滤与设置
@@ -698,20 +763,9 @@ class CtaChanPivotStrategy(CtaTemplate):
             # 入场过滤：触发价与止损距离不超过 N 倍 ATR
             distance = abs(trigger_price - stop_base)
             if distance < self.atr_entry_filter * self.atr:
-                # 判断信号类型
-                if self._pivots and last_pivot:
-                    if p_now['type'] == 'bottom' and p_now['price'] > last_pivot['zg']:
-                        self._signal_type = "3B"
-                        reason = f"3B买点: 回踩不破中枢ZG={last_pivot['zg']:.0f}"
-                    elif p_now['type'] == 'top' and p_now['price'] < last_pivot['zd']:
-                        self._signal_type = "3S"
-                        reason = f"3S卖点: 回抽不破中枢ZD={last_pivot['zd']:.0f}"
-                    else:
-                        self._signal_type = "2B" if sig == 'Buy' else "2S"
-                        reason = f"{self._signal_type}: 背驰确认"
-                else:
-                    self._signal_type = "2B" if sig == 'Buy' else "2S"
-                    reason = f"{self._signal_type}: 背驰确认"
+                # 使用已确定的信号类型
+                self._signal_type = sig_type or ("2B" if sig == 'Buy' else "2S")
+                reason = f"{self._signal_type}: 信号确认"
 
                 self._pending_signal = {
                     'type': sig,

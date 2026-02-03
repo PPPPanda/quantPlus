@@ -1,0 +1,14 @@
+{
+  "experiment": "baseline",
+  "timestamp": "2026-02-03T01:50:00+08:00",
+  "params": {
+    "BASE": {"activate_atr": 1.5, "trail_atr": 3.0, "entry_filter_atr": 2.0, "pivot_valid_range": 6, "min_bi_gap": 4},
+    "BEST": {"activate_atr": 2.5, "trail_atr": 3.0, "entry_filter_atr": 2.5, "pivot_valid_range": 6, "min_bi_gap": 4}
+  },
+  "slippage": 2,
+  "commission": 0,
+  "unit": "points",
+  "data_dir": "data/analyse/",
+  "contracts": ["p2201", "p2205", "p2401", "p2405", "p2505", "p2509", "p2601"],
+  "script": "scripts/backtest_all_contracts.py"
+}
