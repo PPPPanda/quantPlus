@@ -232,14 +232,15 @@ uv run python -m qp.backtest.run_cta_backtest --vt_symbol p0.DCE --days 365
 
 ## 策略说明
 
-### 策略回测对比（60分钟数据，2025-05 ~ 2026-01，约8个月）
+### 策略回测对比
 
-| 策略 | Sharpe Ratio | 总收益率 | 年化收益 | 最大回撤 | 推荐度 |
-|------|-------------|---------|---------|---------|--------|
-| CtaTurtleEnhancedStrategy (激进) | **1.28** | **+24.41%** | **+34.07%** | -8.23% | **推荐** |
-| CtaPalmOilStrategy | -1.50 | -1.64% | -2.28% | -1.85% | 学习用 |
+| 策略 | 数据周期 | Sharpe | 总收益率 | 年化收益 | 最大回撤 | 定位 |
+|------|---------|--------|---------|---------|---------|------|
+| CtaChanPivotStrategy (p2601) | 1m→5m/15m | **2.74** | **+11.53%** | **+31.44%** | -3.23% | **主力策略** |
+| CtaTurtleEnhancedStrategy (激进) | 60m | 1.28 | +24.41% | +34.07% | -8.23% | 趋势跟踪 |
+| CtaPalmOilStrategy | 日线 | -1.50 | -1.64% | -2.28% | -1.85% | 学习用 |
 
-**结论**：增强海龟策略经过激进优化后，收益率达到24%+，年化34%，远超目标。
+> ChanPivot 为缠论中枢策略，基于5分钟K线做笔/中枢识别+3B/3S信号，配合15分钟MACD趋势过滤和ATR风控。13合约批量回测中4个盈利，策略仍在迭代优化中。
 
 ### CtaTurtleEnhancedStrategy（增强海龟策略）**推荐**
 
@@ -417,24 +418,36 @@ if bars:
 
 ```
 quantPlus/
-├── vendor/vnpy/           # vn.py 框架 (submodule, 只读)
+├── vendor/vnpy/               # vn.py 框架 (submodule, 只读)
 ├── src/qp/
-│   ├── ui/                # GUI 启动器与 Profile 配置
-│   ├── runtime/           # 命令行入口
-│   ├── strategies/        # CTA 策略实现
-│   │   ├── cta_palm_oil.py            # 双均线策略（学习用）
-│   │   └── cta_turtle_enhanced.py     # 增强海龟策略（推荐）
-│   ├── research/          # 数据研究与入库
-│   │   ├── openbb_fetch.py    # 数据拉取（OpenBB/akshare）
-│   │   ├── ingest_vnpy.py     # 数据入库
-│   │   └── pipeline_palm_oil.py # 一键流水线
-│   └── backtest/          # 脚本化回测
-│       └── run_cta_backtest.py # 命令行回测工具
-├── .vntrader/             # vn.py 数据目录（本地）
-│   └── database.db        # SQLite 历史数据库
-├── data/openbb/           # 数据缓存（CSV）
-├── pyproject.toml         # uv 依赖配置
-├── development.md         # 开发规范
+│   ├── ui/                    # GUI 启动器与 Profile 配置
+│   ├── runtime/               # 命令行入口
+│   ├── strategies/            # CTA 策略实现
+│   │   ├── cta_chan_pivot.py      # 缠论中枢策略（主力策略）
+│   │   ├── cta_palm_oil.py        # 双均线策略（学习用）
+│   │   └── cta_turtle_enhanced.py # 增强海龟策略
+│   ├── datafeed/              # 数据源与归一化
+│   │   ├── normalizer.py          # 1分钟K线归一化（多源一致性）
+│   │   ├── bar_generator.py       # PandasStyleBarGenerator
+│   │   ├── session_synthesizer.py # 交易时段K线合成器
+│   │   └── xtquant_feed.py        # 迅投研数据源封装
+│   ├── research/              # 数据研究与入库
+│   │   ├── openbb_fetch.py        # 数据拉取（OpenBB/akshare）
+│   │   ├── ingest_vnpy.py         # 数据入库
+│   │   └── pipeline_palm_oil.py   # 一键流水线
+│   ├── backtest/              # 脚本化回测
+│   │   ├── cli.py                 # CLI 回测入口
+│   │   ├── engine.py              # 回测引擎封装
+│   │   └── run_cta_backtest.py    # 批量回测工具
+│   ├── apps/enhanced_chart/   # 增强K线图 App
+│   ├── common/                # 常量/日志/工具
+│   └── utils/
+│       └── chan_debugger.py        # 缠论调试工具
+├── strategies/                # 桥接文件（vnpy_ctastrategy 加载目录）
+├── scripts/                   # 工具脚本 + archive/ 归档
+├── data/                      # 分析数据/debug 输出
+├── .vntrader/                 # vn.py 配置与数据目录（本地）
+├── pyproject.toml             # uv 依赖配置
 └── README.md
 ```
 

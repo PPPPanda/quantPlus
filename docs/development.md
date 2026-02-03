@@ -25,33 +25,75 @@
 ```
 quantPlus/
 ├── vendor/
-│   └── vnpy/                          # vn.py submodule，独立维护与更新
+│   └── vnpy/                              # vn.py submodule，独立维护与更新
 ├── src/
 │   └── qp/
 │       ├── runtime/
-│       │   └── trader_app.py          # 实盘启动 + GUI 显示入口（支持 profile 和 gateway 参数）
+│       │   └── trader_app.py              # 实盘启动 + GUI 显示入口（支持 profile 和 gateway 参数）
 │       ├── ui/
-│       │   ├── launcher.py            # GUI 启动器
-│       │   └── profiles.py            # Profile 配置（trade/research/all）
+│       │   ├── launcher.py                # GUI 启动器
+│       │   └── profiles.py                # Profile 配置（trade/research/all）
 │       ├── strategies/
-│       │   ├── cta_palm_oil.py        # 双均线策略（学习用）
-│       │   └── cta_turtle_enhanced.py # 增强海龟策略（推荐）
+│       │   ├── base.py                    # 策略基类/通用工具
+│       │   ├── cta_palm_oil.py            # 双均线策略（学习用）
+│       │   ├── cta_turtle_enhanced.py     # 增强海龟策略
+│       │   └── cta_chan_pivot.py          # 缠论中枢策略（主力策略）
+│       ├── datafeed/
+│       │   ├── normalizer.py              # 1分钟K线归一化（多源一致性）
+│       │   ├── bar_generator.py           # PandasStyleBarGenerator（K线合成）
+│       │   ├── session_synthesizer.py     # 交易时段K线合成器
+│       │   ├── xtquant_feed.py            # 迅投研数据源封装
+│       │   ├── download_palm_oil.py       # 棕榈油数据下载
+│       │   └── base.py                    # 数据源基类
 │       ├── research/
-│       │   ├── openbb_fetch.py        # OpenBB 数据拉取 / 因子计算
-│       │   └── ingest_vnpy.py         # OpenBB 数据 -> vn.py 数据库/CSV 转换入库
-│       └── backtest/
-│           └── run_cta_backtest.py    # 脚本化回测入口（批处理/CI 场景）
+│       │   ├── openbb_fetch.py            # OpenBB 数据拉取 / 因子计算
+│       │   ├── ingest_vnpy.py             # 数据 -> vn.py 数据库/CSV 转换入库
+│       │   └── pipeline_palm_oil.py       # 一键数据流水线
+│       ├── backtest/
+│       │   ├── cli.py                     # CLI 回测入口（python -m qp.backtest.cli）
+│       │   ├── engine.py                  # 回测引擎封装
+│       │   ├── run_cta_backtest.py        # 脚本化回测（批处理/CI）
+│       │   ├── run_tick_backtest.py        # Tick 级别回测
+│       │   └── run_xtquant_backtest.py    # 迅投研数据回测
+│       ├── apps/
+│       │   └── enhanced_chart/            # 增强K线图 App（MACD/MA/OI叠加）
+│       ├── common/
+│       │   ├── constants.py               # 全局常量
+│       │   ├── logging.py                 # 日志配置
+│       │   └── utils.py                   # 通用工具函数
+│       └── utils/
+│           └── chan_debugger.py            # 缠论调试工具（K线/笔/中枢/信号记录）
+├── strategies/                            # 桥接文件（vnpy_ctastrategy 加载目录）
+│   ├── cta_palm_oil.py                    # → qp.strategies.cta_palm_oil
+│   ├── cta_turtle_enhanced.py             # → qp.strategies.cta_turtle_enhanced
+│   └── cta_chan_pivot.py                  # → qp.strategies.cta_chan_pivot
+├── scripts/
+│   ├── check_sensitive_info.py            # pre-commit 敏感信息检测
+│   ├── convert_png_to_ico.py              # PNG → ICO 转换工具
+│   ├── run_chan_pivot.py                  # 缠论策略基准运行脚本
+│   ├── test_chan_debugger.py              # ChanDebugger 功能测试
+│   ├── test_chan_invariants.py            # 缠论结构不变量测试
+│   └── archive/                           # 已归档的一次性实验脚本（29个）
 ├── tests/
-│   └── test_openctp_connection.py     # OpenCTP 连接测试脚本
+│   └── test_openctp_connection.py         # OpenCTP 连接测试脚本
+├── data/
+│   ├── analyse/                           # 分析用CSV数据
+│   │   ├── wind/                          # Wind数据源CSV
+│   │   └── *.csv                          # XTQuant数据源CSV
+│   └── debug/                             # ChanDebugger 输出目录
+├── experiments/                           # GUI/回测实验截图与产物
 ├── docs/
-│   ├── development.md                 # 本文件
-│   ├── openctp_quickstart.md          # OpenCTP 快速上手指南
-│   ├── openctp_integration_research.md # OpenCTP 技术调研报告
-│   ├── trade_all_features.md          # Trade 模式功能说明
-│   ├── quickstart_chart_recorder.md   # K线图和数据录制快速上手
-│   └── data_directory_guide.md        # Data 目录说明
-├── pyproject.toml                     # uv 依赖管理
-└── uv.lock                            # 锁定依赖版本
+│   ├── development.md                     # 本文件
+│   ├── debug.md                           # 调试指南
+│   ├── enhanced_chart_development.md      # 增强K线图开发文档
+│   ├── ctptest_guide.md                   # CTP测试指南
+│   ├── openctp_quickstart.md              # OpenCTP 快速上手指南
+│   ├── openctp_integration_research.md    # OpenCTP 技术调研报告
+│   ├── trade_all_features.md              # Trade 模式功能说明
+│   ├── quickstart_chart_recorder.md       # K线图和数据录制快速上手
+│   └── data_directory_guide.md            # Data 目录说明
+├── pyproject.toml                         # uv 依赖管理
+└── uv.lock                                # 锁定依赖版本
 ```
 
 ### 职责说明
@@ -60,11 +102,18 @@ quantPlus/
 |------|------|
 | `vendor/vnpy/` | vn.py 框架 submodule，只读引用，更新通过 git submodule update |
 | `src/qp/runtime/trader_app.py` | GUI 主入口，支持 `--profile` (trade/research/all) 和 `--gateway` (ctp/tts) 参数 |
+| `src/qp/strategies/cta_chan_pivot.py` | **缠论中枢策略**，基于5m笔/中枢信号+15m MACD过滤+ATR风控（主力策略） |
 | `src/qp/strategies/cta_palm_oil.py` | 双均线 CTA 策略，继承 CtaTemplate（学习用） |
-| `src/qp/strategies/cta_turtle_enhanced.py` | 增强海龟策略（趋势过滤+中轨止盈）**推荐** |
+| `src/qp/strategies/cta_turtle_enhanced.py` | 增强海龟策略（趋势过滤+中轨止盈） |
+| `src/qp/datafeed/normalizer.py` | **1分钟K线归一化**：时间戳标准化、交易时段过滤、session-aware窗口计算 |
+| `src/qp/datafeed/bar_generator.py` | PandasStyleBarGenerator，pandas风格K线合成（label=right） |
+| `src/qp/datafeed/session_synthesizer.py` | 交易时段K线合成器（1m→session bar→daily bar） |
+| `src/qp/utils/chan_debugger.py` | 缠论调试工具，记录K线/笔/中枢/信号/交易到 `data/debug/` |
+| `src/qp/backtest/cli.py` | CLI 回测入口（`python -m qp.backtest.cli`） |
+| `src/qp/backtest/engine.py` | 回测引擎封装（run_backtest函数） |
 | `src/qp/research/openbb_fetch.py` | 研究层数据获取，与交易运行时隔离 |
-| `src/qp/research/ingest_vnpy.py` | 数据桥接：将 OpenBB 数据转为 vn.py 可用格式 |
-| `src/qp/backtest/run_cta_backtest.py` | 脚本化回测，用于批量参数优化或 CI 流水线；图形化回测推荐走 GUI 的 research profile |
+| `src/qp/research/ingest_vnpy.py` | 数据桥接：将数据转为 vn.py 可用格式 |
+| `scripts/archive/` | 已归档的一次性实验脚本（iteration_v1-v6、backtest_v2-v4、trim等） |
 
 ---
 
@@ -438,18 +487,18 @@ from qp.strategies.{策略模块} import {策略类名}
 ```
 quantPlus/
 ├── strategies/                    # vnpy_ctastrategy 加载策略的目录
-│   ├── cta_palm_oil.py           # 桥接文件
-│   ├── cta_turtle_enhanced.py    # 桥接文件
-│   └── cta_chan_v1.py            # 桥接文件
+│   ├── cta_chan_pivot.py         # 桥接文件
+│   ├── cta_palm_oil.py          # 桥接文件
+│   └── cta_turtle_enhanced.py   # 桥接文件
 └── src/qp/strategies/            # 策略源码目录
-    ├── cta_palm_oil.py           # 策略实现
-    ├── cta_turtle_enhanced.py    # 策略实现
-    └── cta_chan_v1.py            # 策略实现
+    ├── cta_chan_pivot.py         # 缠论中枢策略
+    ├── cta_palm_oil.py          # 双均线策略
+    └── cta_turtle_enhanced.py   # 增强海龟策略
 ```
 
 **桥接文件内容**（只需一行导入）：
 ```python
-from qp.strategies.cta_chan_v1 import CtaChanV1Strategy
+from qp.strategies.cta_chan_pivot import CtaChanPivotStrategy
 ```
 
 **注意**：修改桥接文件后，需要重启 GUI 才能生效。如果仍不显示，尝试删除 `strategies/__pycache__/` 缓存目录。
@@ -497,12 +546,15 @@ uv run python -m qp.backtest.run_cta_backtest --strategy {策略类名} --days 3
 
 ## 9. 现有策略说明
 
-### 策略回测对比（60分钟数据，2025-05 ~ 2026-01，约8个月）
+### 策略回测对比
 
-| 策略 | Sharpe Ratio | 总收益率 | 年化收益 | 最大回撤 | 推荐度 |
-|------|-------------|---------|---------|---------|--------|
-| CtaTurtleEnhancedStrategy (激进) | **1.28** | **+24.41%** | **+34.07%** | -8.23% | **推荐** |
-| CtaPalmOilStrategy | -1.50 | -1.64% | -2.28% | -1.85% | 学习用 |
+| 策略 | 数据周期 | 回测区间 | Sharpe | 总收益率 | 年化收益 | 最大回撤 | 定位 |
+|------|---------|---------|--------|---------|---------|---------|------|
+| CtaChanPivotStrategy (p2601) | 1m→5m/15m | 2025-07~2026-01 | **2.74** | **+11.53%** | **+31.44%** | -3.23% | **主力策略** |
+| CtaTurtleEnhancedStrategy (激进) | 60m | 2025-05~2026-01 | 1.28 | +24.41% | +34.07% | -8.23% | 趋势跟踪 |
+| CtaPalmOilStrategy | 日线 | 2025-01~2026-01 | -1.50 | -1.64% | -2.28% | -1.85% | 学习用 |
+
+> **注**：ChanPivot 回测数据来自 13 合约批量回测中表现最佳的 p2601.DCE（XT 数据源）。13 合约总体：4 盈利 / 13 总计，策略仍在迭代优化中。
 
 ### CtaTurtleEnhancedStrategy（增强海龟策略）**推荐**
 
@@ -545,6 +597,165 @@ uv run python -m qp.backtest.run_cta_backtest --strategy CtaTurtleEnhancedStrate
 ### CtaPalmOilStrategy
 
 基础双均线策略，用于学习和验证框架功能。
+
+### CtaChanPivotStrategy（缠论中枢策略）
+
+#### 策略概述
+
+基于缠论中枢理论的 CTA 策略，核心流程：
+
+```
+5分钟K线 → 包含处理 → 分型识别 → 严格笔构建 → 中枢(ZhongShu)识别
+  → 3B/3S 主信号 + 2B/2S 辅助信号
+  → 15分钟 MACD 趋势过滤
+  → P1硬止损 + ATR移动止损
+```
+
+策略实现完全增量化：所有指标（MACD、ATR）和缠论结构（包含处理、分型、笔、中枢）均为逐 bar 增量更新，无需回溯历史数据。
+
+#### 数据流架构
+
+```
+┌─────────────┐    ┌──────────────────────┐    ┌───────────────────┐
+│ 1分钟K线输入 │───→│ session-aware 合成     │───→│ 增量指标计算        │
+│  (on_bar)   │    │  5m: _update_5m_bar() │    │  MACD(5m/15m)     │
+│             │    │ 15m: _update_15m_bar()│    │  ATR(5m)          │
+└─────────────┘    └──────────────────────┘    └───────────────────┘
+                                                        │
+      ┌─────────────────────────────────────────────────┘
+      ▼
+┌───────────────────┐    ┌───────────────────┐    ┌──────────────┐
+│ 缠论结构增量构建    │───→│ 信号检测            │───→│ 风控与执行     │
+│  包含处理          │    │  3B/3S (中枢信号)   │    │  P1硬止损     │
+│  分型 → 严格笔     │    │  2B/2S (背驰辅助)   │    │  ATR移动止损  │
+│  中枢识别          │    │  15m MACD过滤       │    │  1m级别监控   │
+└───────────────────┘    └───────────────────┘    └──────────────┘
+```
+
+**关键设计**：
+- 1 分钟 K 线通过 `normalizer.py` 的 session-aware 逻辑合成 5m/15m，保证跨数据源（Wind / XTQuant）一致
+- 15m MACD 使用 `shift(1)` 延迟（`_prev_diff_15m` / `_prev_dea_15m`），避免 look-ahead bias
+- 信号在 5m bar 级别生成，入场和止损在 1m bar 级别监控执行
+
+#### 核心信号说明
+
+**3B 买点（中枢三买）**：
+
+| 条件 | 说明 |
+|------|------|
+| 回踩点 > ZG | 当前笔端点（底分型）高于中枢高点，说明回踩不破中枢 |
+| 离开段 > ZG | 前一笔端点（顶分型）也高于中枢高点，说明确实向上离开过 |
+| 中枢时效性 | `end_bi_idx >= len(bi_points) - pivot_valid_range`，中枢必须是近期的 |
+| 大周期多头 | 15分钟 MACD：`prev_diff_15m > prev_dea_15m`（金叉状态） |
+
+**3S 卖点（中枢三卖）**：
+
+| 条件 | 说明 |
+|------|------|
+| 回抽点 < ZD | 当前笔端点（顶分型）低于中枢低点，说明回抽不破中枢 |
+| 离开段 < ZD | 前一笔端点（底分型）也低于中枢低点，说明确实向下离开过 |
+| 中枢时效性 | 同上 |
+| 大周期空头 | 15分钟 MACD：`prev_diff_15m < prev_dea_15m`（死叉状态） |
+
+**2B/2S 辅助信号（趋势延续）**：
+
+| 信号 | 条件 |
+|------|------|
+| 2B 买点 | 低点抬高（`p_now.price > p_prev.price`）+ MACD 背驰（`diff` 回升）+ 大周期多头 |
+| 2S 卖点 | 高点降低（`p_now.price < p_prev.price`）+ MACD 背驰（`diff` 回落）+ 大周期空头 |
+
+> 2B/2S 仅在 3B/3S 未触发时作为补充信号，优先级低于中枢信号。
+
+#### 风控系统
+
+**P1 硬止损**：
+
+- 多头止损 = 回踩点价格 - 1（`stop_base - 1`）
+- 空头止损 = 回抽点价格 + 1（`stop_base + 1`）
+- 在 1 分钟级别逐 bar 检查（`_check_stop_loss_1m`）
+
+**ATR 移动止损**：
+
+| 阶段 | 条件 | 行为 |
+|------|------|------|
+| 未激活 | 浮盈 ≤ `atr_activate_mult × ATR`（默认 1.5 倍） | 仅使用 P1 硬止损 |
+| 激活后 | 浮盈 > 1.5 × ATR | 启动追踪，多头：`high - atr_trailing_mult × ATR`；空头：`low + atr_trailing_mult × ATR` |
+| 追踪中 | 每根 5m bar | 止损只能朝有利方向移动（多头只上移，空头只下移） |
+
+**入场过滤**：触发价与止损距离不超过 `atr_entry_filter × ATR`（默认 2.0 倍），过滤距离过大的信号。
+
+#### 可配置参数表
+
+| 参数 | 默认值 | 说明 |
+|------|--------|------|
+| `macd_fast` | 12 | MACD 快线 EMA 周期 |
+| `macd_slow` | 26 | MACD 慢线 EMA 周期 |
+| `macd_signal` | 9 | MACD 信号线 EMA 周期 |
+| `atr_window` | 14 | ATR 计算窗口（5m bar 数） |
+| `atr_trailing_mult` | 3.0 | ATR 移动止损倍数 |
+| `atr_activate_mult` | 1.5 | 激活移动止损的浮盈 ATR 倍数 |
+| `atr_entry_filter` | 2.0 | 入场过滤：触发价与止损距离上限（ATR 倍数） |
+| `min_bi_gap` | 4 | 严格笔端点最小间隔（包含处理后的 K 线数） |
+| `pivot_valid_range` | 6 | 中枢有效范围（笔端点数，超过则视为过期） |
+| `fixed_volume` | 1 | 固定开仓手数 |
+| `debug` | False | 是否输出 debug 日志到控制台 |
+| `debug_enabled` | True | 是否启用 ChanDebugger 记录 |
+| `debug_log_console` | True | ChanDebugger 是否同时输出到控制台 |
+
+#### 回测表现
+
+批量回测（13 合约，1 分钟数据）：
+
+| 合约 | 收益率 | Sharpe | 最大回撤 | 备注 |
+|------|--------|--------|----------|------|
+| **p2601.DCE** | **+11.53%** | **2.74** | **-3.23%** | 最佳合约 |
+| 其他 12 合约 | — | — | — | 混合表现 |
+| **总体** | — | — | — | **4 盈利 / 13 总计** |
+
+> 策略对趋势行情敏感度高，在震荡市中表现一般。最佳表现出现在趋势明显的合约上。
+
+#### 使用方法
+
+**CLI 回测**：
+
+```bash
+# 单合约回测
+uv run python -m qp.backtest.run_cta_backtest \
+  --strategy CtaChanPivotStrategy \
+  --symbol p2601 \
+  --interval MINUTE \
+  --days 365
+
+# 批量回测（多合约）
+uv run python -m qp.backtest.run_cta_backtest \
+  --strategy CtaChanPivotStrategy \
+  --interval MINUTE \
+  --days 365 \
+  --batch
+```
+
+**桥接文件**（`strategies/cta_chan_pivot.py`）：
+
+```python
+from qp.strategies.cta_chan_pivot import CtaChanPivotStrategy
+```
+
+#### Debug 系统
+
+策略内置 `ChanDebugger` 调试工具，输出目录为 `data/debug/`，包含以下记录：
+
+| 文件类型 | 内容 | 用途 |
+|----------|------|------|
+| K线记录 | 1m / 5m K 线及指标值 | 验证数据合成正确性 |
+| 包含处理 | 合并前后的 high/low 和方向 | 调试包含处理逻辑 |
+| 笔端点 | 类型(top/bottom)、价格、索引 | 验证严格笔构建 |
+| 中枢 | ZG/ZD、起止笔索引、状态 | 验证中枢识别 |
+| 信号 | 类型(3B/3S/2B/2S)、方向、触发价、止损价 | 分析信号质量 |
+| 交易记录 | 开平仓、价格、手数、盈亏、信号类型 | 复盘交易表现 |
+| 持仓状态 | 方向、入场价、止损价、浮盈、追踪状态 | 实时监控 |
+| 策略配置 | 所有参数快照 | 回测复现 |
+
+**启用方式**：设置 `debug_enabled=True`（默认已启用），输出到 `data/debug/{strategy_name}/` 目录。
 
 ## 10. 数据获取
 
@@ -977,3 +1188,157 @@ data = xtdata.get_market_data(
     fill_data=False,  # 关键：不填充非交易时段
 )
 ```
+
+---
+
+## 14. 数据归一化与 Session-Aware K线合成
+
+### 问题背景
+
+在使用多数据源（Wind、XTQuant）进行回测对比时，发现分钟级 K 线存在以下不一致问题：
+
+| 问题 | Wind | XTQuant | 影响 |
+|------|------|---------|------|
+| 时间戳格式 | `:59` 秒（如 `09:04:59`） | `:00` 秒（如 `09:05:00`） | 同一根 bar 时间戳不同，合成窗口错位 |
+| Session boundary bars | 可能包含集合竞价 bar | 不包含 | 首根 bar 数据不一致 |
+| 零成交噪声 | 可能存在 V=0 且 OHLC 相同的 bar | 较少 | 影响指标计算 |
+| 非交易时段数据 | 无 | `fill_data=True` 时会填充 | K 线数量差异大 |
+
+这些差异在逐 bar 增量策略（如 `CtaChanPivotStrategy`）中会被放大：一根 bar 的时间戳偏差 → 窗口归属不同 → 合成的 5m/15m bar 不同 → 指标值不同 → 信号不同 → 回测结果不可复现。
+
+### normalize_1m_bars() 功能
+
+`src/qp/datafeed/normalizer.py` 提供统一的 1 分钟 K 线归一化函数：
+
+```python
+from qp.datafeed.normalizer import normalize_1m_bars, PALM_OIL_SESSIONS
+
+df_clean = normalize_1m_bars(df_raw, sessions=PALM_OIL_SESSIONS)
+```
+
+**处理步骤**：
+
+| 步骤 | 操作 | 说明 |
+|------|------|------|
+| 1 | 时间戳标准化 | `:59` 秒 → 下一分钟 `:00`（+1s），统一到分钟精度（`floor("min")`） |
+| 2 | 去重 | 同一时间戳保留最后一条（`drop_duplicates(keep="last")`） |
+| 3 | 交易时段过滤 | 只保留 `(session_start, session_end]` 区间内的 bar |
+| 4 | 零成交噪声剔除 | V=0 且 O=H=L=C 的 bar 视为噪声，移除 |
+
+### SessionSpec 与 PALM_OIL_SESSIONS 定义
+
+```python
+@dataclass(frozen=True)
+class SessionSpec:
+    """交易时段定义."""
+    start: time   # 时段开始时间（不含）
+    end: time     # 时段结束时间（含）
+    name: str = ""
+```
+
+**大商所棕榈油 4 个交易时段**：
+
+```python
+PALM_OIL_SESSIONS: List[SessionSpec] = [
+    SessionSpec(start=time(21, 0), end=time(23, 0), name="night"),   # 夜盘
+    SessionSpec(start=time(9, 0),  end=time(10, 15), name="am1"),    # 早盘1
+    SessionSpec(start=time(10, 30), end=time(11, 30), name="am2"),   # 早盘2
+    SessionSpec(start=time(13, 30), end=time(15, 0),  name="pm"),    # 午盘
+]
+```
+
+**区间语义**：`(start, end]`，即 start 时刻不含（集合竞价不算），end 时刻包含。
+
+### compute_window_end() 原理
+
+```python
+def compute_window_end(dt, sessions, window_minutes) -> Optional[datetime]:
+```
+
+**功能**：计算 `dt` 所属的 N 分钟窗口结束时间（session-aware）。
+
+**算法流程**：
+
+```
+1. 定位 dt 所属的 session → (session_start, session_end)
+2. 计算 dt 距 session_start 的分钟数 elapsed
+3. 窗口结束偏移 = ceil(elapsed / window_minutes) × window_minutes
+4. window_end = session_start + 窗口结束偏移
+5. 截断：if window_end > session_end → window_end = session_end
+```
+
+**关键设计**：
+- 窗口从 `session_start` 起算对齐，不是从自然整点对齐
+- Session 尾部截断：如 am1 时段（09:00, 10:15]，5 分钟窗口最后一个为 10:15 而非 10:20
+- 不跨 session：夜盘 23:00 窗口结束后，不会延伸到次日 am1
+
+**示例**（5 分钟窗口，am1 时段）：
+
+| 1m bar 时间戳 | elapsed (分钟) | window_end |
+|---------------|---------------|------------|
+| 09:01 | 1 | 09:05 |
+| 09:05 | 5 | 09:05 |
+| 09:06 | 6 | 09:10 |
+| 10:11 | 71 | 10:15 |
+| 10:15 | 75 | 10:15（尾部截断） |
+
+### get_session_key() 用途
+
+```python
+def get_session_key(dt, sessions) -> Optional[Tuple[datetime, datetime]]:
+```
+
+返回 `dt` 所属 session 的 `(session_start_dt, session_end_dt)` 元组，作为 session 唯一标识。
+
+**用途**：在策略的 K 线合成中，通过比较 `session_key` 是否变化来判断是否跨 session。跨 session 时必须强制 emit 当前窗口的 bar，避免两个不同 session 的数据被合并到同一根 K 线中。
+
+### 策略中的 Session-Aware 5m/15m 合成
+
+`CtaChanPivotStrategy` 中的 `_update_5m_bar()` / `_update_15m_bar()` 实现了 session-aware 的增量 K 线合成。
+
+**核心逻辑**（以 5m 为例）：
+
+```python
+def _update_5m_bar(self, bar: dict) -> Optional[dict]:
+    dt = bar['datetime']
+    window_end = compute_window_end(dt, self._sessions, 5)
+    session_key = get_session_key(dt, self._sessions)
+    result = None
+
+    if self._window_bar_5m is not None:
+        session_changed = (self._last_session_key_5m != session_key)
+        window_changed  = (self._last_window_end_5m != window_end)
+        if session_changed or window_changed:
+            result = self._window_bar_5m.copy()   # ← emit 上一个窗口
+            self._window_bar_5m = None
+
+    # 初始化或更新当前窗口 ...
+    return result
+```
+
+**关键设计点**：
+
+| 设计 | 说明 |
+|------|------|
+| 窗口切换 emit | 检测到 `window_end` 变化时，emit 上一个窗口的 bar（而非等 `dt == window_end`） |
+| Session 切换 emit | 检测到 `session_key` 变化时，即使窗口未满也强制 emit |
+| 先 emit 后更新 | 当前 bar 的数据归入新窗口，不会污染上一个窗口 |
+| 返回值语义 | 返回 `None` = 当前窗口仍在累积；返回 `dict` = 上一个窗口已完成 |
+
+**为什么不用 `dt == window_end` 判断？**
+
+不同数据源的尾部 bar 时间戳可能不同（如 Wind 的 10:15 bar 可能是 10:14:59），用精确时间匹配会导致：
+- 某些数据源永远不会触发 emit（因为永远没有精确等于 window_end 的 bar）
+- 窗口数据被意外合并到下一个窗口
+
+使用「窗口切换」检测则完全避免了这个问题：只要新 bar 属于不同窗口，就 emit 上一个窗口。
+
+### 验证结论
+
+通过 date-aligned 测试验证归一化效果：
+
+1. **测试方法**：取 Wind 和 XTQuant 数据的重叠日期区间，分别经 `normalize_1m_bars()` 处理后，使用 `CtaChanPivotStrategy` 回测
+2. **对齐方式**：只保留两个数据源都有数据的交易日（date-aligned），排除数据缺失导致的差异
+3. **结果**：在 overlap 区间内，Wind 与 XT 的回测指标**完全一致**（收益率差异 +0.00，Sharpe 差异 +0.00）
+
+> 这证明了归一化 + session-aware 合成方案成功消除了数据源差异，策略结果完全可复现。
