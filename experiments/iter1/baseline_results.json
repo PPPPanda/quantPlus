@@ -1,0 +1,76 @@
+{
+  "params": {
+    "debug_enabled": true,
+    "debug_log_console": false,
+    "cooldown_losses": 4,
+    "cooldown_bars": 30
+  },
+  "bt_params": {
+    "interval": "Interval.MINUTE",
+    "rate": "0.0001",
+    "slippage": "1.0",
+    "size": "10.0",
+    "pricetick": "2.0",
+    "capital": "1000000.0"
+  },
+  "results": [
+    {
+      "contract": "p2601.DCE",
+      "source": "XT",
+      "slot": "\u6807\u6746",
+      "bars": 30231,
+      "start_date": "2025-07-01",
+      "end_date": "2025-11-07",
+      "total_days": "88",
+      "trades": "123",
+      "total_return%": 1.4931669999999952,
+      "annual_return%": 4.072273636363623,
+      "max_dd%": -0.3837814678737356,
+      "sharpe": 3.426105611985745,
+      "total_pnl": 14931.669999999998,
+      "commission": 1128.3300000000002,
+      "win_rate%": 0,
+      "avg_trade_pnl": 0,
+      "elapsed_s": 4.0
+    },
+    {
+      "contract": "p2405.DCE",
+      "source": "Wind",
+      "slot": "\u4fee\u590d",
+      "bars": 28502,
+      "start_date": "2023-12-06",
+      "end_date": "2024-04-12",
+      "total_days": "84",
+      "trades": "133",
+      "total_return%": 0.572872000000002,
+      "annual_return%": 1.6367771428571487,
+      "max_dd%": -0.24103242489505902,
+      "sharpe": 1.71451203466926,
+      "total_pnl": 5728.72,
+      "commission": 991.28,
+      "win_rate%": 0,
+      "avg_trade_pnl": 0,
+      "elapsed_s": 4.1
+    },
+    {
+      "contract": "p2209.DCE",
+      "source": "Wind",
+      "slot": "\u538b\u529b",
+      "bars": 28408,
+      "start_date": "2022-04-15",
+      "end_date": "2022-08-16",
+      "total_days": "84",
+      "trades": "116",
+      "total_return%": 6.736243200000014,
+      "annual_return%": 19.246409142857182,
+      "max_dd%": -2.2393530105290482,
+      "sharpe": 4.143997261358155,
+      "total_pnl": 67362.43199999999,
+      "commission": 1197.5680000000002,
+      "win_rate%": 0,
+      "avg_trade_pnl": 0,
+      "elapsed_s": 3.7
+    }
+  ],
+  "total_pnl": 88022.82199999999
+}

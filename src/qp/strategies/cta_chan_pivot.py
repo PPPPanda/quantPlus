@@ -66,7 +66,7 @@ class CtaChanPivotStrategy(CtaTemplate):
     # ATR 参数
     atr_window: int = 14
     atr_trailing_mult: float = 3.0   # ATR 移动止损倍数
-    atr_activate_mult: float = 1.5   # 激活移动止损的浮盈 ATR 倍数
+    atr_activate_mult: float = 2.5   # 激活移动止损的浮盈 ATR 倍数
     atr_entry_filter: float = 2.0    # 入场过滤：触发价与止损距离不超过 N 倍 ATR
 
     # 笔构建参数
@@ -78,6 +78,13 @@ class CtaChanPivotStrategy(CtaTemplate):
     # 合约参数
     fixed_volume: int = 1            # 固定手数
 
+    # B02: 连亏冷却参数
+    cooldown_losses: int = 0         # 0 = 禁用冷却；连亏 N 笔后触发冷却
+    cooldown_bars: int = 10          # 冷却 M 根 5m bar
+
+    # B03: 止损 buffer 参数
+    stop_buffer_atr_pct: float = 0.05  # 止损 buffer = max(pricetick, atr * pct)
+
     # 调试
     debug: bool = False
     debug_enabled: bool = True      # 是否启用Debug记录
@@ -87,6 +94,7 @@ class CtaChanPivotStrategy(CtaTemplate):
         "macd_fast", "macd_slow", "macd_signal",
         "atr_window", "atr_trailing_mult", "atr_activate_mult", "atr_entry_filter",
         "min_bi_gap", "pivot_valid_range", "fixed_volume",
+        "cooldown_losses", "cooldown_bars", "stop_buffer_atr_pct",
         "debug", "debug_enabled", "debug_log_console",
     ]
 
@@ -165,6 +173,10 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._entry_price: float = 0.0
         self._stop_price: float = 0.0
         self._trailing_active: bool = False
+
+        # B02: 连亏冷却状态
+        self._consecutive_losses: int = 0
+        self._cooldown_remaining: int = 0  # 剩余冷却 5m bar 数
 
         # 5m bar 计数
         self._bar_5m_count: int = 0
@@ -255,9 +267,14 @@ class CtaChanPivotStrategy(CtaTemplate):
                 self.put_event()
                 return
 
-        # 2. 进场管理：检查待触发信号（1分钟级别，仅实盘模式）
-        if self.trading and self._position == 0 and self._pending_signal:
-            self._check_entry_1m(bar_dict)
+        # 2. 信号管理：检查待触发信号（入场/平仓，仅实盘模式）
+        if self.trading and self._pending_signal:
+            # Buy 信号仅在无仓时触发；CloseLong 信号仅在持多仓时触发
+            sig_type = self._pending_signal.get('type', '')
+            if (sig_type == 'Buy' and self._position == 0) or \
+               (sig_type == 'CloseLong' and self._position == 1) or \
+               (sig_type == 'Sell' and self._position == 0):
+                self._check_entry_1m(bar_dict)
 
         # 3. 增量更新 15m K 线
         bar_15m = self._update_15m_bar(bar_dict)
@@ -423,6 +440,10 @@ class CtaChanPivotStrategy(CtaTemplate):
     def _on_5m_bar(self, bar: dict) -> None:
         """5 分钟 K 线回调 - 核心交易逻辑."""
         self._bar_5m_count += 1
+
+        # B02: 冷却计数器递减
+        if self._cooldown_remaining > 0:
+            self._cooldown_remaining -= 1
 
         # 更新指标
         self._update_macd_5m(bar['close'])
@@ -624,6 +645,7 @@ class CtaChanPivotStrategy(CtaTemplate):
                 'start_bi_idx': len(self._bi_points) - 4,
                 'end_bi_idx': len(self._bi_points) - 1
             }
+
             self._pivots.append(new_pivot)
             # Debug: 记录新中枢（仅实盘模式）
             if self._debugger and self.trading:
@@ -639,6 +661,10 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._update_pivots()
 
         if len(self._bi_points) < 5:
+            return
+
+        # B02: 冷却期间不生成新信号
+        if self._cooldown_remaining > 0:
             return
 
         # 获取笔端点
@@ -674,13 +700,13 @@ class CtaChanPivotStrategy(CtaTemplate):
                                 stop_base = p_now['price']
 
             # --- 3S 卖点 ---
-            # 场景：向下离开中枢 + 回抽不破中枢低点 (ZD)
+            # B09: 3S 仅平多仓，不再反手开空
             elif p_now['type'] == 'top':
                 if p_now['price'] < last_pivot['zd']:
                     if p_last['price'] < last_pivot['zd']:
                         if last_pivot['end_bi_idx'] >= len(self._bi_points) - self.pivot_valid_range:
                             if is_bear:
-                                sig = 'Sell'
+                                sig = 'CloseLong'
                                 trigger_price = p_now['data']['low']
                                 stop_base = p_now['price']
 
@@ -697,8 +723,9 @@ class CtaChanPivotStrategy(CtaTemplate):
 
             elif p_now['type'] == 'top':
                 div = p_now['data']['diff'] < p_prev['data']['diff']
+                # B09: 2S 仅平多仓，不再反手开空
                 if p_now['price'] < p_prev['price'] and div and is_bear:
-                    sig = 'Sell'  # 2S
+                    sig = 'CloseLong'  # 2S
                     trigger_price = p_now['data']['low']
                     stop_base = p_now['price']
 
@@ -706,23 +733,45 @@ class CtaChanPivotStrategy(CtaTemplate):
         # 信号过滤与设置
         # --------------------------------------------------------
         if sig and self.atr > 0:
+            # B09: CloseLong 信号仅在持有多仓时有效
+            if sig == 'CloseLong':
+                if self._position == 1:
+                    # 有多仓，设置平仓信号
+                    self._signal_type = "3S" if (self._pivots and last_pivot and
+                        p_now['price'] < last_pivot['zd']) else "2S"
+                    reason = f"{self._signal_type}: 平多信号"
+                    self._pending_signal = {
+                        'type': 'CloseLong',
+                        'trigger_price': trigger_price,
+                        'stop_base': stop_base
+                    }
+                    self.signal = f"待平多({self._signal_type})"
+                    if self._debugger and self.trading:
+                        self._debugger.log_signal(
+                            signal_type=self._signal_type,
+                            direction="CloseLong",
+                            trigger_price=trigger_price,
+                            stop_price=stop_base,
+                            atr=self.atr,
+                            reason=reason
+                        )
+                # 无多仓时忽略 CloseLong 信号
+                return
+
             # 入场过滤：触发价与止损距离不超过 N 倍 ATR
             distance = abs(trigger_price - stop_base)
             if distance < self.atr_entry_filter * self.atr:
-                # 判断信号类型
+                # 判断信号类型（只有 Buy 信号能到这里）
                 if self._pivots and last_pivot:
                     if p_now['type'] == 'bottom' and p_now['price'] > last_pivot['zg']:
                         self._signal_type = "3B"
                         reason = f"3B买点: 回踩不破中枢ZG={last_pivot['zg']:.0f}"
-                    elif p_now['type'] == 'top' and p_now['price'] < last_pivot['zd']:
-                        self._signal_type = "3S"
-                        reason = f"3S卖点: 回抽不破中枢ZD={last_pivot['zd']:.0f}"
                     else:
-                        self._signal_type = "2B" if sig == 'Buy' else "2S"
-                        reason = f"{self._signal_type}: 背驰确认"
+                        self._signal_type = "2B"
+                        reason = f"{self._signal_type}: 趋势延续确认"
                 else:
-                    self._signal_type = "2B" if sig == 'Buy' else "2S"
-                    reason = f"{self._signal_type}: 背驰确认"
+                    self._signal_type = "2B"
+                    reason = f"{self._signal_type}: 趋势延续确认"
 
                 self._pending_signal = {
                     'type': sig,
@@ -746,7 +795,7 @@ class CtaChanPivotStrategy(CtaTemplate):
                     self.write_log(f"[DEBUG] 信号生成: {sig}, trigger={trigger_price:.0f}, stop={stop_base:.0f}")
 
     def _check_entry_1m(self, bar: dict) -> None:
-        """1分钟级别检查入场（待触发信号）."""
+        """1分钟级别检查入场/平仓（待触发信号）."""
         signal = self._pending_signal
         if not signal:
             return
@@ -764,13 +813,51 @@ class CtaChanPivotStrategy(CtaTemplate):
                     fill_price = bar['close']
                 self._open_position(1, fill_price, signal['stop_base'])
 
+        elif signal['type'] == 'CloseLong':
+            # B09: 平多仓信号
+            if self._position != 1:
+                # 已无多仓，信号失效
+                self._pending_signal = None
+                self.signal = ""
+                return
+            # 检查是否触发平仓（价格跌破触发价）
+            if bar['low'] < signal['trigger_price']:
+                fill_price = min(signal['trigger_price'], bar['open'])
+                if fill_price < bar['low']:
+                    fill_price = bar['close']
+                # 平多仓
+                pnl = fill_price - self._entry_price
+                self.sell(fill_price, abs(self.pos))
+                self.write_log(f"3S/2S平多: price={fill_price:.0f}, pnl={pnl:.0f}")
+                if self._debugger and self.trading:
+                    self._debugger.log_trade(
+                        action="CLOSE_LONG",
+                        price=fill_price,
+                        volume=self.fixed_volume,
+                        position=0,
+                        pnl=pnl,
+                        signal_type=self._signal_type
+                    )
+                self._position = 0
+                self._trailing_active = False
+                self._pending_signal = None
+                self.signal = "平多"
+                # B02: 连亏计数
+                if self.cooldown_losses > 0:
+                    if pnl < 0:
+                        self._consecutive_losses += 1
+                        if self._consecutive_losses >= self.cooldown_losses:
+                            self._cooldown_remaining = self.cooldown_bars
+                            self._consecutive_losses = 0
+                    else:
+                        self._consecutive_losses = 0
+
         elif signal['type'] == 'Sell':
-            # 检查是否已经破止损（信号失效）
+            # 保留 Sell 逻辑以防万一（当前不应该被触发）
             if bar['high'] > signal['stop_base']:
                 self._pending_signal = None
                 self.signal = ""
                 return
-            # 检查是否触发入场
             if bar['low'] < signal['trigger_price']:
                 fill_price = min(signal['trigger_price'], bar['open'])
                 if fill_price < bar['low']:
@@ -849,6 +936,17 @@ class CtaChanPivotStrategy(CtaTemplate):
             self._position = 0
             self._trailing_active = False
             self.signal = "止损"
+
+            # B02: 更新连亏计数（cooldown_losses > 0 时才启用）
+            if self.cooldown_losses > 0:
+                if pnl < 0:
+                    self._consecutive_losses += 1
+                    if self._consecutive_losses >= self.cooldown_losses:
+                        self._cooldown_remaining = self.cooldown_bars
+                        self._consecutive_losses = 0
+                else:
+                    self._consecutive_losses = 0
+
             return True
 
         return False
