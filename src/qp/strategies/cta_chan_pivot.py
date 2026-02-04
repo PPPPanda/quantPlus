@@ -33,7 +33,9 @@ from vnpy.trader.constant import Interval
 from vnpy_ctastrategy import CtaTemplate
 from vnpy_ctastrategy.base import StopOrder
 
-from qp.datafeed.normalizer import PALM_OIL_SESSIONS, compute_window_end, get_session_key
+from qp.datafeed.normalizer import (
+    PALM_OIL_SESSIONS, compute_window_end, get_session_key, _get_session_for_time,
+)
 from qp.utils.chan_debugger import ChanDebugger
 
 logger = logging.getLogger(__name__)
@@ -109,6 +111,16 @@ class CtaChanPivotStrategy(CtaTemplate):
     div_mode: int = 1                  # 0=baseline(仅diff), 1=OR(diff或面积背驰), 2=AND, 3=仅面积背驰
     div_threshold: float = 0.50        # 面积背驰阈值：当前笔面积 < 前同向笔面积 * threshold 视为背驰
 
+    # S8: 走势段(segment)背驰参数
+    seg_enabled: bool = False          # True=用segment背驰替代原2B/2S; False=保持原逻辑
+    seg_div_ratio: float = 0.82        # 段背驰阈值：area2/area1 <= ratio 视为背驰(2B)
+    seg_div_ratio_sell: float = 0.78   # 段背驰阈值(2S平多)
+    seg_min_bi: int = 3                # 段最小笔数（过短的段不参与背驰比较）
+    seg_price_tol: float = 0.003       # 价格容差：创新低/新高的允许偏差（比例）
+
+    # S9: 2B入场histogram确认门
+    hist_gate: int = 0                 # 0=禁用; 1=2B需histogram>0; 2=2B需histogram上拐
+
     # 调试
     debug: bool = False
     debug_enabled: bool = True      # 是否启用Debug记录
@@ -128,6 +140,8 @@ class CtaChanPivotStrategy(CtaTemplate):
         "max_pivot_entries", "pivot_reentry_atr",
         "dedup_bars", "dedup_atr_mult",
         "div_mode", "div_threshold",
+        "seg_enabled", "seg_div_ratio", "seg_div_ratio_sell", "seg_min_bi", "seg_price_tol",
+        "hist_gate",
         "debug", "debug_enabled", "debug_log_console",
     ]
 
@@ -232,6 +246,10 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._current_bi_macd_area: float = 0.0  # 当前笔段累积 |histogram|
         self._bi_macd_areas: list[float] = []     # 每笔完成时的面积记录
 
+        # S8: 走势段(segment)缓存
+        self._segments: list[dict] = []           # 已完成的走势段列表
+        self._seg_last_bi_count: int = 0          # 上次构建segments时的笔数
+
         # Debug工具
         self._debugger: Optional[ChanDebugger] = None
         self._signal_type: str = ""  # 当前信号类型(用于debug)
@@ -296,6 +314,13 @@ class CtaChanPivotStrategy(CtaTemplate):
 
         使用增量方式合成 5m/15m K 线并计算指标。
         """
+        # 非交易时段 bar 直接跳过（兼容未归一化的原始数据）
+        dt = bar.datetime
+        if hasattr(dt, 'tzinfo') and dt.tzinfo is not None:
+            dt = dt.replace(tzinfo=None)
+        if _get_session_for_time(dt.time(), self._sessions) is None:
+            return
+
         self.bar_count += 1
 
         # 转换为 dict 格式
@@ -826,6 +851,161 @@ class CtaChanPivotStrategy(CtaTemplate):
         else:
             return diff_ok
 
+    # ------------------------------------------------------------------
+    # S8: 走势段(Segment)构建与背驰判定
+    # ------------------------------------------------------------------
+
+    def _build_segments(self) -> list[dict]:
+        """
+        S8: 从 bi_points + bi_macd_areas 构建走势段.
+
+        段定义（简化工程版，非严格缠论线段）：
+        - down 段：从某个 top 开始，回抽 top 不创新高（top 逐步走低）
+        - up 段：从某个 bottom 开始，回抽 bottom 不创新低
+        - 段切换：出现更高的 top（down→up）或更低的 bottom（up→down）
+        """
+        bp = self._bi_points
+        areas = self._bi_macd_areas
+        n_bp = len(bp)
+
+        if n_bp < 5:
+            return []
+
+        segments: list[dict] = []
+
+        def bi_dir(i: int) -> str:
+            """笔 i 连接 bp[i] -> bp[i+1] 的方向."""
+            return 'up' if bp[i + 1]['price'] > bp[i]['price'] else 'down'
+
+        def seg_area(seg_dir: str, bi_start: int, bi_end: int) -> float:
+            """计算段内同向笔的 MACD 面积之和."""
+            total = 0.0
+            for k in range(bi_start, min(bi_end, len(areas))):
+                if bi_dir(k) == seg_dir:
+                    total += abs(areas[k]) if k < len(areas) else 0.0
+            return total
+
+        # 初始化当前段
+        cur_dir = bi_dir(0)
+        cur_start = 0
+
+        # 追踪 **前一个** 同类端点价格（不是全局极值）
+        # down 段：当新 top > prev_top 时切换
+        # up 段：当新 bottom < prev_bottom 时切换
+        prev_top_price = None
+        prev_bottom_price = None
+
+        for j in range(min(2, n_bp)):
+            if bp[j]['type'] == 'top':
+                prev_top_price = bp[j]['price']
+            elif bp[j]['type'] == 'bottom':
+                prev_bottom_price = bp[j]['price']
+
+        def _close_segment(end_i: int) -> None:
+            bi_end = end_i
+            if bi_end > cur_start:
+                segments.append({
+                    'dir': cur_dir,
+                    'start_i': cur_start,
+                    'end_i': end_i,
+                    'start_price': bp[cur_start]['price'],
+                    'end_price': bp[end_i]['price'],
+                    'bi_start': cur_start,
+                    'bi_end': bi_end,
+                    'macd_area': seg_area(cur_dir, cur_start, bi_end),
+                    'bi_count': bi_end - cur_start,
+                })
+
+        for i in range(2, n_bp):
+            p = bp[i]
+
+            if p['type'] == 'top':
+                if cur_dir == 'down' and prev_top_price is not None:
+                    if p['price'] > prev_top_price:
+                        # top 创新高 → down 段结束
+                        end_i = i - 1
+                        _close_segment(end_i)
+                        cur_dir = 'up'
+                        cur_start = end_i
+                        prev_bottom_price = bp[end_i]['price'] if bp[end_i]['type'] == 'bottom' else prev_bottom_price
+                # 始终更新为当前 top 价格（跟踪前一个，而非全局最大）
+                prev_top_price = p['price']
+
+            elif p['type'] == 'bottom':
+                if cur_dir == 'up' and prev_bottom_price is not None:
+                    if p['price'] < prev_bottom_price:
+                        # bottom 创新低 → up 段结束
+                        end_i = i - 1
+                        _close_segment(end_i)
+                        cur_dir = 'down'
+                        cur_start = end_i
+                        prev_top_price = bp[end_i]['price'] if bp[end_i]['type'] == 'top' else prev_top_price
+                prev_bottom_price = p['price']
+
+        # 关闭最后一个未完成段
+        end_i = n_bp - 1
+        if end_i > cur_start:
+            segments.append({
+                'dir': cur_dir,
+                'start_i': cur_start,
+                'end_i': end_i,
+                'start_price': bp[cur_start]['price'],
+                'end_price': bp[end_i]['price'],
+                'bi_start': cur_start,
+                'bi_end': end_i,
+                'macd_area': seg_area(cur_dir, cur_start, end_i),
+                'bi_count': end_i - cur_start,
+            })
+
+        return segments
+
+    def _get_segments(self) -> list[dict]:
+        """获取走势段（带缓存，笔数变化时重建）."""
+        n = len(self._bi_points)
+        if n != self._seg_last_bi_count:
+            self._segments = self._build_segments()
+            self._seg_last_bi_count = n
+        return self._segments
+
+    def _check_seg_divergence(self, direction: str) -> bool:
+        """
+        S8: 检查最近两个同向走势段是否存在背驰.
+
+        direction: 'down' → 检查底背驰(2B买入)
+                   'up'   → 检查顶背驰(2S平多)
+
+        返回 True 表示存在背驰（价格创新极值但力度衰减）。
+        """
+        segs = self._get_segments()
+        # 取最近两个同向段
+        same_dir = [s for s in segs if s['dir'] == direction and s['bi_count'] >= self.seg_min_bi]
+        if len(same_dir) < 2:
+            return False
+
+        s1 = same_dir[-2]  # 前一段
+        s2 = same_dir[-1]  # 当前段
+
+        # 能量过滤：前一段要"真用力"
+        if s1['macd_area'] <= 0:
+            return False
+
+        # 价格条件
+        tol = self.seg_price_tol
+        if direction == 'down':
+            # 底背驰：当前段终点 <= 前一段终点 * (1+tol)（创新低/等低）
+            price_ok = s2['end_price'] <= s1['end_price'] * (1 + tol)
+        else:
+            # 顶背驰：当前段终点 >= 前一段终点 * (1-tol)（创新高/等高）
+            price_ok = s2['end_price'] >= s1['end_price'] * (1 - tol)
+
+        if not price_ok:
+            return False
+
+        # 力度衰减
+        ratio_th = self.seg_div_ratio if direction == 'down' else self.seg_div_ratio_sell
+        ratio = s2['macd_area'] / (s1['macd_area'] + 1e-9)
+        return ratio <= ratio_th
+
     def _check_signal(self, curr_bar: dict, new_bi: dict) -> None:
         """R2: 检查交易信号（使用中枢状态机）."""
         # 1. 尝试更新中枢
@@ -925,11 +1105,9 @@ class CtaChanPivotStrategy(CtaTemplate):
                                 stop_base = p_now['price']
 
         # --------------------------------------------------------
-        # 辅助逻辑：保留 2B/2S（作为趋势延续补充）
+        # 辅助逻辑：2B/2S（趋势延续）
+        # S2: 结构闸门 — 需要活跃中枢且处于 active/forming
         # B10: 支持面积背驰混合模式
-        # S2: 2B结构闸门 — 需要活跃中枢且处于active/forming状态
-        #     即中枢尚未被离开(left_up/left_down)时才允许2B/2S
-        #     防止在无结构/中枢已远的情况下做趋势追随
         # --------------------------------------------------------
         has_active_structure = (ap is not None and ap['state'] in ('forming', 'active'))
         if not sig and has_active_structure:
@@ -939,9 +1117,19 @@ class CtaChanPivotStrategy(CtaTemplate):
                 price_ok = p_now['price'] > p_prev['price']
                 cond = self._eval_div_condition(diff_ok)
                 if price_ok and cond and is_bull:
-                    sig = 'Buy'  # 2B
-                    trigger_price = p_now['data']['high']
-                    stop_base = p_now['price']
+                    # S9: histogram 确认门
+                    hist_ok = True
+                    if self.hist_gate > 0:
+                        hist_now = self.diff_5m - self.dea_5m
+                        if self.hist_gate == 1:
+                            hist_ok = hist_now > 0  # histogram > 0
+                        elif self.hist_gate == 2:
+                            hist_prev_val = p_prev['data']['diff'] - p_prev['data'].get('dea', self.dea_5m)
+                            hist_ok = hist_now > hist_prev_val  # histogram 上拐
+                    if hist_ok:
+                        sig = 'Buy'  # 2B
+                        trigger_price = p_now['data']['high']
+                        stop_base = p_now['price']
 
             elif p_now['type'] == 'top':
                 diff_ok = p_now['data']['diff'] < p_prev['data']['diff']
@@ -952,15 +1140,15 @@ class CtaChanPivotStrategy(CtaTemplate):
                     trigger_price = p_now['data']['low']
                     stop_base = p_now['price']
 
+        # (S8: 段背驰入场信号已验证无效，已移除)
+
         # --------------------------------------------------------
-        # S6: 真正背驰2B — 底背驰买入（作为额外信号路径）
-        # 条件：低点走低(价格新低) + MACD面积衰减(力度更弱) + 中枢存在
+        # S6: 单笔面积背驰补充路径（与S8共存）
         # --------------------------------------------------------
         if not sig and has_active_structure and len(self._bi_macd_areas) >= 3:
             if p_now['type'] == 'bottom':
-                # 底背驰：价格创新低或持平，但MACD面积更小
                 price_lower = p_now['price'] <= p_prev['price']
-                area_div = self._has_area_divergence()  # 当前笔面积 < 前同向笔 * 0.7
+                area_div = self._has_area_divergence()
                 if price_lower and area_div is True and is_bull:
                     sig = 'Buy'  # 底背驰2B
                     trigger_price = p_now['data']['high']

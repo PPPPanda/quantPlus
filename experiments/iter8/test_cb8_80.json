@@ -1,0 +1,109 @@
+{
+  "settings": {
+    "debug_enabled": false,
+    "debug_log_console": false,
+    "cooldown_losses": 2,
+    "cooldown_bars": 20,
+    "atr_activate_mult": 2.5,
+    "atr_trailing_mult": 3.0,
+    "atr_entry_filter": 2.0,
+    "circuit_breaker_losses": 8,
+    "circuit_breaker_bars": 80
+  },
+  "results": [
+    {
+      "contract": "p2601",
+      "source": "XT",
+      "slot": "bench",
+      "trades": 122,
+      "total_pnl": 12766.642,
+      "points": 1276.6642,
+      "sharpe": 3.64,
+      "return_pct": 1.28,
+      "max_dd_pct": -0.2,
+      "commission": 1113.0,
+      "slippage": 1220.0
+    },
+    {
+      "contract": "p2405",
+      "source": "Wind",
+      "slot": "bench",
+      "trades": 139,
+      "total_pnl": 8884.866000000002,
+      "points": 888.4866000000002,
+      "sharpe": 2.64,
+      "return_pct": 0.89,
+      "max_dd_pct": -0.21,
+      "commission": 1035.0,
+      "slippage": 1380.0
+    },
+    {
+      "contract": "p2209",
+      "source": "Wind",
+      "slot": "bench",
+      "trades": 116,
+      "total_pnl": 74396.18000000001,
+      "points": 7439.618,
+      "sharpe": 4.5,
+      "return_pct": 7.44,
+      "max_dd_pct": -1.89,
+      "commission": 1204.0,
+      "slippage": 1160.0
+    },
+    {
+      "contract": "p2501",
+      "source": "Wind",
+      "slot": "y25",
+      "trades": 283,
+      "total_pnl": 11568.202,
+      "points": 1156.8201999999999,
+      "sharpe": 1.88,
+      "return_pct": 1.16,
+      "max_dd_pct": -0.44,
+      "commission": 2352.0,
+      "slippage": 2820.0
+    },
+    {
+      "contract": "p2505",
+      "source": "Wind",
+      "slot": "y25",
+      "trades": 124,
+      "total_pnl": 5580.0160000000005,
+      "points": 558.0016,
+      "sharpe": 1.56,
+      "return_pct": 0.56,
+      "max_dd_pct": -0.28,
+      "commission": 1100.0,
+      "slippage": 1240.0
+    },
+    {
+      "contract": "p2509",
+      "source": "Wind",
+      "slot": "y25",
+      "trades": 106,
+      "total_pnl": 1468.5339999999994,
+      "points": 146.85339999999994,
+      "sharpe": 0.8,
+      "return_pct": 0.15,
+      "max_dd_pct": -0.2,
+      "commission": 891.0,
+      "slippage": 1060.0
+    },
+    {
+      "contract": "p2301",
+      "source": "Wind",
+      "slot": "extra",
+      "trades": 98,
+      "total_pnl": 444.90599999999904,
+      "points": 44.4905999999999,
+      "sharpe": 0.11,
+      "return_pct": 0.04,
+      "max_dd_pct": -0.61,
+      "commission": 795.0,
+      "slippage": 980.0
+    }
+  ],
+  "total_pnl": 115109.34600000002,
+  "total_points": 11510.934600000002,
+  "y25_all_positive": true
+}
