@@ -83,7 +83,7 @@ class CtaChanPivotStrategy(CtaTemplate):
     cooldown_bars: int = 10          # 冷却 M 根 5m bar
 
     # B03: 止损 buffer 参数
-    stop_buffer_atr_pct: float = 0.05  # 止损 buffer = max(pricetick, atr * pct)
+    stop_buffer_atr_pct: float = 0.02  # 止损 buffer = max(pricetick, atr * pct)
 
     # B10: 背驰模式参数（面积背驰 + diff 混合）
     div_mode: int = 1                  # 0=baseline(仅diff), 1=OR(diff或面积背驰), 2=AND, 3=仅面积背驰
@@ -924,19 +924,27 @@ class CtaChanPivotStrategy(CtaTemplate):
                     fill_price = bar['close']
                 self._open_position(-1, fill_price, signal['stop_base'])
 
+    def _calc_stop_buffer(self) -> float:
+        """B11: 计算止损 buffer，自适应 ATR."""
+        pricetick = 2.0  # 棕榈油 pricetick
+        if self.atr > 0:
+            return max(pricetick, self.atr * self.stop_buffer_atr_pct)
+        return pricetick
+
     def _open_position(self, direction: int, price: float, stop_base: float) -> None:
         """开仓."""
+        buffer = self._calc_stop_buffer()
         if direction == 1:
             self.buy(price, self.fixed_volume)
-            self._stop_price = stop_base - 1
+            self._stop_price = stop_base - buffer
             self.signal = "3B/2B买入"
-            self.write_log(f"开多: price={price:.0f}, stop={self._stop_price:.0f}")
+            self.write_log(f"开多: price={price:.0f}, stop={self._stop_price:.0f}, buffer={buffer:.1f}")
             action = "OPEN_LONG"
         else:
             self.short(price, self.fixed_volume)
-            self._stop_price = stop_base + 1
+            self._stop_price = stop_base + buffer
             self.signal = "3S/2S卖出"
-            self.write_log(f"开空: price={price:.0f}, stop={self._stop_price:.0f}")
+            self.write_log(f"开空: price={price:.0f}, stop={self._stop_price:.0f}, buffer={buffer:.1f}")
             action = "OPEN_SHORT"
 
         self._position = direction
