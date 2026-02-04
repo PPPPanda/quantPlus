@@ -170,6 +170,10 @@ class CtaChanPivotStrategy(CtaTemplate):
         # 中枢列表
         self._pivots: list[dict] = []
 
+        # R2: 活跃中枢状态机
+        # state: None, 'forming', 'active', 'left_up', 'left_down'
+        self._active_pivot: Optional[dict] = None
+
         # 待触发信号
         self._pending_signal: Optional[dict] = None
 
@@ -523,7 +527,11 @@ class CtaChanPivotStrategy(CtaTemplate):
                 )
 
     def _process_inclusion(self, new_bar: dict) -> None:
-        """包含处理."""
+        """包含处理.
+
+        R1修正: dir==0时不强制默认向上，而是跳过合并直接append，
+        等第一次出现非包含K线时从价格关系推导方向。
+        """
         if not self._k_lines:
             self._k_lines.append(new_bar)
             return
@@ -535,9 +543,11 @@ class CtaChanPivotStrategy(CtaTemplate):
         in_new = last['high'] <= new_bar['high'] and last['low'] >= new_bar['low']
 
         if in_last or in_new:
-            # 存在包含关系，进行合并
+            # 存在包含关系
             if self._inclusion_dir == 0:
-                self._inclusion_dir = 1  # 默认向上
+                # R1: 方向未定时不合并，直接append（等待方向确定）
+                self._k_lines.append(new_bar)
+                return
 
             merged = last.copy()
             merged['datetime'] = new_bar['datetime']
@@ -635,40 +645,98 @@ class CtaChanPivotStrategy(CtaTemplate):
             return None
 
     def _update_pivots(self) -> None:
-        """中枢识别：基于最近4个笔端点（即3个笔）的重叠区."""
+        """R2: 中枢状态机.
+
+        状态流转:
+        - None → forming: 检测到3笔重叠
+        - forming → active: 第4笔仍在中枢范围内（延伸）
+        - active → active: 后续笔仍在中枢范围内
+        - forming/active → left_up: 某笔 low > ZG（向上离开）
+        - forming/active → left_down: 某笔 high < ZD（向下离开）
+        - left_* → None: 离开后又形成新中枢（旧中枢归档）
+
+        信号只在 left_up/left_down 状态下生成。
+        """
         if len(self._bi_points) < 4:
             return
 
-        # 取最近4个点 b0->b1->b2->b3
+        latest_bi = self._bi_points[-1]
+        ap = self._active_pivot
+
+        # --- 如果有活跃中枢，检查是否延伸或离开 ---
+        if ap is not None:
+            zg = ap['zg']
+            zd = ap['zd']
+            state = ap['state']
+
+            if state in ('forming', 'active'):
+                # 检查最新笔是否离开中枢
+                bi_low = min(self._bi_points[-1]['price'], self._bi_points[-2]['price'])
+                bi_high = max(self._bi_points[-1]['price'], self._bi_points[-2]['price'])
+
+                if bi_low > zg:
+                    # 向上离开：整笔都在中枢上方
+                    ap['state'] = 'left_up'
+                    ap['leave_bi_idx'] = len(self._bi_points) - 1
+                    ap['leave_price'] = latest_bi['price']
+                    if self._debugger and self.trading:
+                        self._debugger.log_pivot(ap, pivot_idx=len(self._pivots), status="left_up")
+                    return
+                elif bi_high < zd:
+                    # 向下离开：整笔都在中枢下方
+                    ap['state'] = 'left_down'
+                    ap['leave_bi_idx'] = len(self._bi_points) - 1
+                    ap['leave_price'] = latest_bi['price']
+                    if self._debugger and self.trading:
+                        self._debugger.log_pivot(ap, pivot_idx=len(self._pivots), status="left_down")
+                    return
+                else:
+                    # 仍在中枢范围内，延伸
+                    ap['state'] = 'active'
+                    ap['end_bi_idx'] = len(self._bi_points) - 1
+                    # 入场计数不变
+                    return
+
+            elif state in ('left_up', 'left_down'):
+                # 已离开，检查是否形成新中枢（归档旧的）
+                # 继续往下尝试检测新中枢
+                pass
+
+        # --- 尝试检测新中枢 ---
         b0 = self._bi_points[-4]
         b1 = self._bi_points[-3]
         b2 = self._bi_points[-2]
         b3 = self._bi_points[-1]
 
-        # 计算每一笔的价格区间 (Range)
         r1 = (min(b0['price'], b1['price']), max(b0['price'], b1['price']))
         r2 = (min(b1['price'], b2['price']), max(b1['price'], b2['price']))
         r3 = (min(b2['price'], b3['price']), max(b2['price'], b3['price']))
 
-        # 计算三笔重叠区域 (Intersection)
-        zg = min(r1[1], r2[1], r3[1])  # 重叠区高点
-        zd = max(r1[0], r2[0], r3[0])  # 重叠区低点
+        zg = min(r1[1], r2[1], r3[1])
+        zd = max(r1[0], r2[0], r3[0])
 
-        if zg > zd:  # 存在有效重叠，确认为中枢
+        if zg > zd:
+            # 归档旧中枢
+            if ap is not None:
+                self._pivots.append(ap)
+
             new_pivot = {
                 'zg': zg,
                 'zd': zd,
                 'start_bi_idx': len(self._bi_points) - 4,
-                'end_bi_idx': len(self._bi_points) - 1
+                'end_bi_idx': len(self._bi_points) - 1,
+                'state': 'forming',
+                'leave_bi_idx': None,
+                'leave_price': None,
+                'entry_count': 0,  # R6: 同中枢入场计数
             }
+            self._active_pivot = new_pivot
 
-            self._pivots.append(new_pivot)
-            # Debug: 记录新中枢（仅实盘模式）
             if self._debugger and self.trading:
                 self._debugger.log_pivot(
                     new_pivot,
-                    pivot_idx=len(self._pivots),
-                    status="confirmed"
+                    pivot_idx=len(self._pivots) + 1,
+                    status="forming"
                 )
 
     def _has_area_divergence(self) -> Optional[bool]:
@@ -711,7 +779,7 @@ class CtaChanPivotStrategy(CtaTemplate):
             return diff_ok
 
     def _check_signal(self, curr_bar: dict, new_bi: dict) -> None:
-        """检查交易信号."""
+        """R2: 检查交易信号（使用中枢状态机）."""
         # 1. 尝试更新中枢
         self._update_pivots()
 
@@ -733,33 +801,51 @@ class CtaChanPivotStrategy(CtaTemplate):
         sig = None
         stop_base = 0.0
         trigger_price = 0.0
-        last_pivot = self._pivots[-1] if self._pivots else None
+
+        # R2: 使用活跃中枢状态机
+        ap = self._active_pivot
+        # 同时保留对历史中枢的 fallback（兼容性）
+        last_pivot = ap if ap else (self._pivots[-1] if self._pivots else None)
 
         # --------------------------------------------------------
-        # 核心逻辑：Pivot 3B/3S
+        # 核心逻辑：Pivot 3B/3S（R2: 状态机驱动）
         # --------------------------------------------------------
-        if last_pivot:
-
+        if ap and ap['state'] in ('left_up', 'left_down'):
             # --- 3B 买点 ---
-            # 场景：向上离开中枢 + 回踩不破中枢高点 (ZG)
+            # R2: 向上离开中枢 + 回踩不破 ZG（状态机确认离开段）
+            if ap['state'] == 'left_up' and p_now['type'] == 'bottom':
+                # 回踩点在 ZG 之上 = 回踩不破中枢高点
+                if p_now['price'] > ap['zg']:
+                    if is_bull:
+                        sig = 'Buy'
+                        trigger_price = p_now['data']['high']
+                        stop_base = p_now['price']
+
+            # --- 3S 卖点 ---
+            # R2: 向下离开中枢 + 回抽不破 ZD
+            elif ap['state'] == 'left_down' and p_now['type'] == 'top':
+                if p_now['price'] < ap['zd']:
+                    if is_bear:
+                        sig = 'CloseLong'
+                        trigger_price = p_now['data']['low']
+                        stop_base = p_now['price']
+
+        elif last_pivot:
+            # Fallback: 中枢处于 forming/active 时，使用旧逻辑（价格阈值）
             if p_now['type'] == 'bottom':
-                # 1. 回踩点必须在中枢之上
                 if p_now['price'] > last_pivot['zg']:
-                    # 2. 离开段必须也曾高于中枢
                     if p_last['price'] > last_pivot['zg']:
-                        # 3. 中枢必须是"最近"的
-                        if last_pivot['end_bi_idx'] >= len(self._bi_points) - self.pivot_valid_range:
+                        age = len(self._bi_points) - 1 - last_pivot.get('end_bi_idx', 0)
+                        if age <= self.pivot_valid_range:
                             if is_bull:
                                 sig = 'Buy'
                                 trigger_price = p_now['data']['high']
                                 stop_base = p_now['price']
-
-            # --- 3S 卖点 ---
-            # B09: 3S 仅平多仓，不再反手开空
             elif p_now['type'] == 'top':
                 if p_now['price'] < last_pivot['zd']:
                     if p_last['price'] < last_pivot['zd']:
-                        if last_pivot['end_bi_idx'] >= len(self._bi_points) - self.pivot_valid_range:
+                        age = len(self._bi_points) - 1 - last_pivot.get('end_bi_idx', 0)
+                        if age <= self.pivot_valid_range:
                             if is_bear:
                                 sig = 'CloseLong'
                                 trigger_price = p_now['data']['low']
@@ -782,7 +868,6 @@ class CtaChanPivotStrategy(CtaTemplate):
             elif p_now['type'] == 'top':
                 diff_ok = p_now['data']['diff'] < p_prev['data']['diff']
                 price_ok = p_now['price'] < p_prev['price']
-                # B09: 2S 仅平多仓，不再反手开空
                 cond = self._eval_div_condition(diff_ok)
                 if price_ok and cond and is_bear:
                     sig = 'CloseLong'  # 2S
