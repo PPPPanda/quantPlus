@@ -79,17 +79,14 @@ class CtaChanPivotStrategy(CtaTemplate):
     fixed_volume: int = 1            # 固定手数
 
     # B02: 连亏冷却参数
-    cooldown_losses: int = 3         # R1: 连亏 N 笔后触发冷却（2→3）
-    cooldown_bars: int = 40          # R1: 冷却 M 根 5m bar（20→40, ~3.3小时）
-    daily_loss_limit: float = 0.0    # R1: 当日亏损上限(点数), 超过后当日不再开仓; 0=禁用
-    min_hold_bars: int = 0           # R2: 最小持仓bar数(1m), 防止噪声短交易; 0=禁用
-    trade_interval: int = 0          # R4: 平仓后至少等N根5m bar才允许新信号; 0=禁用
+    cooldown_losses: int = 2         # 0 = 禁用冷却；连亏 N 笔后触发冷却
+    cooldown_bars: int = 20          # 冷却 M 根 5m bar
 
     # B03: 止损 buffer 参数
     stop_buffer_atr_pct: float = 0.02  # 止损 buffer = max(pricetick, atr * pct)
 
     # B10: 背驰模式参数（面积背驰 + diff 混合）
-    div_mode: int = 1                  # 0=baseline(仅diff), 1=OR(diff或面积背驰), 2=AND+fallback, 3=仅面积背驰
+    div_mode: int = 1                  # 0=baseline(仅diff), 1=OR(diff或面积背驰), 2=AND, 3=仅面积背驰
     div_threshold: float = 0.70        # 面积背驰阈值：当前笔面积 < 前同向笔面积 * threshold 视为背驰
 
     # 调试
@@ -101,8 +98,7 @@ class CtaChanPivotStrategy(CtaTemplate):
         "macd_fast", "macd_slow", "macd_signal",
         "atr_window", "atr_trailing_mult", "atr_activate_mult", "atr_entry_filter",
         "min_bi_gap", "pivot_valid_range", "fixed_volume",
-        "cooldown_losses", "cooldown_bars", "daily_loss_limit", "min_hold_bars", "trade_interval",
-        "stop_buffer_atr_pct",
+        "cooldown_losses", "cooldown_bars", "stop_buffer_atr_pct",
         "div_mode", "div_threshold",
         "debug", "debug_enabled", "debug_log_console",
     ]
@@ -197,11 +193,6 @@ class CtaChanPivotStrategy(CtaTemplate):
         # Debug工具
         self._debugger: Optional[ChanDebugger] = None
         self._signal_type: str = ""  # 当前信号类型(用于debug)
-        self._entry_zg: float = 0.0  # B13: 3B入场关联的中枢ZG（结构止损用）
-        self._daily_pnl: float = 0.0   # R1: 当日已实现PnL(点数)
-        self._current_date: str = ""   # R1: 当前交易日期
-        self._hold_bar_count: int = 0  # R2: 当前持仓已持有的1m bar数
-        self._trade_interval_remaining: int = 0  # R4: 交易间隔冷却
 
         logger.info("策略初始化: %s", strategy_name)
 
@@ -264,16 +255,6 @@ class CtaChanPivotStrategy(CtaTemplate):
         使用增量方式合成 5m/15m K 线并计算指标。
         """
         self.bar_count += 1
-
-        # R1: 日期切换时重置当日PnL
-        bar_date = str(bar.datetime.date())
-        if bar_date != self._current_date:
-            self._current_date = bar_date
-            self._daily_pnl = 0.0
-
-        # R2: 持仓bar计数
-        if self._position != 0:
-            self._hold_bar_count += 1
 
         # 转换为 dict 格式
         bar_dict = {
@@ -473,10 +454,6 @@ class CtaChanPivotStrategy(CtaTemplate):
         if self._cooldown_remaining > 0:
             self._cooldown_remaining -= 1
 
-        # R4: 交易间隔计数器递减
-        if self._trade_interval_remaining > 0:
-            self._trade_interval_remaining -= 1
-
         # 更新指标
         self._update_macd_5m(bar['close'])
         self._update_atr(bar)
@@ -658,80 +635,40 @@ class CtaChanPivotStrategy(CtaTemplate):
             return None
 
     def _update_pivots(self) -> None:
-        """
-        B14: 中枢状态机.
-
-        状态: forming → active → left_up/left_down
-        - forming: 收集3笔，计算初始 [ZD, ZG]
-        - active: 后续笔在中枢内 → 延伸；完全脱离 → left
-        - left_up/left_down: 等待回试触发3B/3S
-        """
+        """中枢识别：基于最近4个笔端点（即3个笔）的重叠区."""
         if len(self._bi_points) < 4:
             return
 
-        last_pivot = self._pivots[-1] if self._pivots else None
-
-        # 如果当前有 active 中枢，检查新笔是否延伸或离开
-        if last_pivot and last_pivot.get('state') == 'active':
-            p = self._bi_points[-1]
-            zg = last_pivot['zg']
-            zd = last_pivot['zd']
-
-            # 笔完全在中枢上方 → 向上离开
-            if p['type'] == 'bottom' and p['price'] > zg:
-                last_pivot['state'] = 'left_up'
-                last_pivot['left_bi_idx'] = len(self._bi_points) - 1
-                return
-
-            # 笔完全在中枢下方 → 向下离开
-            if p['type'] == 'top' and p['price'] < zd:
-                last_pivot['state'] = 'left_down'
-                last_pivot['left_bi_idx'] = len(self._bi_points) - 1
-                return
-
-            # 仍在中枢内 → 更新 end_bi_idx（延伸）
-            last_pivot['end_bi_idx'] = len(self._bi_points) - 1
-            return
-
-        # 如果当前中枢已 left，检查是否需要新中枢
-        if last_pivot and last_pivot.get('state') in ('left_up', 'left_down'):
-            # 已经离开的中枢，不再更新；等新中枢形成
-            pass
-
-        # 尝试从最近4个笔端点形成新中枢
+        # 取最近4个点 b0->b1->b2->b3
         b0 = self._bi_points[-4]
         b1 = self._bi_points[-3]
         b2 = self._bi_points[-2]
         b3 = self._bi_points[-1]
 
+        # 计算每一笔的价格区间 (Range)
         r1 = (min(b0['price'], b1['price']), max(b0['price'], b1['price']))
         r2 = (min(b1['price'], b2['price']), max(b1['price'], b2['price']))
         r3 = (min(b2['price'], b3['price']), max(b2['price'], b3['price']))
 
-        zg = min(r1[1], r2[1], r3[1])
-        zd = max(r1[0], r2[0], r3[0])
+        # 计算三笔重叠区域 (Intersection)
+        zg = min(r1[1], r2[1], r3[1])  # 重叠区高点
+        zd = max(r1[0], r2[0], r3[0])  # 重叠区低点
 
-        if zg > zd:
-            # 检查是否与上一个中枢重叠（避免重复创建）
-            if last_pivot:
-                if (last_pivot['start_bi_idx'] >= len(self._bi_points) - 5):
-                    return  # 太近的笔，不重复建中枢
-
+        if zg > zd:  # 存在有效重叠，确认为中枢
             new_pivot = {
                 'zg': zg,
                 'zd': zd,
                 'start_bi_idx': len(self._bi_points) - 4,
-                'end_bi_idx': len(self._bi_points) - 1,
-                'state': 'active',  # B14: 新中枢初始为 active
-                'left_bi_idx': -1,
+                'end_bi_idx': len(self._bi_points) - 1
             }
 
             self._pivots.append(new_pivot)
+            # Debug: 记录新中枢（仅实盘模式）
             if self._debugger and self.trading:
                 self._debugger.log_pivot(
                     new_pivot,
                     pivot_idx=len(self._pivots),
-                    status="active"
+                    status="confirmed"
                 )
 
     def _has_area_divergence(self) -> Optional[bool]:
@@ -785,14 +722,6 @@ class CtaChanPivotStrategy(CtaTemplate):
         if self._cooldown_remaining > 0:
             return
 
-        # R1: 当日亏损超限时不生成新信号
-        if self.daily_loss_limit > 0 and self._daily_pnl < -self.daily_loss_limit:
-            return
-
-        # R4: 交易间隔冷却
-        if self._trade_interval_remaining > 0:
-            return
-
         # 获取笔端点
         p_now = self._bi_points[-1]   # 当前回踩点
         p_last = self._bi_points[-2]  # 前一极值点（离开段端点）
@@ -807,29 +736,34 @@ class CtaChanPivotStrategy(CtaTemplate):
         last_pivot = self._pivots[-1] if self._pivots else None
 
         # --------------------------------------------------------
-        # 核心逻辑：Pivot 3B/3S（B14: 需中枢状态机配合）
+        # 核心逻辑：Pivot 3B/3S
         # --------------------------------------------------------
         if last_pivot:
-            pivot_state = last_pivot.get('state', '')
 
             # --- 3B 买点 ---
-            # B14: 中枢必须已向上离开(left_up)，当前回踩不破ZG
-            if pivot_state == 'left_up' and p_now['type'] == 'bottom':
+            # 场景：向上离开中枢 + 回踩不破中枢高点 (ZG)
+            if p_now['type'] == 'bottom':
+                # 1. 回踩点必须在中枢之上
                 if p_now['price'] > last_pivot['zg']:
-                    if is_bull:
-                        sig = 'Buy'
-                        trigger_price = p_now['data']['high']
-                        stop_base = p_now['price']
+                    # 2. 离开段必须也曾高于中枢
+                    if p_last['price'] > last_pivot['zg']:
+                        # 3. 中枢必须是"最近"的
+                        if last_pivot['end_bi_idx'] >= len(self._bi_points) - self.pivot_valid_range:
+                            if is_bull:
+                                sig = 'Buy'
+                                trigger_price = p_now['data']['high']
+                                stop_base = p_now['price']
 
             # --- 3S 卖点 ---
-            # B14: 中枢必须已向下离开(left_down)，当前回抽不破ZD
             # B09: 3S 仅平多仓，不再反手开空
-            elif pivot_state == 'left_down' and p_now['type'] == 'top':
+            elif p_now['type'] == 'top':
                 if p_now['price'] < last_pivot['zd']:
-                    if is_bear:
-                        sig = 'CloseLong'
-                        trigger_price = p_now['data']['low']
-                        stop_base = p_now['price']
+                    if p_last['price'] < last_pivot['zd']:
+                        if last_pivot['end_bi_idx'] >= len(self._bi_points) - self.pivot_valid_range:
+                            if is_bear:
+                                sig = 'CloseLong'
+                                trigger_price = p_now['data']['low']
+                                stop_base = p_now['price']
 
         # --------------------------------------------------------
         # 辅助逻辑：保留 2B/2S（作为趋势延续补充）
@@ -966,14 +900,8 @@ class CtaChanPivotStrategy(CtaTemplate):
                     )
                 self._position = 0
                 self._trailing_active = False
-                self._hold_bar_count = 0  # R2: 重置持仓计数
                 self._pending_signal = None
                 self.signal = "平多"
-                # R1: 更新当日PnL
-                self._daily_pnl += pnl
-                # R4: 设置交易间隔
-                if self.trade_interval > 0:
-                    self._trade_interval_remaining = self.trade_interval
                 # B02: 连亏计数
                 if self.cooldown_losses > 0:
                     if pnl < 0:
@@ -1022,14 +950,7 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._position = direction
         self._entry_price = price
         self._trailing_active = False
-        self._hold_bar_count = 0  # R2: 重置持仓计数
         self._pending_signal = None
-
-        # B13: 记录3B入场关联的中枢ZG（结构止损）
-        if self._signal_type == "3B" and self._pivots:
-            self._entry_zg = self._pivots[-1]['zg']
-        else:
-            self._entry_zg = 0.0
 
         # Debug: 记录开仓（仅实盘模式）
         if self._debugger and self.trading:
@@ -1044,10 +965,6 @@ class CtaChanPivotStrategy(CtaTemplate):
 
     def _check_stop_loss_1m(self, bar: dict) -> bool:
         """1分钟级别检查止损."""
-        # R2: 最小持仓保护 — 持仓不足min_hold_bars时不止损
-        if self.min_hold_bars > 0 and self._hold_bar_count < self.min_hold_bars:
-            return False
-
         sl_hit = False
         exit_price = 0.0
 
@@ -1086,15 +1003,7 @@ class CtaChanPivotStrategy(CtaTemplate):
 
             self._position = 0
             self._trailing_active = False
-            self._hold_bar_count = 0  # R2: 重置持仓计数
             self.signal = "止损"
-
-            # R1: 更新当日PnL
-            self._daily_pnl += pnl
-
-            # R4: 设置交易间隔
-            if self.trade_interval > 0:
-                self._trade_interval_remaining = self.trade_interval
 
             # B02: 更新连亏计数（cooldown_losses > 0 时才启用）
             if self.cooldown_losses > 0:
