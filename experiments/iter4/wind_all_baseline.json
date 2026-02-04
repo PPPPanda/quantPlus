@@ -1,0 +1,111 @@
+{
+  "setting": {
+    "cooldown_losses": 2,
+    "cooldown_bars": 20,
+    "div_mode": 1,
+    "div_threshold": 0.7,
+    "stop_buffer_atr_pct": 0.02
+  },
+  "results": [
+    {
+      "contract": "p2601",
+      "pts": 1239.8,
+      "pnl": 12398,
+      "sharpe": 2.7,
+      "trades": 132
+    },
+    {
+      "contract": "p2201",
+      "pts": -420.4,
+      "pnl": -4204,
+      "sharpe": -1.0,
+      "trades": 125
+    },
+    {
+      "contract": "p2205",
+      "pts": 1347.8,
+      "pnl": 13478,
+      "sharpe": 1.44,
+      "trades": 127
+    },
+    {
+      "contract": "p2209",
+      "pts": 7109.8,
+      "pnl": 71098,
+      "sharpe": 4.36,
+      "trades": 118
+    },
+    {
+      "contract": "p2301",
+      "pts": -604.9,
+      "pnl": -6049,
+      "sharpe": -2.52,
+      "trades": 112
+    },
+    {
+      "contract": "p2305",
+      "pts": -477.4,
+      "pnl": -4774,
+      "sharpe": -2.03,
+      "trades": 97
+    },
+    {
+      "contract": "p2309",
+      "pts": 507.8,
+      "pnl": 5078,
+      "sharpe": 1.48,
+      "trades": 110
+    },
+    {
+      "contract": "p2401",
+      "pts": -367.3,
+      "pnl": -3673,
+      "sharpe": -2.18,
+      "trades": 126
+    },
+    {
+      "contract": "p2405",
+      "pts": 942.9,
+      "pnl": 9429,
+      "sharpe": 2.68,
+      "trades": 141
+    },
+    {
+      "contract": "p2409",
+      "pts": 455.1,
+      "pnl": 4551,
+      "sharpe": 1.2,
+      "trades": 236
+    },
+    {
+      "contract": "p2501",
+      "pts": 515.8,
+      "pnl": 5158,
+      "sharpe": 0.77,
+      "trades": 287
+    },
+    {
+      "contract": "p2505",
+      "pts": 448.1,
+      "pnl": 4481,
+      "sharpe": 1.37,
+      "trades": 126
+    },
+    {
+      "contract": "p2509",
+      "pts": 137.2,
+      "pnl": 1372,
+      "sharpe": 0.67,
+      "trades": 123
+    }
+  ],
+  "total_pts": 10834.3,
+  "p2209_pts": 7109.8,
+  "non_p2209_pts": 3724.499999999999,
+  "neg_contracts": [
+    "p2201",
+    "p2301",
+    "p2305",
+    "p2401"
+  ]
+}

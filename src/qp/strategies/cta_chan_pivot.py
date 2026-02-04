@@ -86,7 +86,7 @@ class CtaChanPivotStrategy(CtaTemplate):
     stop_buffer_atr_pct: float = 0.02  # 止损 buffer = max(pricetick, atr * pct)
 
     # B10: 背驰模式参数（面积背驰 + diff 混合）
-    div_mode: int = 1                  # 0=baseline(仅diff), 1=OR(diff或面积背驰), 2=AND, 3=仅面积背驰
+    div_mode: int = 1                  # 0=baseline(仅diff), 1=OR(diff或面积背驰), 2=AND+fallback, 3=仅面积背驰
     div_threshold: float = 0.70        # 面积背驰阈值：当前笔面积 < 前同向笔面积 * threshold 视为背驰
 
     # 调试
@@ -193,6 +193,7 @@ class CtaChanPivotStrategy(CtaTemplate):
         # Debug工具
         self._debugger: Optional[ChanDebugger] = None
         self._signal_type: str = ""  # 当前信号类型(用于debug)
+        self._entry_zg: float = 0.0  # B13: 3B入场关联的中枢ZG（结构止损用）
 
         logger.info("策略初始化: %s", strategy_name)
 
@@ -635,40 +636,80 @@ class CtaChanPivotStrategy(CtaTemplate):
             return None
 
     def _update_pivots(self) -> None:
-        """中枢识别：基于最近4个笔端点（即3个笔）的重叠区."""
+        """
+        B14: 中枢状态机.
+
+        状态: forming → active → left_up/left_down
+        - forming: 收集3笔，计算初始 [ZD, ZG]
+        - active: 后续笔在中枢内 → 延伸；完全脱离 → left
+        - left_up/left_down: 等待回试触发3B/3S
+        """
         if len(self._bi_points) < 4:
             return
 
-        # 取最近4个点 b0->b1->b2->b3
+        last_pivot = self._pivots[-1] if self._pivots else None
+
+        # 如果当前有 active 中枢，检查新笔是否延伸或离开
+        if last_pivot and last_pivot.get('state') == 'active':
+            p = self._bi_points[-1]
+            zg = last_pivot['zg']
+            zd = last_pivot['zd']
+
+            # 笔完全在中枢上方 → 向上离开
+            if p['type'] == 'bottom' and p['price'] > zg:
+                last_pivot['state'] = 'left_up'
+                last_pivot['left_bi_idx'] = len(self._bi_points) - 1
+                return
+
+            # 笔完全在中枢下方 → 向下离开
+            if p['type'] == 'top' and p['price'] < zd:
+                last_pivot['state'] = 'left_down'
+                last_pivot['left_bi_idx'] = len(self._bi_points) - 1
+                return
+
+            # 仍在中枢内 → 更新 end_bi_idx（延伸）
+            last_pivot['end_bi_idx'] = len(self._bi_points) - 1
+            return
+
+        # 如果当前中枢已 left，检查是否需要新中枢
+        if last_pivot and last_pivot.get('state') in ('left_up', 'left_down'):
+            # 已经离开的中枢，不再更新；等新中枢形成
+            pass
+
+        # 尝试从最近4个笔端点形成新中枢
         b0 = self._bi_points[-4]
         b1 = self._bi_points[-3]
         b2 = self._bi_points[-2]
         b3 = self._bi_points[-1]
 
-        # 计算每一笔的价格区间 (Range)
         r1 = (min(b0['price'], b1['price']), max(b0['price'], b1['price']))
         r2 = (min(b1['price'], b2['price']), max(b1['price'], b2['price']))
         r3 = (min(b2['price'], b3['price']), max(b2['price'], b3['price']))
 
-        # 计算三笔重叠区域 (Intersection)
-        zg = min(r1[1], r2[1], r3[1])  # 重叠区高点
-        zd = max(r1[0], r2[0], r3[0])  # 重叠区低点
+        zg = min(r1[1], r2[1], r3[1])
+        zd = max(r1[0], r2[0], r3[0])
 
-        if zg > zd:  # 存在有效重叠，确认为中枢
+        if zg > zd:
+            # 检查是否与上一个中枢重叠（避免重复创建）
+            if last_pivot:
+                if (last_pivot['start_bi_idx'] >= len(self._bi_points) - 5):
+                    return  # 太近的笔，不重复建中枢
+
             new_pivot = {
                 'zg': zg,
                 'zd': zd,
                 'start_bi_idx': len(self._bi_points) - 4,
-                'end_bi_idx': len(self._bi_points) - 1
+                'end_bi_idx': len(self._bi_points) - 1,
+                'state': 'active',  # B14: 新中枢初始为 active
+                'left_bi_idx': -1,
             }
 
             self._pivots.append(new_pivot)
-            # Debug: 记录新中枢（仅实盘模式）
             if self._debugger and self.trading:
                 self._debugger.log_pivot(
                     new_pivot,
                     pivot_idx=len(self._pivots),
-                    status="confirmed"
+                    status="active"
                 )
 
     def _has_area_divergence(self) -> Optional[bool]:
@@ -736,34 +777,29 @@ class CtaChanPivotStrategy(CtaTemplate):
         last_pivot = self._pivots[-1] if self._pivots else None
 
         # --------------------------------------------------------
-        # 核心逻辑：Pivot 3B/3S
+        # 核心逻辑：Pivot 3B/3S（B14: 需中枢状态机配合）
         # --------------------------------------------------------
         if last_pivot:
+            pivot_state = last_pivot.get('state', '')
 
             # --- 3B 买点 ---
-            # 场景：向上离开中枢 + 回踩不破中枢高点 (ZG)
-            if p_now['type'] == 'bottom':
-                # 1. 回踩点必须在中枢之上
+            # B14: 中枢必须已向上离开(left_up)，当前回踩不破ZG
+            if pivot_state == 'left_up' and p_now['type'] == 'bottom':
                 if p_now['price'] > last_pivot['zg']:
-                    # 2. 离开段必须也曾高于中枢
-                    if p_last['price'] > last_pivot['zg']:
-                        # 3. 中枢必须是"最近"的
-                        if last_pivot['end_bi_idx'] >= len(self._bi_points) - self.pivot_valid_range:
-                            if is_bull:
-                                sig = 'Buy'
-                                trigger_price = p_now['data']['high']
-                                stop_base = p_now['price']
+                    if is_bull:
+                        sig = 'Buy'
+                        trigger_price = p_now['data']['high']
+                        stop_base = p_now['price']
 
             # --- 3S 卖点 ---
+            # B14: 中枢必须已向下离开(left_down)，当前回抽不破ZD
             # B09: 3S 仅平多仓，不再反手开空
-            elif p_now['type'] == 'top':
+            elif pivot_state == 'left_down' and p_now['type'] == 'top':
                 if p_now['price'] < last_pivot['zd']:
-                    if p_last['price'] < last_pivot['zd']:
-                        if last_pivot['end_bi_idx'] >= len(self._bi_points) - self.pivot_valid_range:
-                            if is_bear:
-                                sig = 'CloseLong'
-                                trigger_price = p_now['data']['low']
-                                stop_base = p_now['price']
+                    if is_bear:
+                        sig = 'CloseLong'
+                        trigger_price = p_now['data']['low']
+                        stop_base = p_now['price']
 
         # --------------------------------------------------------
         # 辅助逻辑：保留 2B/2S（作为趋势延续补充）
@@ -951,6 +987,12 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._entry_price = price
         self._trailing_active = False
         self._pending_signal = None
+
+        # B13: 记录3B入场关联的中枢ZG（结构止损）
+        if self._signal_type == "3B" and self._pivots:
+            self._entry_zg = self._pivots[-1]['zg']
+        else:
+            self._entry_zg = 0.0
 
         # Debug: 记录开仓（仅实盘模式）
         if self._debugger and self.trading:
