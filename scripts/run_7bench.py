@@ -45,8 +45,8 @@ BT_PARAMS = dict(
 DEFAULT_SETTING = {
     "debug_enabled": False,
     "debug_log_console": False,
-    "cooldown_losses": 4,
-    "cooldown_bars": 30,
+    "cooldown_losses": 2,
+    "cooldown_bars": 20,
     "atr_activate_mult": 2.5,
     "atr_trailing_mult": 3.0,
     "atr_entry_filter": 2.0,

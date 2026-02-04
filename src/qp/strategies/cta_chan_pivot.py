@@ -79,8 +79,8 @@ class CtaChanPivotStrategy(CtaTemplate):
     fixed_volume: int = 1            # 固定手数
 
     # B02: 连亏冷却参数
-    cooldown_losses: int = 0         # 0 = 禁用冷却；连亏 N 笔后触发冷却
-    cooldown_bars: int = 10          # 冷却 M 根 5m bar
+    cooldown_losses: int = 2         # 0 = 禁用冷却；连亏 N 笔后触发冷却
+    cooldown_bars: int = 20          # 冷却 M 根 5m bar
 
     # B03: 止损 buffer 参数
     stop_buffer_atr_pct: float = 0.02  # 止损 buffer = max(pricetick, atr * pct)
