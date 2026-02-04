@@ -26,7 +26,7 @@ def parse_args() -> argparse.Namespace:
         type=str,
         choices=sorted(VALID_PROFILES),
         default="all",
-        help="启动配置: trade=实盘, research=投研回测, all=全功能 (默认: all)",
+        help="启动配置: trade=实盘, research=投研回测, all=全功能, paper=模拟盘 (默认: all)",
     )
     parser.add_argument(
         "--gateway",

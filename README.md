@@ -10,7 +10,7 @@ A 股期货量化交易工程，基于 [VeighNa (vnpy)](https://github.com/vnpy/
 - **双数据源**：OpenBB 用于研究分析，vn.py 数据库用于实盘/回测
 - **双网关支持**：CTP (SimNow) + TTS (OpenCTP 7x24)，灵活切换
 - **GUI 支持**：VeighNa Trader 图形界面，支持实盘交易、回测、数据管理
-- **Profile 模式**：trade（实盘）、research（投研回测）、all（全功能）
+- **Profile 模式**：trade（实盘）、research（投研回测）、all（全功能）、paper（模拟盘）
 - **uv 管理**：统一依赖锁定，可复现环境
 
 ## 环境要求
@@ -59,7 +59,7 @@ uv sync --extra research
 ### Trader GUI
 
 ```bash
-# 全功能模式（实盘 + 回测 + 数据管理）
+# 全功能模式（实盘 + 回测 + 数据管理，不含模拟盘）
 uv run python -m qp.runtime.trader_app --profile all
 
 # 投研/回测模式（CtaBacktester + DataManager）
@@ -68,11 +68,17 @@ uv run python -m qp.runtime.trader_app --profile research
 # 实盘交易模式（CtaStrategy + RiskManager + K线图）
 uv run python -m qp.runtime.trader_app --profile trade
 
-# 使用 OpenCTP TTS
+# 模拟盘（PaperAccount 本地模拟成交，含风控）
+uv run python -m qp.runtime.trader_app --profile paper
+
+# 使用 OpenCTP TTS（7x24 模拟环境）
 uv run python -m qp.runtime.trader_app --gateway tts
 
 # 使用 CTP (SimNow，默认)
 uv run python -m qp.runtime.trader_app --gateway ctp
+
+# 穿透式认证测试（必须使用 trade 或 all，不能用 paper）
+uv run python -m qp.runtime.trader_app --gateway ctptest --profile all
 
 # 查看帮助
 uv run python -m qp.runtime.trader_app --help
@@ -80,20 +86,24 @@ uv run python -m qp.runtime.trader_app --help
 
 ### Profile 说明
 
-| Profile | 用途 | 加载的 App |
-|---------|------|-----------|
-| `trade` | 实盘交易 | CtaStrategy, **ChartWizard**, DataRecorder, RiskManager |
-| `research` | 投研回测 | CtaBacktester, DataManager, ChartWizard |
-| `all` | 全功能调试 | 以上全部 + PaperAccount |
+| Profile | 用途 | 加载的 App | 订单去向 |
+|---------|------|-----------|----------|
+| `trade` | 实盘交易 | CtaStrategy, DataRecorder, ChartWizard, **RiskManager** | → 真实交易所 |
+| `research` | 投研回测 | CtaBacktester, DataManager, ChartWizard | 无实盘 |
+| `all` | 全功能（实盘+回测） | 以上全部（不含 PaperAccount） | → 真实交易所 |
+| `paper` | 模拟盘 | CtaStrategy, ChartWizard, DataRecorder, PaperAccount, **RiskManager** | → 本地模拟成交 |
 
-注：ChartWizard（K线图）为必需模块，DataRecorder（数据录制）为可选模块。
+> **⚠️ PaperAccount 与实盘互斥**：PaperAccount 一旦加载会接管所有委托，不会发往真实交易所（vnpy 官方设计）。因此 `all` 和 `trade` profile 中不包含 PaperAccount。需要模拟盘请使用 `--profile paper`。
+
+> **⚠️ RiskManager 必须最后加载**：RiskManager 通过 patch `send_order` 实现事前风控拦截，必须在所有 patch `send_order` 的 App 之后加载，否则风控会被绕过。详见 [docs/development.md](./docs/development.md) 第 15 节。
 
 ### 网关说明
 
-| 网关 | 服务商 | 数据类型 |
-|------|---------|---------|
-| `ctp` | simNow | 实时行情或者7*24轮播 |
-| `tts` | openCTP | 实时行情或者7*24轮播 |
+| 网关 | 服务商 | 数据类型 | 说明 |
+|------|---------|---------|------|
+| `ctp` | SimNow | 实时行情或者7x24轮播 | 默认网关 |
+| `tts` | OpenCTP | 实时行情或者7x24轮播 | SimNow 替代方案 |
+| `ctptest` | 期货公司 | 穿透式认证测试 | 需配合 `--profile trade` 或 `all` |
 
 如何接入网关请查看常见问题模块
 

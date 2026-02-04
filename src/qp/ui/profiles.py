@@ -130,7 +130,7 @@ def _get_research_apps() -> list[type[BaseApp]]:
 
 
 def _get_all_apps() -> list[type[BaseApp]]:
-    """获取 all profile 的 App 列表（trade + research + 额外模块）."""
+    """获取 all profile 的 App 列表（trade + research，不含模拟盘）."""
     apps: list[type[BaseApp] | None] = []
 
     # === Trade 相关 ===
@@ -146,13 +146,37 @@ def _get_all_apps() -> list[type[BaseApp]]:
     apps.append(_try_import_app("vnpy_datamanager", "DataManagerApp"))
     apps.append(_try_import_enhanced_chart())  # 使用增强版
 
-    # === 额外可选 ===
-    apps.append(_try_import_app("vnpy_paperaccount", "PaperAccountApp"))
-
     # === 风控必须最后加载 ===
     # RiskManagerApp 通过 patch main_engine.send_order 实现拦截，
     # 必须在所有可能 patch send_order 的 App（如 PaperAccountApp）之后加载，
     # 否则后加载的 App 会覆盖风控的 patch，导致风控检查被绕过。
+    apps.append(_try_import_app("vnpy_riskmanager", "RiskManagerApp"))
+
+    # ⚠️ 注意：PaperAccountApp 不在 all profile 中加载。
+    # PaperAccount 一旦加载会接管所有委托，不会发往真实交易所（vnpy 官方设计）。
+    # 需要模拟盘请使用 --profile paper。
+
+    # 过滤掉 None
+    return [app for app in apps if app is not None]
+
+
+def _get_paper_apps() -> list[type[BaseApp]]:
+    """获取 paper profile 的 App 列表（模拟盘：PaperAccount + 风控 + CTA）."""
+    apps: list[type[BaseApp] | None] = []
+
+    # CTA 策略
+    apps.append(_try_import_app("vnpy_ctastrategy", "CtaStrategyApp"))
+
+    # K线图表
+    apps.append(_try_import_enhanced_chart())
+
+    # 数据记录
+    apps.append(_try_import_app("vnpy_datarecorder", "DataRecorderApp"))
+
+    # PaperAccount（接管所有委托，本地模拟成交）
+    apps.append(_try_import_app("vnpy_paperaccount", "PaperAccountApp"))
+
+    # 风控最后加载（确保 check_allowed 在 PaperAccount 之前执行）
     apps.append(_try_import_app("vnpy_riskmanager", "RiskManagerApp"))
 
     # 过滤掉 None
@@ -182,5 +206,7 @@ def get_apps_for_profile(profile: str) -> list[type[BaseApp]]:
         return _get_trade_apps()
     elif profile == "research":
         return _get_research_apps()
+    elif profile == "paper":
+        return _get_paper_apps()
     else:  # profile == "all"
         return _get_all_apps()

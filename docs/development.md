@@ -101,7 +101,7 @@ quantPlus/
 | 路径 | 职责 |
 |------|------|
 | `vendor/vnpy/` | vn.py 框架 submodule，只读引用，更新通过 git submodule update |
-| `src/qp/runtime/trader_app.py` | GUI 主入口，支持 `--profile` (trade/research/all) 和 `--gateway` (ctp/tts) 参数 |
+| `src/qp/runtime/trader_app.py` | GUI 主入口，支持 `--profile` (trade/research/all/paper) 和 `--gateway` (ctp/tts/ctptest) 参数 |
 | `src/qp/strategies/cta_chan_pivot.py` | **缠论中枢策略**，基于5m笔/中枢信号+15m MACD过滤+ATR风控（主力策略） |
 | `src/qp/strategies/cta_palm_oil.py` | 双均线 CTA 策略，继承 CtaTemplate（学习用） |
 | `src/qp/strategies/cta_turtle_enhanced.py` | 增强海龟策略（趋势过滤+中轨止盈） |
@@ -150,8 +150,14 @@ uv run python -m qp.runtime.trader_app --profile research
 # 仅实盘交易（加载 CtaStrategyApp, RiskManagerApp）
 uv run python -m qp.runtime.trader_app --profile trade
 
+# 模拟盘（PaperAccount 本地模拟成交，含风控）
+uv run python -m qp.runtime.trader_app --profile paper
+
 # 使用 OpenCTP TTS 网关（7x24 模拟环境）
 uv run python -m qp.runtime.trader_app --gateway tts
+
+# 穿透式认证测试（必须使用 trade 或 all，不能用 paper）
+uv run python -m qp.runtime.trader_app --gateway ctptest --profile all
 
 # 组合使用：TTS 网关 + 投研模式
 uv run python -m qp.runtime.trader_app --gateway tts --profile research
@@ -182,11 +188,15 @@ GUI 的功能页签由加载的 App 模块决定：
 
 ### Profile 含义
 
-| Profile | 用途 | 加载的 App |
-|---------|------|-----------|
-| `trade` | 实盘交易 | CtaStrategy, RiskManager, ChartWizard |
-| `research` | 投研回测 | CtaBacktester, DataManager, ChartWizard |
-| `all` | 全功能调试 | 以上全部 |
+| Profile | 用途 | 加载的 App | 订单去向 |
+|---------|------|-----------|----------|
+| `trade` | 实盘交易 | CtaStrategy, DataRecorder, ChartWizard, RiskManager | → 真实交易所 |
+| `research` | 投研回测 | CtaBacktester, DataManager, ChartWizard | 无实盘 |
+| `all` | 全功能（实盘+回测） | 以上全部（不含 PaperAccount） | → 真实交易所 |
+| `paper` | 模拟盘 | CtaStrategy, ChartWizard, DataRecorder, PaperAccount, RiskManager | → 本地模拟成交 |
+
+> **⚠️ PaperAccount 与实盘互斥**：PaperAccount 一旦加载会接管所有委托，不会发往真实交易所（vnpy 官方设计）。
+> 因此 `all` 和 `trade` profile 中不包含 PaperAccount。需要模拟盘请使用 `--profile paper`。
 
 ### vt_symbol 规范
 
@@ -1342,3 +1352,82 @@ def _update_5m_bar(self, bar: dict) -> Optional[dict]:
 3. **结果**：在 overlap 区间内，Wind 与 XT 的回测指标**完全一致**（收益率差异 +0.00，Sharpe 差异 +0.00）
 
 > 这证明了归一化 + session-aware 合成方案成功消除了数据源差异，策略结果完全可复现。
+
+---
+
+## 15. App 加载顺序与风控（重要）
+
+### 问题背景
+
+vnpy 的多个 App 模块通过**猴子补丁（monkey-patching）`main_engine.send_order`** 来拦截订单流。当多个 App 都 patch 同一个函数时，加载顺序决定了调用链：
+
+```
+最后加载的 App 的 send_order → 倒数第二个的 send_order → ... → 原始 send_order
+```
+
+如果加载顺序不正确，后加载的 App 会覆盖前一个的 patch，导致某些 App 的逻辑被完全绕过。
+
+### 已知 patch send_order 的 App
+
+| App | patch 行为 | 说明 |
+|-----|-----------|------|
+| `RiskManagerApp` | `main_engine.send_order → risk_engine.send_order`（保存原函数为 `_send_order`） | 事前风控检查，不通过则拦截 |
+| `PaperAccountApp` | `main_engine.send_order → paper_engine.send_order`（**不保存也不调用**原函数） | 完全接管订单，本地模拟成交 |
+
+### PaperAccount 的特殊行为
+
+**PaperAccount 一旦加载，会无条件接管所有委托**，官方文档原文：
+
+> "本地模拟交易模块会自动启动，并接管主引擎层所有合约的交易委托和撤单请求，不会再通过底层交易接口发往外部服务器。"
+
+这意味着：
+- PaperAccount **与实盘交易互斥**，不能同时使用
+- PaperAccount 的 `send_order` **不调用链中的下一个函数**，直接模拟成交并返回
+
+### 2026-02 实际踩坑：风控完全失效
+
+**现象**：`RiskManagerApp` 的每日委托上限设为 140，实际委托到 142 笔仍无拦截、无日志、无弹窗。
+
+**根因**：`_get_all_apps()` 中 `PaperAccountApp` 在 `RiskManagerApp` **之后**加载，覆盖了风控的 `send_order` patch：
+
+```python
+# 错误的加载顺序（修复前）
+apps.append(RiskManagerApp)      # ② 风控 patch send_order
+apps.append(PaperAccountApp)     # ③ 模拟盘 patch send_order → 覆盖了 ②！
+```
+
+结果：所有订单直接走 `paper_engine.send_order`，`risk_engine.send_order`（包含 `check_allowed`）**从未被调用**。
+
+**修复方案**：
+
+1. **`RiskManagerApp` 必须最后加载**，确保风控 patch 在调用链最外层
+2. **`PaperAccountApp` 从 `all` profile 中移除**，避免实盘/穿透式测试时被意外接管
+3. **新增 `paper` profile**，专门用于模拟盘场景
+
+```python
+# 正确的加载顺序（修复后）
+apps.append(PaperAccountApp)     # 先加载（仅在 paper profile）
+apps.append(RiskManagerApp)      # 最后加载 → 风控在最外层
+```
+
+### 加载顺序规则
+
+**通用原则**：`RiskManagerApp` 必须是最后一个加载的、会 patch `send_order` 的 App。
+
+| Profile | 加载顺序 | 说明 |
+|---------|---------|------|
+| `trade` | CtaStrategy → DataRecorder → ChartWizard → **RiskManager** | 风控最后 |
+| `all` | CtaStrategy → DataRecorder → CtaBacktester → DataManager → ChartWizard → **RiskManager** | 不含 PaperAccount |
+| `paper` | CtaStrategy → ChartWizard → DataRecorder → PaperAccount → **RiskManager** | 模拟盘 + 风控 |
+
+### 风控计数的异步陷阱
+
+即使加载顺序正确，`DailyLimitRule` 的计数器也存在异步更新问题：
+
+- `check_allowed()` 在**发单线程**（GUI 或策略回调）中执行，读取 `total_order_count`
+- `on_order()` 在**事件引擎线程**处理委托回报时更新 `total_order_count`
+- 当策略在同一个 `on_bar()` 中连续发出多笔委托时，所有 `check_allowed` 调用看到的都是**同一个 count 值**（因为事件队列在 `on_bar` 返回前不会处理）
+
+**影响**：同一 `on_bar` 中的多笔委托可能全部通过风控检查，实际委托数超过设定上限。
+
+**缓解**：如需严格限制，可在自定义规则中增加**发单计数器**（在 `check_allowed` 内递增，不依赖异步回报）。
