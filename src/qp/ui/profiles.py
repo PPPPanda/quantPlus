@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 # 有效的 profile 名称
-VALID_PROFILES: frozenset[str] = frozenset({"trade", "research", "all"})
+VALID_PROFILES: frozenset[str] = frozenset({"trade", "research", "all", "paper"})
 
 
 def _try_import_app(module_name: str, class_name: str) -> type[BaseApp] | None:

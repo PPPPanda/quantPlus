@@ -107,7 +107,7 @@ class CtaChanPivotStrategy(CtaTemplate):
 
     # B10: 背驰模式参数（面积背驰 + diff 混合）
     div_mode: int = 1                  # 0=baseline(仅diff), 1=OR(diff或面积背驰), 2=AND, 3=仅面积背驰
-    div_threshold: float = 0.70        # 面积背驰阈值：当前笔面积 < 前同向笔面积 * threshold 视为背驰
+    div_threshold: float = 0.50        # 面积背驰阈值：当前笔面积 < 前同向笔面积 * threshold 视为背驰
 
     # 调试
     debug: bool = False
@@ -934,6 +934,7 @@ class CtaChanPivotStrategy(CtaTemplate):
         has_active_structure = (ap is not None and ap['state'] in ('forming', 'active'))
         if not sig and has_active_structure:
             if p_now['type'] == 'bottom':
+                # 原始2B：低点抬高 + 动能增强/面积背驰（趋势延续）
                 diff_ok = p_now['data']['diff'] > p_prev['data']['diff']
                 price_ok = p_now['price'] > p_prev['price']
                 cond = self._eval_div_condition(diff_ok)
@@ -949,6 +950,20 @@ class CtaChanPivotStrategy(CtaTemplate):
                 if price_ok and cond and is_bear:
                     sig = 'CloseLong'  # 2S
                     trigger_price = p_now['data']['low']
+                    stop_base = p_now['price']
+
+        # --------------------------------------------------------
+        # S6: 真正背驰2B — 底背驰买入（作为额外信号路径）
+        # 条件：低点走低(价格新低) + MACD面积衰减(力度更弱) + 中枢存在
+        # --------------------------------------------------------
+        if not sig and has_active_structure and len(self._bi_macd_areas) >= 3:
+            if p_now['type'] == 'bottom':
+                # 底背驰：价格创新低或持平，但MACD面积更小
+                price_lower = p_now['price'] <= p_prev['price']
+                area_div = self._has_area_divergence()  # 当前笔面积 < 前同向笔 * 0.7
+                if price_lower and area_div is True and is_bull:
+                    sig = 'Buy'  # 底背驰2B
+                    trigger_price = p_now['data']['high']
                     stop_base = p_now['price']
 
         # --------------------------------------------------------
