@@ -1,0 +1,1237 @@
+{
+  "p2601": {
+    "contract": "p2601",
+    "summary": {
+      "total_pnl_pts": 1450.0,
+      "total_trades": 63,
+      "wins": 29,
+      "losses": 34,
+      "win_rate": 46.0,
+      "avg_win_pts": 71.0,
+      "avg_loss_pts": -17.9,
+      "profit_factor": 3.38,
+      "avg_duration_min": 816.0,
+      "avg_win_duration_min": 1464.0,
+      "avg_loss_duration_min": 263.0
+    },
+    "worst_losses": [
+      {
+        "open_time": "2025-07-24 21:23:00+08:00",
+        "close_time": "2025-07-24 22:07:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 9026.0,
+        "close_price": 8988.0,
+        "pnl_pts": -38.0,
+        "duration_min": 44,
+        "win": false
+      },
+      {
+        "open_time": "2025-10-14 10:48:00+08:00",
+        "close_time": "2025-10-14 11:13:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 9414.0,
+        "close_price": 9378.0,
+        "pnl_pts": -36.0,
+        "duration_min": 25,
+        "win": false
+      },
+      {
+        "open_time": "2025-07-23 14:33:00+08:00",
+        "close_time": "2025-07-23 14:40:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8986.0,
+        "close_price": 8956.0,
+        "pnl_pts": -30.0,
+        "duration_min": 7,
+        "win": false
+      },
+      {
+        "open_time": "2025-08-19 11:11:00+08:00",
+        "close_time": "2025-08-19 13:39:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 9716.0,
+        "close_price": 9690.0,
+        "pnl_pts": -26.0,
+        "duration_min": 148,
+        "win": false
+      },
+      {
+        "open_time": "2025-09-19 11:08:00+08:00",
+        "close_time": "2025-09-19 13:39:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 9360.0,
+        "close_price": 9334.0,
+        "pnl_pts": -26.0,
+        "duration_min": 151,
+        "win": false
+      },
+      {
+        "open_time": "2025-10-27 10:08:00+08:00",
+        "close_time": "2025-10-27 11:29:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 9124.0,
+        "close_price": 9098.0,
+        "pnl_pts": -26.0,
+        "duration_min": 81,
+        "win": false
+      },
+      {
+        "open_time": "2025-11-05 09:54:00+08:00",
+        "close_time": "2025-11-05 14:26:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8618.0,
+        "close_price": 8592.0,
+        "pnl_pts": -26.0,
+        "duration_min": 272,
+        "win": false
+      },
+      {
+        "open_time": "2025-08-18 09:48:00+08:00",
+        "close_time": "2025-08-18 10:33:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 9650.0,
+        "close_price": 9626.0,
+        "pnl_pts": -24.0,
+        "duration_min": 45,
+        "win": false
+      },
+      {
+        "open_time": "2025-09-01 10:13:00+08:00",
+        "close_time": "2025-09-01 10:47:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 9334.0,
+        "close_price": 9310.0,
+        "pnl_pts": -24.0,
+        "duration_min": 34,
+        "win": false
+      },
+      {
+        "open_time": "2025-09-01 22:28:00+08:00",
+        "close_time": "2025-09-02 09:05:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 9480.0,
+        "close_price": 9456.0,
+        "pnl_pts": -24.0,
+        "duration_min": 637,
+        "win": false
+      }
+    ],
+    "worst_streaks": [
+      {
+        "length": 9,
+        "pnl_pts": -132.0,
+        "start": "2025-10-24 10:40:00+08:00",
+        "end": "2025-11-06 21:43:00+08:00"
+      },
+      {
+        "length": 3,
+        "pnl_pts": -88.0,
+        "start": "2025-07-23 14:33:00+08:00",
+        "end": "2025-07-29 09:08:00+08:00"
+      },
+      {
+        "length": 4,
+        "pnl_pts": -88.0,
+        "start": "2025-08-18 09:48:00+08:00",
+        "end": "2025-08-22 10:36:00+08:00"
+      },
+      {
+        "length": 4,
+        "pnl_pts": -78.0,
+        "start": "2025-09-01 10:13:00+08:00",
+        "end": "2025-09-04 21:03:00+08:00"
+      }
+    ],
+    "worst_days": [
+      {
+        "date": "2025-09-01",
+        "count": 2,
+        "pnl": -48.0
+      },
+      {
+        "date": "2025-07-24",
+        "count": 1,
+        "pnl": -38.0
+      },
+      {
+        "date": "2025-10-14",
+        "count": 1,
+        "pnl": -36.0
+      },
+      {
+        "date": "2025-07-16",
+        "count": 2,
+        "pnl": -28.0
+      },
+      {
+        "date": "2025-07-03",
+        "count": 2,
+        "pnl": -26.0
+      }
+    ],
+    "short_trades": 2,
+    "very_short_trades": 0
+  },
+  "p2405": {
+    "contract": "p2405",
+    "summary": {
+      "total_pnl_pts": 692.0,
+      "total_trades": 69,
+      "wins": 27,
+      "losses": 42,
+      "win_rate": 39.1,
+      "avg_win_pts": 50.7,
+      "avg_loss_pts": -16.1,
+      "profit_factor": 2.02,
+      "avg_duration_min": 413.0,
+      "avg_win_duration_min": 657.0,
+      "avg_loss_duration_min": 257.0
+    },
+    "worst_losses": [
+      {
+        "open_time": "2024-01-24 10:43:00+08:00",
+        "close_time": "2024-01-24 13:40:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 7506.0,
+        "close_price": 7468.0,
+        "pnl_pts": -38.0,
+        "duration_min": 177,
+        "win": false
+      },
+      {
+        "open_time": "2024-03-21 09:09:00+08:00",
+        "close_time": "2024-03-21 09:11:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8384.0,
+        "close_price": 8346.0,
+        "pnl_pts": -38.0,
+        "duration_min": 2,
+        "win": false
+      },
+      {
+        "open_time": "2024-02-06 13:38:00+08:00",
+        "close_time": "2024-02-06 14:50:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 7120.0,
+        "close_price": 7088.0,
+        "pnl_pts": -32.0,
+        "duration_min": 72,
+        "win": false
+      },
+      {
+        "open_time": "2024-04-09 14:08:00+08:00",
+        "close_time": "2024-04-10 10:10:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8236.0,
+        "close_price": 8206.0,
+        "pnl_pts": -30.0,
+        "duration_min": 1202,
+        "win": false
+      },
+      {
+        "open_time": "2024-03-25 14:23:00+08:00",
+        "close_time": "2024-03-26 09:17:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8362.0,
+        "close_price": 8334.0,
+        "pnl_pts": -28.0,
+        "duration_min": 1134,
+        "win": false
+      },
+      {
+        "open_time": "2024-01-04 21:13:00+08:00",
+        "close_time": "2024-01-04 22:52:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 7004.0,
+        "close_price": 6978.0,
+        "pnl_pts": -26.0,
+        "duration_min": 99,
+        "win": false
+      },
+      {
+        "open_time": "2024-03-21 22:44:00+08:00",
+        "close_time": "2024-03-21 22:54:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8356.0,
+        "close_price": 8330.0,
+        "pnl_pts": -26.0,
+        "duration_min": 10,
+        "win": false
+      },
+      {
+        "open_time": "2024-03-26 22:48:00+08:00",
+        "close_time": "2024-03-27 09:05:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8302.0,
+        "close_price": 8276.0,
+        "pnl_pts": -26.0,
+        "duration_min": 617,
+        "win": false
+      },
+      {
+        "open_time": "2024-03-27 22:53:00+08:00",
+        "close_time": "2024-03-28 10:08:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8124.0,
+        "close_price": 8098.0,
+        "pnl_pts": -26.0,
+        "duration_min": 675,
+        "win": false
+      },
+      {
+        "open_time": "2024-03-28 11:28:00+08:00",
+        "close_time": "2024-03-28 13:48:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8114.0,
+        "close_price": 8088.0,
+        "pnl_pts": -26.0,
+        "duration_min": 140,
+        "win": false
+      }
+    ],
+    "worst_streaks": [
+      {
+        "length": 10,
+        "pnl_pts": -170.0,
+        "start": "2024-01-24 10:43:00+08:00",
+        "end": "2024-02-07 09:11:00+08:00"
+      },
+      {
+        "length": 6,
+        "pnl_pts": -170.0,
+        "start": "2024-03-21 09:09:00+08:00",
+        "end": "2024-03-28 13:48:00+08:00"
+      },
+      {
+        "length": 4,
+        "pnl_pts": -64.0,
+        "start": "2023-12-15 10:03:00+08:00",
+        "end": "2023-12-22 22:50:00+08:00"
+      },
+      {
+        "length": 5,
+        "pnl_pts": -58.0,
+        "start": "2024-01-12 22:08:00+08:00",
+        "end": "2024-01-23 10:35:00+08:00"
+      },
+      {
+        "length": 6,
+        "pnl_pts": -24.0,
+        "start": "2024-02-20 09:38:00+08:00",
+        "end": "2024-02-28 14:18:00+08:00"
+      }
+    ],
+    "worst_days": [
+      {
+        "date": "2024-03-21",
+        "count": 2,
+        "pnl": -64.0
+      },
+      {
+        "date": "2024-01-24",
+        "count": 2,
+        "pnl": -46.0
+      },
+      {
+        "date": "2024-02-06",
+        "count": 2,
+        "pnl": -42.0
+      },
+      {
+        "date": "2024-01-04",
+        "count": 2,
+        "pnl": -38.0
+      },
+      {
+        "date": "2024-04-09",
+        "count": 1,
+        "pnl": -30.0
+      }
+    ],
+    "short_trades": 6,
+    "very_short_trades": 3
+  },
+  "p2209": {
+    "contract": "p2209",
+    "summary": {
+      "total_pnl_pts": 214.0,
+      "total_trades": 56,
+      "wins": 19,
+      "losses": 37,
+      "win_rate": 33.9,
+      "avg_win_pts": 104.0,
+      "avg_loss_pts": -47.6,
+      "profit_factor": 1.12,
+      "avg_duration_min": 533.0,
+      "avg_win_duration_min": 652.0,
+      "avg_loss_duration_min": 472.0
+    },
+    "worst_losses": [
+      {
+        "open_time": "2022-05-19 13:48:00+08:00",
+        "close_time": "2022-05-19 21:11:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 11488.0,
+        "close_price": 11312.0,
+        "pnl_pts": -176.0,
+        "duration_min": 443,
+        "win": false
+      },
+      {
+        "open_time": "2022-07-01 22:14:00+08:00",
+        "close_time": "2022-07-04 09:02:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8862.0,
+        "close_price": 8770.0,
+        "pnl_pts": -92.0,
+        "duration_min": 3528,
+        "win": false
+      },
+      {
+        "open_time": "2022-07-20 13:37:00+08:00",
+        "close_time": "2022-07-20 21:16:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8168.0,
+        "close_price": 8076.0,
+        "pnl_pts": -92.0,
+        "duration_min": 459,
+        "win": false
+      },
+      {
+        "open_time": "2022-05-10 13:38:00+08:00",
+        "close_time": "2022-05-10 21:06:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 11536.0,
+        "close_price": 11448.0,
+        "pnl_pts": -88.0,
+        "duration_min": 448,
+        "win": false
+      },
+      {
+        "open_time": "2022-06-28 10:33:00+08:00",
+        "close_time": "2022-06-28 10:42:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 9496.0,
+        "close_price": 9418.0,
+        "pnl_pts": -78.0,
+        "duration_min": 9,
+        "win": false
+      },
+      {
+        "open_time": "2022-04-21 14:48:00+08:00",
+        "close_time": "2022-04-21 21:02:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 11186.0,
+        "close_price": 11110.0,
+        "pnl_pts": -76.0,
+        "duration_min": 374,
+        "win": false
+      },
+      {
+        "open_time": "2022-04-25 13:42:00+08:00",
+        "close_time": "2022-04-25 14:20:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 11556.0,
+        "close_price": 11488.0,
+        "pnl_pts": -68.0,
+        "duration_min": 38,
+        "win": false
+      },
+      {
+        "open_time": "2022-05-09 11:23:00+08:00",
+        "close_time": "2022-05-09 13:59:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 11586.0,
+        "close_price": 11518.0,
+        "pnl_pts": -68.0,
+        "duration_min": 156,
+        "win": false
+      },
+      {
+        "open_time": "2022-06-02 13:48:00+08:00",
+        "close_time": "2022-06-06 09:30:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 12010.0,
+        "close_price": 11950.0,
+        "pnl_pts": -60.0,
+        "duration_min": 5502,
+        "win": false
+      },
+      {
+        "open_time": "2022-07-15 22:28:00+08:00",
+        "close_time": "2022-07-18 09:02:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 7728.0,
+        "close_price": 7670.0,
+        "pnl_pts": -58.0,
+        "duration_min": 3514,
+        "win": false
+      }
+    ],
+    "worst_streaks": [
+      {
+        "length": 7,
+        "pnl_pts": -360.0,
+        "start": "2022-05-19 13:48:00+08:00",
+        "end": "2022-05-31 14:20:00+08:00"
+      },
+      {
+        "length": 6,
+        "pnl_pts": -312.0,
+        "start": "2022-04-27 21:18:00+08:00",
+        "end": "2022-05-12 09:10:00+08:00"
+      },
+      {
+        "length": 5,
+        "pnl_pts": -288.0,
+        "start": "2022-06-27 10:38:00+08:00",
+        "end": "2022-07-06 22:18:00+08:00"
+      },
+      {
+        "length": 3,
+        "pnl_pts": -152.0,
+        "start": "2022-07-15 11:13:00+08:00",
+        "end": "2022-07-18 22:50:00+08:00"
+      },
+      {
+        "length": 3,
+        "pnl_pts": -136.0,
+        "start": "2022-06-01 22:48:00+08:00",
+        "end": "2022-06-06 21:44:00+08:00"
+      }
+    ],
+    "worst_days": [
+      {
+        "date": "2022-05-19",
+        "count": 1,
+        "pnl": -176.0
+      },
+      {
+        "date": "2022-07-15",
+        "count": 2,
+        "pnl": -104.0
+      },
+      {
+        "date": "2022-07-01",
+        "count": 1,
+        "pnl": -92.0
+      },
+      {
+        "date": "2022-07-20",
+        "count": 1,
+        "pnl": -92.0
+      },
+      {
+        "date": "2022-05-10",
+        "count": 1,
+        "pnl": -88.0
+      }
+    ],
+    "short_trades": 4,
+    "very_short_trades": 2
+  },
+  "p2501": {
+    "contract": "p2501",
+    "summary": {
+      "total_pnl_pts": 1500.0,
+      "total_trades": 142,
+      "wins": 58,
+      "losses": 84,
+      "win_rate": 40.8,
+      "avg_win_pts": 61.3,
+      "avg_loss_pts": -24.5,
+      "profit_factor": 1.73,
+      "avg_duration_min": 653.0,
+      "avg_win_duration_min": 1115.0,
+      "avg_loss_duration_min": 335.0
+    },
+    "worst_losses": [
+      {
+        "open_time": "2024-10-11 22:48:00+08:00",
+        "close_time": "2024-10-14 09:02:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8984.0,
+        "close_price": 8848.0,
+        "pnl_pts": -136.0,
+        "duration_min": 3494,
+        "win": false
+      },
+      {
+        "open_time": "2024-11-08 22:08:00+08:00",
+        "close_time": "2024-11-11 09:02:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 10228.0,
+        "close_price": 10136.0,
+        "pnl_pts": -92.0,
+        "duration_min": 3534,
+        "win": false
+      },
+      {
+        "open_time": "2024-06-25 22:13:00+08:00",
+        "close_time": "2024-06-26 09:03:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 7562.0,
+        "close_price": 7482.0,
+        "pnl_pts": -80.0,
+        "duration_min": 650,
+        "win": false
+      },
+      {
+        "open_time": "2024-04-29 22:06:00+08:00",
+        "close_time": "2024-04-30 09:02:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 7420.0,
+        "close_price": 7344.0,
+        "pnl_pts": -76.0,
+        "duration_min": 656,
+        "win": false
+      },
+      {
+        "open_time": "2024-09-13 09:50:00+08:00",
+        "close_time": "2024-09-13 10:58:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 7912.0,
+        "close_price": 7854.0,
+        "pnl_pts": -58.0,
+        "duration_min": 68,
+        "win": false
+      },
+      {
+        "open_time": "2024-10-25 09:03:00+08:00",
+        "close_time": "2024-10-25 11:12:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 9374.0,
+        "close_price": 9316.0,
+        "pnl_pts": -58.0,
+        "duration_min": 129,
+        "win": false
+      },
+      {
+        "open_time": "2024-06-20 22:23:00+08:00",
+        "close_time": "2024-06-21 09:04:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 7692.0,
+        "close_price": 7636.0,
+        "pnl_pts": -56.0,
+        "duration_min": 641,
+        "win": false
+      },
+      {
+        "open_time": "2024-10-29 21:08:00+08:00",
+        "close_time": "2024-10-30 11:28:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 9362.0,
+        "close_price": 9312.0,
+        "pnl_pts": -50.0,
+        "duration_min": 860,
+        "win": false
+      },
+      {
+        "open_time": "2024-10-08 10:58:00+08:00",
+        "close_time": "2024-10-08 13:50:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8804.0,
+        "close_price": 8760.0,
+        "pnl_pts": -44.0,
+        "duration_min": 172,
+        "win": false
+      },
+      {
+        "open_time": "2024-11-01 22:23:00+08:00",
+        "close_time": "2024-11-01 22:48:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 9694.0,
+        "close_price": 9650.0,
+        "pnl_pts": -44.0,
+        "duration_min": 25,
+        "win": false
+      }
+    ],
+    "worst_streaks": [
+      {
+        "length": 7,
+        "pnl_pts": -274.0,
+        "start": "2024-10-08 10:58:00+08:00",
+        "end": "2024-10-21 14:26:00+08:00"
+      },
+      {
+        "length": 8,
+        "pnl_pts": -232.0,
+        "start": "2024-06-14 21:08:00+08:00",
+        "end": "2024-06-26 09:03:00+08:00"
+      },
+      {
+        "length": 3,
+        "pnl_pts": -152.0,
+        "start": "2024-11-08 22:08:00+08:00",
+        "end": "2024-11-13 22:42:00+08:00"
+      },
+      {
+        "length": 3,
+        "pnl_pts": -128.0,
+        "start": "2024-10-25 09:03:00+08:00",
+        "end": "2024-10-30 11:28:00+08:00"
+      },
+      {
+        "length": 6,
+        "pnl_pts": -122.0,
+        "start": "2024-12-16 09:03:00+08:00",
+        "end": "2024-12-24 22:34:00+08:00"
+      }
+    ],
+    "worst_days": [
+      {
+        "date": "2024-10-11",
+        "count": 2,
+        "pnl": -154.0
+      },
+      {
+        "date": "2024-11-08",
+        "count": 1,
+        "pnl": -92.0
+      },
+      {
+        "date": "2024-06-25",
+        "count": 1,
+        "pnl": -80.0
+      },
+      {
+        "date": "2024-10-29",
+        "count": 2,
+        "pnl": -70.0
+      },
+      {
+        "date": "2024-12-23",
+        "count": 2,
+        "pnl": -66.0
+      }
+    ],
+    "short_trades": 5,
+    "very_short_trades": 1
+  },
+  "p2505": {
+    "contract": "p2505",
+    "summary": {
+      "total_pnl_pts": 986.0,
+      "total_trades": 59,
+      "wins": 22,
+      "losses": 37,
+      "win_rate": 37.3,
+      "avg_win_pts": 78.0,
+      "avg_loss_pts": -19.7,
+      "profit_factor": 2.35,
+      "avg_duration_min": 756.0,
+      "avg_win_duration_min": 1711.0,
+      "avg_loss_duration_min": 188.0
+    },
+    "worst_losses": [
+      {
+        "open_time": "2025-01-06 10:31:00+08:00",
+        "close_time": "2025-01-06 10:52:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8624.0,
+        "close_price": 8578.0,
+        "pnl_pts": -46.0,
+        "duration_min": 21,
+        "win": false
+      },
+      {
+        "open_time": "2025-01-13 10:58:00+08:00",
+        "close_time": "2025-01-13 11:20:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8746.0,
+        "close_price": 8708.0,
+        "pnl_pts": -38.0,
+        "duration_min": 22,
+        "win": false
+      },
+      {
+        "open_time": "2024-12-20 14:38:00+08:00",
+        "close_time": "2024-12-20 14:54:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8792.0,
+        "close_price": 8756.0,
+        "pnl_pts": -36.0,
+        "duration_min": 16,
+        "win": false
+      },
+      {
+        "open_time": "2025-01-07 09:43:00+08:00",
+        "close_time": "2025-01-07 10:15:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8550.0,
+        "close_price": 8514.0,
+        "pnl_pts": -36.0,
+        "duration_min": 32,
+        "win": false
+      },
+      {
+        "open_time": "2025-01-20 13:38:00+08:00",
+        "close_time": "2025-01-20 13:51:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8462.0,
+        "close_price": 8426.0,
+        "pnl_pts": -36.0,
+        "duration_min": 13,
+        "win": false
+      },
+      {
+        "open_time": "2025-03-19 10:48:00+08:00",
+        "close_time": "2025-03-19 11:22:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 9124.0,
+        "close_price": 9088.0,
+        "pnl_pts": -36.0,
+        "duration_min": 34,
+        "win": false
+      },
+      {
+        "open_time": "2025-03-12 21:19:00+08:00",
+        "close_time": "2025-03-12 22:00:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 9044.0,
+        "close_price": 9010.0,
+        "pnl_pts": -34.0,
+        "duration_min": 41,
+        "win": false
+      },
+      {
+        "open_time": "2024-12-26 21:53:00+08:00",
+        "close_time": "2024-12-26 22:05:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8758.0,
+        "close_price": 8730.0,
+        "pnl_pts": -28.0,
+        "duration_min": 12,
+        "win": false
+      },
+      {
+        "open_time": "2025-02-26 14:08:00+08:00",
+        "close_time": "2025-02-26 21:32:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 9204.0,
+        "close_price": 9178.0,
+        "pnl_pts": -26.0,
+        "duration_min": 444,
+        "win": false
+      },
+      {
+        "open_time": "2025-04-08 09:02:00+08:00",
+        "close_time": "2025-04-08 09:07:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8772.0,
+        "close_price": 8746.0,
+        "pnl_pts": -26.0,
+        "duration_min": 5,
+        "win": false
+      }
+    ],
+    "worst_streaks": [
+      {
+        "length": 9,
+        "pnl_pts": -192.0,
+        "start": "2024-12-26 21:53:00+08:00",
+        "end": "2025-01-08 11:23:00+08:00"
+      },
+      {
+        "length": 4,
+        "pnl_pts": -108.0,
+        "start": "2025-03-12 21:19:00+08:00",
+        "end": "2025-03-19 11:22:00+08:00"
+      },
+      {
+        "length": 5,
+        "pnl_pts": -84.0,
+        "start": "2025-02-26 14:08:00+08:00",
+        "end": "2025-03-03 22:59:00+08:00"
+      }
+    ],
+    "worst_days": [
+      {
+        "date": "2025-01-07",
+        "count": 2,
+        "pnl": -54.0
+      },
+      {
+        "date": "2025-01-06",
+        "count": 1,
+        "pnl": -46.0
+      },
+      {
+        "date": "2025-02-28",
+        "count": 2,
+        "pnl": -40.0
+      },
+      {
+        "date": "2025-01-13",
+        "count": 1,
+        "pnl": -38.0
+      },
+      {
+        "date": "2024-12-20",
+        "count": 1,
+        "pnl": -36.0
+      }
+    ],
+    "short_trades": 4,
+    "very_short_trades": 0
+  },
+  "p2509": {
+    "contract": "p2509",
+    "summary": {
+      "total_pnl_pts": 362.0,
+      "total_trades": 61,
+      "wins": 25,
+      "losses": 36,
+      "win_rate": 41.0,
+      "avg_win_pts": 42.5,
+      "avg_loss_pts": -19.4,
+      "profit_factor": 1.52,
+      "avg_duration_min": 745.0,
+      "avg_win_duration_min": 1021.0,
+      "avg_loss_duration_min": 553.0
+    },
+    "worst_losses": [
+      {
+        "open_time": "2025-04-30 14:28:00+08:00",
+        "close_time": "2025-05-06 09:04:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8128.0,
+        "close_price": 8022.0,
+        "pnl_pts": -106.0,
+        "duration_min": 8316,
+        "win": false
+      },
+      {
+        "open_time": "2025-06-13 11:16:00+08:00",
+        "close_time": "2025-06-13 14:49:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8176.0,
+        "close_price": 8134.0,
+        "pnl_pts": -42.0,
+        "duration_min": 213,
+        "win": false
+      },
+      {
+        "open_time": "2025-06-16 10:49:00+08:00",
+        "close_time": "2025-06-16 13:46:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8438.0,
+        "close_price": 8406.0,
+        "pnl_pts": -32.0,
+        "duration_min": 177,
+        "win": false
+      },
+      {
+        "open_time": "2025-07-28 13:38:00+08:00",
+        "close_time": "2025-07-29 09:21:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8928.0,
+        "close_price": 8896.0,
+        "pnl_pts": -32.0,
+        "duration_min": 1183,
+        "win": false
+      },
+      {
+        "open_time": "2025-08-06 21:58:00+08:00",
+        "close_time": "2025-08-07 09:02:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 9020.0,
+        "close_price": 8990.0,
+        "pnl_pts": -30.0,
+        "duration_min": 664,
+        "win": false
+      },
+      {
+        "open_time": "2025-05-19 13:38:00+08:00",
+        "close_time": "2025-05-19 14:43:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8016.0,
+        "close_price": 7988.0,
+        "pnl_pts": -28.0,
+        "duration_min": 65,
+        "win": false
+      },
+      {
+        "open_time": "2025-06-12 09:08:00+08:00",
+        "close_time": "2025-06-12 10:05:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8014.0,
+        "close_price": 7986.0,
+        "pnl_pts": -28.0,
+        "duration_min": 57,
+        "win": false
+      },
+      {
+        "open_time": "2025-07-10 14:33:00+08:00",
+        "close_time": "2025-07-10 21:07:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8640.0,
+        "close_price": 8614.0,
+        "pnl_pts": -26.0,
+        "duration_min": 394,
+        "win": false
+      },
+      {
+        "open_time": "2025-05-08 21:58:00+08:00",
+        "close_time": "2025-05-08 22:47:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 7970.0,
+        "close_price": 7948.0,
+        "pnl_pts": -22.0,
+        "duration_min": 49,
+        "win": false
+      },
+      {
+        "open_time": "2025-06-10 10:58:00+08:00",
+        "close_time": "2025-06-10 11:19:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8180.0,
+        "close_price": 8158.0,
+        "pnl_pts": -22.0,
+        "duration_min": 21,
+        "win": false
+      }
+    ],
+    "worst_streaks": [
+      {
+        "length": 4,
+        "pnl_pts": -146.0,
+        "start": "2025-04-24 21:58:00+08:00",
+        "end": "2025-05-06 09:04:00+08:00"
+      },
+      {
+        "length": 6,
+        "pnl_pts": -104.0,
+        "start": "2025-08-01 21:23:00+08:00",
+        "end": "2025-08-08 14:14:00+08:00"
+      },
+      {
+        "length": 6,
+        "pnl_pts": -80.0,
+        "start": "2025-06-20 09:01:00+08:00",
+        "end": "2025-06-30 22:31:00+08:00"
+      },
+      {
+        "length": 4,
+        "pnl_pts": -46.0,
+        "start": "2025-05-14 14:33:00+08:00",
+        "end": "2025-05-19 14:43:00+08:00"
+      },
+      {
+        "length": 3,
+        "pnl_pts": -30.0,
+        "start": "2025-07-03 09:32:00+08:00",
+        "end": "2025-07-07 22:35:00+08:00"
+      }
+    ],
+    "worst_days": [
+      {
+        "date": "2025-04-30",
+        "count": 1,
+        "pnl": -106.0
+      },
+      {
+        "date": "2025-06-13",
+        "count": 1,
+        "pnl": -42.0
+      },
+      {
+        "date": "2025-06-16",
+        "count": 1,
+        "pnl": -32.0
+      },
+      {
+        "date": "2025-07-28",
+        "count": 1,
+        "pnl": -32.0
+      },
+      {
+        "date": "2025-06-25",
+        "count": 2,
+        "pnl": -30.0
+      }
+    ],
+    "short_trades": 5,
+    "very_short_trades": 2
+  },
+  "p2301": {
+    "contract": "p2301",
+    "summary": {
+      "total_pnl_pts": -442.0,
+      "total_trades": 55,
+      "wins": 13,
+      "losses": 42,
+      "win_rate": 23.6,
+      "avg_win_pts": 62.6,
+      "avg_loss_pts": -29.9,
+      "profit_factor": 0.65,
+      "avg_duration_min": 412.0,
+      "avg_win_duration_min": 922.0,
+      "avg_loss_duration_min": 254.0
+    },
+    "worst_losses": [
+      {
+        "open_time": "2022-11-11 10:13:00+08:00",
+        "close_time": "2022-11-11 10:39:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8474.0,
+        "close_price": 8416.0,
+        "pnl_pts": -58.0,
+        "duration_min": 26,
+        "win": false
+      },
+      {
+        "open_time": "2022-10-13 09:03:00+08:00",
+        "close_time": "2022-10-13 10:14:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 7732.0,
+        "close_price": 7676.0,
+        "pnl_pts": -56.0,
+        "duration_min": 71,
+        "win": false
+      },
+      {
+        "open_time": "2022-12-06 22:45:00+08:00",
+        "close_time": "2022-12-07 09:02:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8194.0,
+        "close_price": 8138.0,
+        "pnl_pts": -56.0,
+        "duration_min": 617,
+        "win": false
+      },
+      {
+        "open_time": "2022-11-15 21:34:00+08:00",
+        "close_time": "2022-11-15 22:35:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8168.0,
+        "close_price": 8114.0,
+        "pnl_pts": -54.0,
+        "duration_min": 61,
+        "win": false
+      },
+      {
+        "open_time": "2022-11-18 09:48:00+08:00",
+        "close_time": "2022-11-18 14:15:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 7934.0,
+        "close_price": 7880.0,
+        "pnl_pts": -54.0,
+        "duration_min": 267,
+        "win": false
+      },
+      {
+        "open_time": "2022-08-23 10:48:00+08:00",
+        "close_time": "2022-08-23 11:16:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8608.0,
+        "close_price": 8558.0,
+        "pnl_pts": -50.0,
+        "duration_min": 28,
+        "win": false
+      },
+      {
+        "open_time": "2022-11-10 21:14:00+08:00",
+        "close_time": "2022-11-10 22:37:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8340.0,
+        "close_price": 8290.0,
+        "pnl_pts": -50.0,
+        "duration_min": 83,
+        "win": false
+      },
+      {
+        "open_time": "2022-08-22 10:13:00+08:00",
+        "close_time": "2022-08-22 10:46:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8542.0,
+        "close_price": 8494.0,
+        "pnl_pts": -48.0,
+        "duration_min": 33,
+        "win": false
+      },
+      {
+        "open_time": "2022-09-27 14:28:00+08:00",
+        "close_time": "2022-09-27 21:27:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 7258.0,
+        "close_price": 7216.0,
+        "pnl_pts": -42.0,
+        "duration_min": 419,
+        "win": false
+      },
+      {
+        "open_time": "2022-10-20 10:13:00+08:00",
+        "close_time": "2022-10-20 11:05:00+08:00",
+        "direction": "Direction.LONG",
+        "open_price": 8244.0,
+        "close_price": 8202.0,
+        "pnl_pts": -42.0,
+        "duration_min": 52,
+        "win": false
+      }
+    ],
+    "worst_streaks": [
+      {
+        "length": 14,
+        "pnl_pts": -418.0,
+        "start": "2022-08-19 13:59:00+08:00",
+        "end": "2022-09-14 09:02:00+08:00"
+      },
+      {
+        "length": 7,
+        "pnl_pts": -306.0,
+        "start": "2022-11-10 21:14:00+08:00",
+        "end": "2022-11-21 21:41:00+08:00"
+      },
+      {
+        "length": 9,
+        "pnl_pts": -232.0,
+        "start": "2022-09-22 10:53:00+08:00",
+        "end": "2022-10-18 15:00:00+08:00"
+      },
+      {
+        "length": 3,
+        "pnl_pts": -114.0,
+        "start": "2022-12-06 22:45:00+08:00",
+        "end": "2022-12-13 14:45:00+08:00"
+      },
+      {
+        "length": 3,
+        "pnl_pts": -72.0,
+        "start": "2022-11-24 13:43:00+08:00",
+        "end": "2022-11-29 21:12:00+08:00"
+      }
+    ],
+    "worst_days": [
+      {
+        "date": "2022-11-11",
+        "count": 2,
+        "pnl": -82.0
+      },
+      {
+        "date": "2022-09-05",
+        "count": 2,
+        "pnl": -60.0
+      },
+      {
+        "date": "2022-10-13",
+        "count": 1,
+        "pnl": -56.0
+      },
+      {
+        "date": "2022-12-06",
+        "count": 1,
+        "pnl": -56.0
+      },
+      {
+        "date": "2022-11-15",
+        "count": 1,
+        "pnl": -54.0
+      }
+    ],
+    "short_trades": 6,
+    "very_short_trades": 2
+  }
+}
