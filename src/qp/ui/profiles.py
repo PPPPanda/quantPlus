@@ -102,7 +102,7 @@ def _get_trade_apps() -> list[type[BaseApp]]:
     # 可选：数据记录
     apps.append(_try_import_app("vnpy_datarecorder", "DataRecorderApp"))
 
-    # 可选：风控管理
+    # 风控必须最后加载（确保 patch 链正确）
     apps.append(_try_import_app("vnpy_riskmanager", "RiskManagerApp"))
 
     # 过滤掉 None
@@ -136,7 +136,6 @@ def _get_all_apps() -> list[type[BaseApp]]:
     # === Trade 相关 ===
     apps.append(_try_import_app("vnpy_ctastrategy", "CtaStrategyApp"))
     apps.append(_try_import_app("vnpy_datarecorder", "DataRecorderApp"))
-    apps.append(_try_import_app("vnpy_riskmanager", "RiskManagerApp"))
 
     # === Research 相关 ===
     apps.append(_try_import_app("vnpy_ctabacktester", "CtaBacktesterApp"))
@@ -149,6 +148,12 @@ def _get_all_apps() -> list[type[BaseApp]]:
 
     # === 额外可选 ===
     apps.append(_try_import_app("vnpy_paperaccount", "PaperAccountApp"))
+
+    # === 风控必须最后加载 ===
+    # RiskManagerApp 通过 patch main_engine.send_order 实现拦截，
+    # 必须在所有可能 patch send_order 的 App（如 PaperAccountApp）之后加载，
+    # 否则后加载的 App 会覆盖风控的 patch，导致风控检查被绕过。
+    apps.append(_try_import_app("vnpy_riskmanager", "RiskManagerApp"))
 
     # 过滤掉 None
     return [app for app in apps if app is not None]

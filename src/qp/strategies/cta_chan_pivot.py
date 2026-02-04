@@ -87,6 +87,15 @@ class CtaChanPivotStrategy(CtaTemplate):
     # R3: 两段式出场 — 锁盈参数
     lock_profit_atr: float = 0.0       # 浮盈≥1R时锁盈: 止损抬到 entry + N*ATR（0=禁用）
 
+    # S5: 最小持仓保护（开仓后前N根5m bar止损距离加宽）
+    min_hold_bars: int = 2             # 0=禁用; >0时开仓后前N根5m bar止损距离乘以2
+
+    # S4: 3B回踩深度要求 — 回踩点不能离ZG太远
+    max_pullback_atr: float = 4.0      # 0=禁用; >0时3B回踩点必须 < ZG + N*ATR
+
+    # S7: 结构trailing — trailing激活后用笔低点作为止损参考
+    use_bi_trailing: bool = True       # True时trailing优先用最近bottom - buffer
+
     # B03: 止损 buffer 参数
     stop_buffer_atr_pct: float = 0.02  # 止损 buffer = max(pricetick, atr * pct)
 
@@ -112,6 +121,9 @@ class CtaChanPivotStrategy(CtaTemplate):
         "cooldown_losses", "cooldown_bars",
         "circuit_breaker_losses", "circuit_breaker_bars",
         "lock_profit_atr",
+        "min_hold_bars",
+        "max_pullback_atr",
+        "use_bi_trailing",
         "stop_buffer_atr_pct",
         "max_pivot_entries", "pivot_reentry_atr",
         "dedup_bars", "dedup_atr_mult",
@@ -193,12 +205,18 @@ class CtaChanPivotStrategy(CtaTemplate):
         # 待触发信号
         self._pending_signal: Optional[dict] = None
 
+        # S3: 3B两步确认缓冲
+        # 第一步：回踩bottom形成且>ZG → 存入_pending_3b_confirm
+        # 第二步：下一笔向上确认(high > 回踩bar high) → 转为_pending_signal
+        self._pending_3b_confirm: Optional[dict] = None
+
         # 交易状态
         self._position: int = 0
         self._entry_price: float = 0.0
         self._stop_price: float = 0.0
         self._initial_stop: float = 0.0   # R3: 记录初始止损价（计算 1R 用）
         self._trailing_active: bool = False
+        self._bars_since_entry: int = 0  # S5: 开仓后经过的5m bar数
 
         # B02: 连亏冷却状态
         self._consecutive_losses: int = 0
@@ -473,6 +491,10 @@ class CtaChanPivotStrategy(CtaTemplate):
     def _on_5m_bar(self, bar: dict) -> None:
         """5 分钟 K 线回调 - 核心交易逻辑."""
         self._bar_5m_count += 1
+
+        # S5: 计数开仓后的bar数
+        if self._position != 0:
+            self._bars_since_entry += 1
 
         # R1: 清理过老的入场记录
         if self._recent_entries and self.dedup_bars > 0:
@@ -841,7 +863,11 @@ class CtaChanPivotStrategy(CtaTemplate):
             # R2: 向上离开中枢 + 回踩不破 ZG（状态机确认离开段）
             if ap['state'] == 'left_up' and p_now['type'] == 'bottom':
                 # 回踩点在 ZG 之上 = 回踩不破中枢高点
-                if p_now['price'] > ap['zg']:
+                # S4: 且回踩点不能离ZG太远（确保是真正的"回踩"而非追高）
+                pullback_ok = True
+                if self.max_pullback_atr > 0 and self.atr > 0:
+                    pullback_ok = p_now['price'] < ap['zg'] + self.max_pullback_atr * self.atr
+                if p_now['price'] > ap['zg'] and pullback_ok:
                     if is_bull:
                         # R1: 同中枢入场去重 — 检查是否超限
                         if self.max_pivot_entries > 0 and ap['entry_count'] >= self.max_pivot_entries:
@@ -901,8 +927,12 @@ class CtaChanPivotStrategy(CtaTemplate):
         # --------------------------------------------------------
         # 辅助逻辑：保留 2B/2S（作为趋势延续补充）
         # B10: 支持面积背驰混合模式
+        # S2: 2B结构闸门 — 需要活跃中枢且处于active/forming状态
+        #     即中枢尚未被离开(left_up/left_down)时才允许2B/2S
+        #     防止在无结构/中枢已远的情况下做趋势追随
         # --------------------------------------------------------
-        if not sig:
+        has_active_structure = (ap is not None and ap['state'] in ('forming', 'active'))
+        if not sig and has_active_structure:
             if p_now['type'] == 'bottom':
                 diff_ok = p_now['data']['diff'] > p_prev['data']['diff']
                 price_ok = p_now['price'] > p_prev['price']
@@ -1003,6 +1033,12 @@ class CtaChanPivotStrategy(CtaTemplate):
         if not signal:
             return
 
+        # S1: 冷却期间冻结 Buy 信号（CloseLong 仍允许，避免持仓风险）
+        if self._cooldown_remaining > 0 and signal['type'] == 'Buy':
+            self._pending_signal = None
+            self.signal = ""
+            return
+
         if signal['type'] == 'Buy':
             # 检查是否已经破止损（信号失效）
             if bar['low'] < signal['stop_base']:
@@ -1087,6 +1123,7 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._entry_price = price
         self._initial_stop = self._stop_price  # R3: 记录初始止损
         self._trailing_active = False
+        self._bars_since_entry = 0  # S5: 重置持仓bar计数
         self._pending_signal = None
 
         # R1: 递增当前中枢的入场计数 + 记录近期入场
@@ -1114,14 +1151,24 @@ class CtaChanPivotStrategy(CtaTemplate):
         sl_hit = False
         exit_price = 0.0
 
+        # S5: 最小持仓保护期间加宽止损
+        effective_stop = self._stop_price
+        if self.min_hold_bars > 0 and self._bars_since_entry <= self.min_hold_bars:
+            # 保护期内：止损距离加倍（向远离方向移动）
+            stop_dist = abs(self._entry_price - self._stop_price)
+            if self._position == 1:
+                effective_stop = self._entry_price - stop_dist * 2
+            elif self._position == -1:
+                effective_stop = self._entry_price + stop_dist * 2
+
         if self._position == 1:
-            if bar['low'] <= self._stop_price:
+            if bar['low'] <= effective_stop:
                 sl_hit = True
-                exit_price = bar['open'] if bar['open'] < self._stop_price else self._stop_price
+                exit_price = bar['open'] if bar['open'] < effective_stop else effective_stop
         elif self._position == -1:
-            if bar['high'] >= self._stop_price:
+            if bar['high'] >= effective_stop:
                 sl_hit = True
-                exit_price = bar['open'] if bar['open'] > self._stop_price else self._stop_price
+                exit_price = bar['open'] if bar['open'] > effective_stop else effective_stop
 
         if sl_hit:
             # 计算盈亏
@@ -1204,7 +1251,18 @@ class CtaChanPivotStrategy(CtaTemplate):
 
         if self._trailing_active:
             if self._position == 1:
+                # S7: 结构trailing — 用最近笔底点作为止损参考
                 new_stop = bar['high'] - (self.atr * self.atr_trailing_mult)
+                if self.use_bi_trailing and len(self._bi_points) >= 2:
+                    # 找最近的bottom bi point
+                    for i in range(len(self._bi_points) - 1, max(len(self._bi_points) - 4, -1), -1):
+                        bp = self._bi_points[i]
+                        if bp['type'] == 'bottom' and bp['price'] > self._entry_price + self.atr:
+                            buffer = self._calc_stop_buffer()
+                            bi_stop = bp['price'] - buffer
+                            # 取ATR trailing和笔低点中较高者（更紧但仍结构合理）
+                            new_stop = max(new_stop, bi_stop)
+                            break
                 if new_stop > self._stop_price:
                     self._stop_price = new_stop
             else:
