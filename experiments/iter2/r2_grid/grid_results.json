@@ -1,0 +1,122 @@
+[
+  {
+    "macd_zero_filter": 0,
+    "atr_entry_filter": 1.0,
+    "total_pnl": 47771,
+    "total_points": 4777.1,
+    "y25_pnl": -9535,
+    "y25_all_positive": false,
+    "p2501": -9890,
+    "p2505": 460,
+    "p2509": -105,
+    "p2601": 5065
+  },
+  {
+    "macd_zero_filter": 0,
+    "atr_entry_filter": 1.5,
+    "total_pnl": 87632,
+    "total_points": 8763.2,
+    "y25_pnl": -79,
+    "y25_all_positive": false,
+    "p2501": -187,
+    "p2505": 2448,
+    "p2509": -2341,
+    "p2601": 11566
+  },
+  {
+    "macd_zero_filter": 0,
+    "atr_entry_filter": 2.0,
+    "total_pnl": 90506,
+    "total_points": 9050.6,
+    "y25_pnl": 735,
+    "y25_all_positive": false,
+    "p2501": -764,
+    "p2505": 1934,
+    "p2509": -435,
+    "p2601": 14932
+  },
+  {
+    "macd_zero_filter": 0,
+    "atr_entry_filter": 2.5,
+    "total_pnl": 90448,
+    "total_points": 9044.8,
+    "y25_pnl": 735,
+    "y25_all_positive": false,
+    "p2501": -764,
+    "p2505": 1934,
+    "p2509": -435,
+    "p2601": 14873
+  },
+  {
+    "macd_zero_filter": 0,
+    "atr_entry_filter": 3.0,
+    "total_pnl": 90448,
+    "total_points": 9044.8,
+    "y25_pnl": 735,
+    "y25_all_positive": false,
+    "p2501": -764,
+    "p2505": 1934,
+    "p2509": -435,
+    "p2601": 14873
+  },
+  {
+    "macd_zero_filter": 1,
+    "atr_entry_filter": 1.0,
+    "total_pnl": -13524,
+    "total_points": -1352.4,
+    "y25_pnl": -1647,
+    "y25_all_positive": false,
+    "p2501": -4752,
+    "p2505": 779,
+    "p2509": 2326,
+    "p2601": 6451
+  },
+  {
+    "macd_zero_filter": 1,
+    "atr_entry_filter": 1.5,
+    "total_pnl": 12490,
+    "total_points": 1249.0,
+    "y25_pnl": 1791,
+    "y25_all_positive": false,
+    "p2501": -1484,
+    "p2505": 1653,
+    "p2509": 1623,
+    "p2601": 9228
+  },
+  {
+    "macd_zero_filter": 1,
+    "atr_entry_filter": 2.0,
+    "total_pnl": 9749,
+    "total_points": 974.9,
+    "y25_pnl": 311,
+    "y25_all_positive": false,
+    "p2501": -2111,
+    "p2505": 1035,
+    "p2509": 1386,
+    "p2601": 8969
+  },
+  {
+    "macd_zero_filter": 1,
+    "atr_entry_filter": 2.5,
+    "total_pnl": 9749,
+    "total_points": 974.9,
+    "y25_pnl": 311,
+    "y25_all_positive": false,
+    "p2501": -2111,
+    "p2505": 1035,
+    "p2509": 1386,
+    "p2601": 8969
+  },
+  {
+    "macd_zero_filter": 1,
+    "atr_entry_filter": 3.0,
+    "total_pnl": 9749,
+    "total_points": 974.9,
+    "y25_pnl": 311,
+    "y25_all_positive": false,
+    "p2501": -2111,
+    "p2505": 1035,
+    "p2509": 1386,
+    "p2601": 8969
+  }
+]

@@ -85,6 +85,10 @@ class CtaChanPivotStrategy(CtaTemplate):
     # B03: 止损 buffer 参数
     stop_buffer_atr_pct: float = 0.05  # 止损 buffer = max(pricetick, atr * pct)
 
+    # B10: 背驰模式参数（面积背驰 + diff 混合）
+    div_mode: int = 1                  # 0=baseline(仅diff), 1=OR(diff或面积背驰), 2=AND, 3=仅面积背驰
+    div_threshold: float = 0.70        # 面积背驰阈值：当前笔面积 < 前同向笔面积 * threshold 视为背驰
+
     # 调试
     debug: bool = False
     debug_enabled: bool = True      # 是否启用Debug记录
@@ -95,6 +99,7 @@ class CtaChanPivotStrategy(CtaTemplate):
         "atr_window", "atr_trailing_mult", "atr_activate_mult", "atr_entry_filter",
         "min_bi_gap", "pivot_valid_range", "fixed_volume",
         "cooldown_losses", "cooldown_bars", "stop_buffer_atr_pct",
+        "div_mode", "div_threshold",
         "debug", "debug_enabled", "debug_log_console",
     ]
 
@@ -180,6 +185,10 @@ class CtaChanPivotStrategy(CtaTemplate):
 
         # 5m bar 计数
         self._bar_5m_count: int = 0
+
+        # B10: MACD 面积背驰追踪
+        self._current_bi_macd_area: float = 0.0  # 当前笔段累积 |histogram|
+        self._bi_macd_areas: list[float] = []     # 每笔完成时的面积记录
 
         # Debug工具
         self._debugger: Optional[ChanDebugger] = None
@@ -449,6 +458,10 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._update_macd_5m(bar['close'])
         self._update_atr(bar)
 
+        # B10: 累积当前笔段的 MACD histogram 面积
+        histogram = self.diff_5m - self.dea_5m
+        self._current_bi_macd_area += abs(histogram)
+
         # Debug: 记录5分钟K线和指标（仅实盘模式）
         if self._debugger and self.trading:
             self._debugger.log_kline_5m(
@@ -608,6 +621,9 @@ class CtaChanPivotStrategy(CtaTemplate):
             # 异向成笔（严格笔要求间隔 >= min_bi_gap）
             if cand['idx'] - last['idx'] >= self.min_bi_gap:
                 self._bi_points.append(cand)
+                # B10: 保存当前笔段面积并重置
+                self._bi_macd_areas.append(self._current_bi_macd_area)
+                self._current_bi_macd_area = 0.0
                 # Debug: 记录新笔（仅实盘模式）
                 if self._debugger and self.trading:
                     self._debugger.log_bi(
@@ -654,6 +670,45 @@ class CtaChanPivotStrategy(CtaTemplate):
                     pivot_idx=len(self._pivots),
                     status="confirmed"
                 )
+
+    def _has_area_divergence(self) -> Optional[bool]:
+        """
+        B10: 检查面积背驰.
+
+        比较当前笔段面积与前同向笔段（间隔2笔）面积。
+        返回 True=有背驰, False=无背驰, None=数据不足无法判断。
+        """
+        n = len(self._bi_macd_areas)
+        if n < 3:
+            return None
+        curr = self._bi_macd_areas[-1]
+        prev_same = self._bi_macd_areas[-3]  # 同向笔段（交替上下，间隔2）
+        if prev_same <= 0:
+            return None
+        return curr < prev_same * self.div_threshold
+
+    def _eval_div_condition(self, diff_ok: bool) -> bool:
+        """
+        B10: 根据 div_mode 评估 2B/2S 背驰条件.
+
+        mode 0: 仅 diff 比较（baseline）
+        mode 1: diff OR 面积背驰
+        mode 2: diff AND 面积背驰（数据不足时 fallback 到 diff）
+        mode 3: 仅面积背驰
+        """
+        if self.div_mode == 0:
+            return diff_ok
+
+        div = self._has_area_divergence()
+
+        if self.div_mode == 1:
+            return diff_ok or (div is True)
+        elif self.div_mode == 2:
+            return (diff_ok and div) if div is not None else diff_ok
+        elif self.div_mode == 3:
+            return div is True
+        else:
+            return diff_ok
 
     def _check_signal(self, curr_bar: dict, new_bi: dict) -> None:
         """检查交易信号."""
@@ -712,19 +767,24 @@ class CtaChanPivotStrategy(CtaTemplate):
 
         # --------------------------------------------------------
         # 辅助逻辑：保留 2B/2S（作为趋势延续补充）
+        # B10: 支持面积背驰混合模式
         # --------------------------------------------------------
         if not sig:
             if p_now['type'] == 'bottom':
-                div = p_now['data']['diff'] > p_prev['data']['diff']
-                if p_now['price'] > p_prev['price'] and div and is_bull:
+                diff_ok = p_now['data']['diff'] > p_prev['data']['diff']
+                price_ok = p_now['price'] > p_prev['price']
+                cond = self._eval_div_condition(diff_ok)
+                if price_ok and cond and is_bull:
                     sig = 'Buy'  # 2B
                     trigger_price = p_now['data']['high']
                     stop_base = p_now['price']
 
             elif p_now['type'] == 'top':
-                div = p_now['data']['diff'] < p_prev['data']['diff']
+                diff_ok = p_now['data']['diff'] < p_prev['data']['diff']
+                price_ok = p_now['price'] < p_prev['price']
                 # B09: 2S 仅平多仓，不再反手开空
-                if p_now['price'] < p_prev['price'] and div and is_bear:
+                cond = self._eval_div_condition(diff_ok)
+                if price_ok and cond and is_bear:
                     sig = 'CloseLong'  # 2S
                     trigger_price = p_now['data']['low']
                     stop_base = p_now['price']

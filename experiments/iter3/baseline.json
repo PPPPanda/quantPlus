@@ -1,0 +1,75 @@
+{
+  "settings": {
+    "cooldown_losses": 4,
+    "cooldown_bars": 30,
+    "atr_activate_mult": 2.5,
+    "atr_trailing_mult": 3.0,
+    "atr_entry_filter": 2.0
+  },
+  "results": [
+    {
+      "contract": "p2601",
+      "pnl": 14932,
+      "points": 1493.2,
+      "trades": 123,
+      "sharpe": 3.43,
+      "slot": "bench"
+    },
+    {
+      "contract": "p2405",
+      "pnl": 5729,
+      "points": 572.9,
+      "trades": 133,
+      "sharpe": 1.71,
+      "slot": "bench"
+    },
+    {
+      "contract": "p2209",
+      "pnl": 67362,
+      "points": 6736.2,
+      "trades": 116,
+      "sharpe": 4.14,
+      "slot": "bench"
+    },
+    {
+      "contract": "p2501",
+      "pnl": -764,
+      "points": -76.4,
+      "trades": 275,
+      "sharpe": -0.11,
+      "slot": "y25"
+    },
+    {
+      "contract": "p2505",
+      "pnl": 1934,
+      "points": 193.4,
+      "trades": 120,
+      "sharpe": 0.65,
+      "slot": "y25"
+    },
+    {
+      "contract": "p2509",
+      "pnl": -435,
+      "points": -43.5,
+      "trades": 119,
+      "sharpe": -0.23,
+      "slot": "y25"
+    },
+    {
+      "contract": "p2401",
+      "pnl": -6318,
+      "points": -631.8,
+      "trades": 116,
+      "sharpe": -4.18,
+      "slot": "extra"
+    }
+  ],
+  "total_pnl": 82440,
+  "total_points": 8244.0,
+  "y25_all_positive": false,
+  "negative_contracts": [
+    "p2501",
+    "p2509",
+    "p2401"
+  ]
+}

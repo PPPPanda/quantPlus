@@ -1,0 +1,2059 @@
+[
+  {
+    "combo": {
+      "div_mode": 1,
+      "div_threshold": 0.7,
+      "min_areas": 2
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 12257.8,
+        "trades": 132,
+        "sharpe": 2.65
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 7558.1,
+        "trades": 137,
+        "sharpe": 2.21
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 70709.7,
+        "trades": 124,
+        "sharpe": 4.33
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": 2198.3,
+        "trades": 287,
+        "sharpe": 0.32
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": 4941.1,
+        "trades": 126,
+        "sharpe": 1.52
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 915.2,
+        "trades": 125,
+        "sharpe": 0.41
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -3827.8,
+        "trades": 128,
+        "sharpe": -2.27
+      }
+    ],
+    "total_pnl": 94752.40000000001,
+    "total_pts": 9475.240000000002,
+    "neg_contracts": [
+      "p2401"
+    ],
+    "n_neg": 1,
+    "status": "PASS"
+  },
+  {
+    "combo": {
+      "div_mode": 1,
+      "div_threshold": 0.7,
+      "min_areas": 3
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 12257.8,
+        "trades": 132,
+        "sharpe": 2.65
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 7558.1,
+        "trades": 137,
+        "sharpe": 2.21
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 70709.7,
+        "trades": 124,
+        "sharpe": 4.33
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": 2198.3,
+        "trades": 287,
+        "sharpe": 0.32
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": 4941.1,
+        "trades": 126,
+        "sharpe": 1.52
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 915.2,
+        "trades": 125,
+        "sharpe": 0.41
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -3827.8,
+        "trades": 128,
+        "sharpe": -2.27
+      }
+    ],
+    "total_pnl": 94752.40000000001,
+    "total_pts": 9475.240000000002,
+    "neg_contracts": [
+      "p2401"
+    ],
+    "n_neg": 1,
+    "status": "PASS"
+  },
+  {
+    "combo": {
+      "div_mode": 1,
+      "div_threshold": 0.8,
+      "min_areas": 2
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 12257.8,
+        "trades": 132,
+        "sharpe": 2.65
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 7558.1,
+        "trades": 137,
+        "sharpe": 2.21
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 70286.7,
+        "trades": 126,
+        "sharpe": 4.3
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": 2198.3,
+        "trades": 287,
+        "sharpe": 0.32
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": 4542.9,
+        "trades": 128,
+        "sharpe": 1.39
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 1017.9,
+        "trades": 127,
+        "sharpe": 0.46
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -3827.8,
+        "trades": 128,
+        "sharpe": -2.27
+      }
+    ],
+    "total_pnl": 94033.9,
+    "total_pts": 9403.39,
+    "neg_contracts": [
+      "p2401"
+    ],
+    "n_neg": 1,
+    "status": "PASS"
+  },
+  {
+    "combo": {
+      "div_mode": 1,
+      "div_threshold": 0.8,
+      "min_areas": 3
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 12257.8,
+        "trades": 132,
+        "sharpe": 2.65
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 7558.1,
+        "trades": 137,
+        "sharpe": 2.21
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 70286.7,
+        "trades": 126,
+        "sharpe": 4.3
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": 2198.3,
+        "trades": 287,
+        "sharpe": 0.32
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": 4542.9,
+        "trades": 128,
+        "sharpe": 1.39
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 1017.9,
+        "trades": 127,
+        "sharpe": 0.46
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -3827.8,
+        "trades": 128,
+        "sharpe": -2.27
+      }
+    ],
+    "total_pnl": 94033.9,
+    "total_pts": 9403.39,
+    "neg_contracts": [
+      "p2401"
+    ],
+    "n_neg": 1,
+    "status": "PASS"
+  },
+  {
+    "combo": {
+      "div_mode": 1,
+      "div_threshold": 0.9,
+      "min_areas": 2
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 12257.8,
+        "trades": 132,
+        "sharpe": 2.65
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 7283.7,
+        "trades": 139,
+        "sharpe": 2.11
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 70286.7,
+        "trades": 126,
+        "sharpe": 4.3
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": 2198.3,
+        "trades": 287,
+        "sharpe": 0.32
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": 4703.0,
+        "trades": 128,
+        "sharpe": 1.44
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 901.9,
+        "trades": 129,
+        "sharpe": 0.41
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -3836.5,
+        "trades": 132,
+        "sharpe": -2.18
+      }
+    ],
+    "total_pnl": 93794.9,
+    "total_pts": 9379.49,
+    "neg_contracts": [
+      "p2401"
+    ],
+    "n_neg": 1,
+    "status": "PASS"
+  },
+  {
+    "combo": {
+      "div_mode": 1,
+      "div_threshold": 0.9,
+      "min_areas": 3
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 12257.8,
+        "trades": 132,
+        "sharpe": 2.65
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 7283.7,
+        "trades": 139,
+        "sharpe": 2.11
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 70286.7,
+        "trades": 126,
+        "sharpe": 4.3
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": 2198.3,
+        "trades": 287,
+        "sharpe": 0.32
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": 4703.0,
+        "trades": 128,
+        "sharpe": 1.44
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 901.9,
+        "trades": 129,
+        "sharpe": 0.41
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -3836.5,
+        "trades": 132,
+        "sharpe": -2.18
+      }
+    ],
+    "total_pnl": 93794.9,
+    "total_pts": 9379.49,
+    "neg_contracts": [
+      "p2401"
+    ],
+    "n_neg": 1,
+    "status": "PASS"
+  },
+  {
+    "combo": {
+      "div_mode": 1,
+      "div_threshold": 0.95,
+      "min_areas": 2
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 12257.8,
+        "trades": 132,
+        "sharpe": 2.65
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 7283.7,
+        "trades": 139,
+        "sharpe": 2.11
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 70286.7,
+        "trades": 126,
+        "sharpe": 4.3
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": 1962.5,
+        "trades": 289,
+        "sharpe": 0.28
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": 4703.0,
+        "trades": 128,
+        "sharpe": 1.44
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 901.9,
+        "trades": 129,
+        "sharpe": 0.41
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -3836.5,
+        "trades": 132,
+        "sharpe": -2.18
+      }
+    ],
+    "total_pnl": 93559.09999999999,
+    "total_pts": 9355.91,
+    "neg_contracts": [
+      "p2401"
+    ],
+    "n_neg": 1,
+    "status": "PASS"
+  },
+  {
+    "combo": {
+      "div_mode": 1,
+      "div_threshold": 0.95,
+      "min_areas": 3
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 12257.8,
+        "trades": 132,
+        "sharpe": 2.65
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 7283.7,
+        "trades": 139,
+        "sharpe": 2.11
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 70286.7,
+        "trades": 126,
+        "sharpe": 4.3
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": 1962.5,
+        "trades": 289,
+        "sharpe": 0.28
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": 4703.0,
+        "trades": 128,
+        "sharpe": 1.44
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 901.9,
+        "trades": 129,
+        "sharpe": 0.41
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -3836.5,
+        "trades": 132,
+        "sharpe": -2.18
+      }
+    ],
+    "total_pnl": 93559.09999999999,
+    "total_pts": 9355.91,
+    "neg_contracts": [
+      "p2401"
+    ],
+    "n_neg": 1,
+    "status": "PASS"
+  },
+  {
+    "combo": {
+      "div_mode": 1,
+      "div_threshold": 1.0,
+      "min_areas": 2
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 12257.8,
+        "trades": 132,
+        "sharpe": 2.65
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 7283.7,
+        "trades": 139,
+        "sharpe": 2.11
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 70286.7,
+        "trades": 126,
+        "sharpe": 4.3
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": 1962.5,
+        "trades": 289,
+        "sharpe": 0.28
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": 4703.0,
+        "trades": 128,
+        "sharpe": 1.44
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 901.9,
+        "trades": 129,
+        "sharpe": 0.41
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -3836.5,
+        "trades": 132,
+        "sharpe": -2.18
+      }
+    ],
+    "total_pnl": 93559.09999999999,
+    "total_pts": 9355.91,
+    "neg_contracts": [
+      "p2401"
+    ],
+    "n_neg": 1,
+    "status": "PASS"
+  },
+  {
+    "combo": {
+      "div_mode": 1,
+      "div_threshold": 1.0,
+      "min_areas": 3
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 12257.8,
+        "trades": 132,
+        "sharpe": 2.65
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 7283.7,
+        "trades": 139,
+        "sharpe": 2.11
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 70286.7,
+        "trades": 126,
+        "sharpe": 4.3
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": 1962.5,
+        "trades": 289,
+        "sharpe": 0.28
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": 4703.0,
+        "trades": 128,
+        "sharpe": 1.44
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 901.9,
+        "trades": 129,
+        "sharpe": 0.41
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -3836.5,
+        "trades": 132,
+        "sharpe": -2.18
+      }
+    ],
+    "total_pnl": 93559.09999999999,
+    "total_pts": 9355.91,
+    "neg_contracts": [
+      "p2401"
+    ],
+    "n_neg": 1,
+    "status": "PASS"
+  },
+  {
+    "combo": {
+      "div_mode": 0,
+      "div_threshold": 0,
+      "min_areas": 0
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 14931.7,
+        "trades": 123,
+        "sharpe": 3.43
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 5728.7,
+        "trades": 133,
+        "sharpe": 1.71
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 67362.4,
+        "trades": 116,
+        "sharpe": 4.14
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -764.0,
+        "trades": 275,
+        "sharpe": -0.11
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": 1934.0,
+        "trades": 120,
+        "sharpe": 0.65
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": -434.8,
+        "trades": 119,
+        "sharpe": -0.23
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -6318.2,
+        "trades": 116,
+        "sharpe": -4.18
+      }
+    ],
+    "total_pnl": 82439.79999999999,
+    "total_pts": 8243.98,
+    "neg_contracts": [
+      "p2501",
+      "p2509",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "PASS"
+  },
+  {
+    "combo": {
+      "div_mode": 3,
+      "div_threshold": 0.7,
+      "min_areas": 2
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 8395.6,
+        "trades": 87,
+        "sharpe": 2.04
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 1085.3,
+        "trades": 100,
+        "sharpe": 0.47
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -543.1,
+        "trades": 194,
+        "sharpe": -0.1
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -570.6,
+        "trades": 81,
+        "sharpe": -0.21
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 3377.0,
+        "trades": 89,
+        "sharpe": 1.93
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -5154.0,
+        "trades": 78,
+        "sharpe": -1.92
+      }
+    ],
+    "total_pnl": 6590.199999999999,
+    "total_pts": 659.0199999999999,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 3,
+      "div_threshold": 0.7,
+      "min_areas": 3
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 8395.6,
+        "trades": 87,
+        "sharpe": 2.04
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 1085.3,
+        "trades": 100,
+        "sharpe": 0.47
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -543.1,
+        "trades": 194,
+        "sharpe": -0.1
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -570.6,
+        "trades": 81,
+        "sharpe": -0.21
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 3377.0,
+        "trades": 89,
+        "sharpe": 1.93
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -5154.0,
+        "trades": 78,
+        "sharpe": -1.92
+      }
+    ],
+    "total_pnl": 6590.199999999999,
+    "total_pts": 659.0199999999999,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 3,
+      "div_threshold": 0.8,
+      "min_areas": 2
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 8656.6,
+        "trades": 89,
+        "sharpe": 2.1
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 1085.3,
+        "trades": 100,
+        "sharpe": 0.47
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -1365.7,
+        "trades": 202,
+        "sharpe": -0.25
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -1246.4,
+        "trades": 85,
+        "sharpe": -0.47
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 3263.5,
+        "trades": 93,
+        "sharpe": 1.85
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -4968.5,
+        "trades": 80,
+        "sharpe": -1.84
+      }
+    ],
+    "total_pnl": 5424.799999999999,
+    "total_pts": 542.4799999999999,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 3,
+      "div_threshold": 0.8,
+      "min_areas": 3
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 8656.6,
+        "trades": 89,
+        "sharpe": 2.1
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 1085.3,
+        "trades": 100,
+        "sharpe": 0.47
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -1365.7,
+        "trades": 202,
+        "sharpe": -0.25
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -1246.4,
+        "trades": 85,
+        "sharpe": -0.47
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 3263.5,
+        "trades": 93,
+        "sharpe": 1.85
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -4968.5,
+        "trades": 80,
+        "sharpe": -1.84
+      }
+    ],
+    "total_pnl": 5424.799999999999,
+    "total_pts": 542.4799999999999,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 3,
+      "div_threshold": 0.9,
+      "min_areas": 2
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 7741.2,
+        "trades": 92,
+        "sharpe": 1.82
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 830.9,
+        "trades": 110,
+        "sharpe": 0.36
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -1756.9,
+        "trades": 206,
+        "sharpe": -0.31
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -2222.3,
+        "trades": 89,
+        "sharpe": -0.73
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 2559.9,
+        "trades": 91,
+        "sharpe": 1.45
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -3151.9,
+        "trades": 86,
+        "sharpe": -1.47
+      }
+    ],
+    "total_pnl": 4000.900000000001,
+    "total_pts": 400.0900000000001,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 3,
+      "div_threshold": 0.9,
+      "min_areas": 3
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 7741.2,
+        "trades": 92,
+        "sharpe": 1.82
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 830.9,
+        "trades": 110,
+        "sharpe": 0.36
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -1756.9,
+        "trades": 206,
+        "sharpe": -0.31
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -2222.3,
+        "trades": 89,
+        "sharpe": -0.73
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 2559.9,
+        "trades": 91,
+        "sharpe": 1.45
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -3151.9,
+        "trades": 86,
+        "sharpe": -1.47
+      }
+    ],
+    "total_pnl": 4000.900000000001,
+    "total_pts": 400.0900000000001,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 3,
+      "div_threshold": 0.95,
+      "min_areas": 2
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 7503.4,
+        "trades": 94,
+        "sharpe": 1.76
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 830.9,
+        "trades": 110,
+        "sharpe": 0.36
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -1697.4,
+        "trades": 206,
+        "sharpe": -0.3
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -2222.3,
+        "trades": 89,
+        "sharpe": -0.73
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 2559.9,
+        "trades": 91,
+        "sharpe": 1.45
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -3222.8,
+        "trades": 90,
+        "sharpe": -1.5
+      }
+    ],
+    "total_pnl": 3751.7,
+    "total_pts": 375.16999999999996,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 3,
+      "div_threshold": 0.95,
+      "min_areas": 3
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 7503.4,
+        "trades": 94,
+        "sharpe": 1.76
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 830.9,
+        "trades": 110,
+        "sharpe": 0.36
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -1697.4,
+        "trades": 206,
+        "sharpe": -0.3
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -2222.3,
+        "trades": 89,
+        "sharpe": -0.73
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 2559.9,
+        "trades": 91,
+        "sharpe": 1.45
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -3222.8,
+        "trades": 90,
+        "sharpe": -1.5
+      }
+    ],
+    "total_pnl": 3751.7,
+    "total_pts": 375.16999999999996,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 2,
+      "div_threshold": 0.7,
+      "min_areas": 2
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 10947.2,
+        "trades": 76,
+        "sharpe": 2.97
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 1027.9,
+        "trades": 92,
+        "sharpe": 0.45
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -6412.8,
+        "trades": 172,
+        "sharpe": -1.28
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -2439.6,
+        "trades": 73,
+        "sharpe": -1.08
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 2243.6,
+        "trades": 81,
+        "sharpe": 1.6
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -2324.6,
+        "trades": 68,
+        "sharpe": -2.07
+      }
+    ],
+    "total_pnl": 3041.7000000000003,
+    "total_pts": 304.17,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 2,
+      "div_threshold": 0.7,
+      "min_areas": 3
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 10947.2,
+        "trades": 76,
+        "sharpe": 2.97
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 1027.9,
+        "trades": 92,
+        "sharpe": 0.45
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -6412.8,
+        "trades": 172,
+        "sharpe": -1.28
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -2439.6,
+        "trades": 73,
+        "sharpe": -1.08
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 2243.6,
+        "trades": 81,
+        "sharpe": 1.6
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -2324.6,
+        "trades": 68,
+        "sharpe": -2.07
+      }
+    ],
+    "total_pnl": 3041.7000000000003,
+    "total_pts": 304.17,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 3,
+      "div_threshold": 1.0,
+      "min_areas": 2
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 7503.4,
+        "trades": 94,
+        "sharpe": 1.76
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 730.9,
+        "trades": 110,
+        "sharpe": 0.31
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -3172.7,
+        "trades": 208,
+        "sharpe": -0.54
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -2160.3,
+        "trades": 91,
+        "sharpe": -0.71
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 2559.9,
+        "trades": 91,
+        "sharpe": 1.45
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -3222.8,
+        "trades": 90,
+        "sharpe": -1.5
+      }
+    ],
+    "total_pnl": 2238.3999999999987,
+    "total_pts": 223.83999999999986,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 3,
+      "div_threshold": 1.0,
+      "min_areas": 3
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 7503.4,
+        "trades": 94,
+        "sharpe": 1.76
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 730.9,
+        "trades": 110,
+        "sharpe": 0.31
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -3172.7,
+        "trades": 208,
+        "sharpe": -0.54
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -2160.3,
+        "trades": 91,
+        "sharpe": -0.71
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 2559.9,
+        "trades": 91,
+        "sharpe": 1.45
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -3222.8,
+        "trades": 90,
+        "sharpe": -1.5
+      }
+    ],
+    "total_pnl": 2238.3999999999987,
+    "total_pts": 223.83999999999986,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 2,
+      "div_threshold": 0.8,
+      "min_areas": 2
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 11208.2,
+        "trades": 78,
+        "sharpe": 3.04
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 812.6,
+        "trades": 94,
+        "sharpe": 0.35
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -7235.5,
+        "trades": 180,
+        "sharpe": -1.44
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -2717.1,
+        "trades": 75,
+        "sharpe": -1.21
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 2027.4,
+        "trades": 83,
+        "sharpe": 1.44
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -2139.1,
+        "trades": 70,
+        "sharpe": -1.84
+      }
+    ],
+    "total_pnl": 1956.5000000000014,
+    "total_pts": 195.65000000000015,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 2,
+      "div_threshold": 0.8,
+      "min_areas": 3
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 11208.2,
+        "trades": 78,
+        "sharpe": 3.04
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 812.6,
+        "trades": 94,
+        "sharpe": 0.35
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -7235.5,
+        "trades": 180,
+        "sharpe": -1.44
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -2717.1,
+        "trades": 75,
+        "sharpe": -1.21
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 2027.4,
+        "trades": 83,
+        "sharpe": 1.44
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -2139.1,
+        "trades": 70,
+        "sharpe": -1.84
+      }
+    ],
+    "total_pnl": 1956.5000000000014,
+    "total_pts": 195.65000000000015,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 2,
+      "div_threshold": 0.9,
+      "min_areas": 2
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 10292.9,
+        "trades": 81,
+        "sharpe": 2.68
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 571.1,
+        "trades": 102,
+        "sharpe": 0.25
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -7626.7,
+        "trades": 184,
+        "sharpe": -1.43
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -3454.8,
+        "trades": 77,
+        "sharpe": -1.29
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 2027.4,
+        "trades": 83,
+        "sharpe": 1.44
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -2233.5,
+        "trades": 72,
+        "sharpe": -1.93
+      }
+    ],
+    "total_pnl": -423.5999999999999,
+    "total_pts": -42.35999999999999,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 2,
+      "div_threshold": 0.9,
+      "min_areas": 3
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 10292.9,
+        "trades": 81,
+        "sharpe": 2.68
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 571.1,
+        "trades": 102,
+        "sharpe": 0.25
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -7626.7,
+        "trades": 184,
+        "sharpe": -1.43
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -3454.8,
+        "trades": 77,
+        "sharpe": -1.29
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 2027.4,
+        "trades": 83,
+        "sharpe": 1.44
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -2233.5,
+        "trades": 72,
+        "sharpe": -1.93
+      }
+    ],
+    "total_pnl": -423.5999999999999,
+    "total_pts": -42.35999999999999,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 2,
+      "div_threshold": 0.95,
+      "min_areas": 2
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 10055.1,
+        "trades": 83,
+        "sharpe": 2.62
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 571.1,
+        "trades": 102,
+        "sharpe": 0.25
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -7626.7,
+        "trades": 184,
+        "sharpe": -1.43
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -3454.8,
+        "trades": 77,
+        "sharpe": -1.29
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 2027.4,
+        "trades": 83,
+        "sharpe": 1.44
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -2449.4,
+        "trades": 74,
+        "sharpe": -2.11
+      }
+    ],
+    "total_pnl": -877.2999999999993,
+    "total_pts": -87.72999999999993,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 2,
+      "div_threshold": 0.95,
+      "min_areas": 3
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 10055.1,
+        "trades": 83,
+        "sharpe": 2.62
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 571.1,
+        "trades": 102,
+        "sharpe": 0.25
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -7626.7,
+        "trades": 184,
+        "sharpe": -1.43
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -3454.8,
+        "trades": 77,
+        "sharpe": -1.29
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 2027.4,
+        "trades": 83,
+        "sharpe": 1.44
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -2449.4,
+        "trades": 74,
+        "sharpe": -2.11
+      }
+    ],
+    "total_pnl": -877.2999999999993,
+    "total_pts": -87.72999999999993,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 2,
+      "div_threshold": 1.0,
+      "min_areas": 2
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 10055.1,
+        "trades": 83,
+        "sharpe": 2.62
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 471.1,
+        "trades": 102,
+        "sharpe": 0.2
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -8301.9,
+        "trades": 186,
+        "sharpe": -1.48
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -3392.9,
+        "trades": 79,
+        "sharpe": -1.27
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 2027.4,
+        "trades": 83,
+        "sharpe": 1.44
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -2449.4,
+        "trades": 74,
+        "sharpe": -2.11
+      }
+    ],
+    "total_pnl": -1590.599999999999,
+    "total_pts": -159.0599999999999,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  },
+  {
+    "combo": {
+      "div_mode": 2,
+      "div_threshold": 1.0,
+      "min_areas": 3
+    },
+    "results": [
+      {
+        "contract": "p2601",
+        "slot": "bench",
+        "pnl": 10055.1,
+        "trades": 83,
+        "sharpe": 2.62
+      },
+      {
+        "contract": "p2405",
+        "slot": "bench",
+        "pnl": 471.1,
+        "trades": 102,
+        "sharpe": 0.2
+      },
+      {
+        "contract": "p2209",
+        "slot": "bench",
+        "pnl": 0,
+        "trades": 0,
+        "sharpe": 0
+      },
+      {
+        "contract": "p2501",
+        "slot": "y25",
+        "pnl": -8301.9,
+        "trades": 186,
+        "sharpe": -1.48
+      },
+      {
+        "contract": "p2505",
+        "slot": "y25",
+        "pnl": -3392.9,
+        "trades": 79,
+        "sharpe": -1.27
+      },
+      {
+        "contract": "p2509",
+        "slot": "y25",
+        "pnl": 2027.4,
+        "trades": 83,
+        "sharpe": 1.44
+      },
+      {
+        "contract": "p2401",
+        "slot": "extra",
+        "pnl": -2449.4,
+        "trades": 74,
+        "sharpe": -2.11
+      }
+    ],
+    "total_pnl": -1590.599999999999,
+    "total_pts": -159.0599999999999,
+    "neg_contracts": [
+      "p2501",
+      "p2505",
+      "p2401"
+    ],
+    "n_neg": 3,
+    "status": "FAIL"
+  }
+]
