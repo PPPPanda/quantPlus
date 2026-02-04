@@ -67,6 +67,7 @@ log/
 .vntrader/database.db
 .vntrader/log/
 .vntrader/ctp/
+.vntrader/ctptest/
 .vntrader/*.json
 .vntrader/*.log
 .vntrader/xt_lock
