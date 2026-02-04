@@ -78,12 +78,23 @@ class CtaChanPivotStrategy(CtaTemplate):
     # 合约参数
     fixed_volume: int = 1            # 固定手数
 
-    # B02: 连亏冷却参数
-    cooldown_losses: int = 2         # 0 = 禁用冷却；连亏 N 笔后触发冷却
-    cooldown_bars: int = 20          # 冷却 M 根 5m bar
+    # B02/R2: 分层连亏断路器
+    cooldown_losses: int = 2         # 0 = 禁用冷却；L1 连亏后触发温和限制
+    cooldown_bars: int = 20          # L1 冷却 M 根 5m bar
+    circuit_breaker_losses: int = 6  # R2: L2 连亏后暂停（0=禁用）
+    circuit_breaker_bars: int = 60   # R2: L2 暂停 M 根 5m bar（≈300 分钟）
+
+    # R3: 两段式出场 — 锁盈参数
+    lock_profit_atr: float = 0.0       # 浮盈≥1R时锁盈: 止损抬到 entry + N*ATR（0=禁用）
 
     # B03: 止损 buffer 参数
     stop_buffer_atr_pct: float = 0.02  # 止损 buffer = max(pricetick, atr * pct)
+
+    # R1: 入场去重（价格区域+时间窗口）
+    max_pivot_entries: int = 2         # 同一中枢最多入场次数（0=禁用限制）
+    pivot_reentry_atr: float = 0.6     # 超限后需突破中枢上沿 + N*ATR 才放行
+    dedup_bars: int = 0                # 去重时间窗口（5m bar 数）; 0=禁用
+    dedup_atr_mult: float = 1.5        # 去重价格距离（ATR 倍数）
 
     # B10: 背驰模式参数（面积背驰 + diff 混合）
     div_mode: int = 1                  # 0=baseline(仅diff), 1=OR(diff或面积背驰), 2=AND, 3=仅面积背驰
@@ -98,7 +109,12 @@ class CtaChanPivotStrategy(CtaTemplate):
         "macd_fast", "macd_slow", "macd_signal",
         "atr_window", "atr_trailing_mult", "atr_activate_mult", "atr_entry_filter",
         "min_bi_gap", "pivot_valid_range", "fixed_volume",
-        "cooldown_losses", "cooldown_bars", "stop_buffer_atr_pct",
+        "cooldown_losses", "cooldown_bars",
+        "circuit_breaker_losses", "circuit_breaker_bars",
+        "lock_profit_atr",
+        "stop_buffer_atr_pct",
+        "max_pivot_entries", "pivot_reentry_atr",
+        "dedup_bars", "dedup_atr_mult",
         "div_mode", "div_threshold",
         "debug", "debug_enabled", "debug_log_console",
     ]
@@ -181,6 +197,7 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._position: int = 0
         self._entry_price: float = 0.0
         self._stop_price: float = 0.0
+        self._initial_stop: float = 0.0   # R3: 记录初始止损价（计算 1R 用）
         self._trailing_active: bool = False
 
         # B02: 连亏冷却状态
@@ -189,6 +206,9 @@ class CtaChanPivotStrategy(CtaTemplate):
 
         # 5m bar 计数
         self._bar_5m_count: int = 0
+
+        # R1: 入场去重追踪
+        self._recent_entries: list[dict] = []     # [{price, bar_5m_count}]
 
         # B10: MACD 面积背驰追踪
         self._current_bi_macd_area: float = 0.0  # 当前笔段累积 |histogram|
@@ -453,6 +473,12 @@ class CtaChanPivotStrategy(CtaTemplate):
     def _on_5m_bar(self, bar: dict) -> None:
         """5 分钟 K 线回调 - 核心交易逻辑."""
         self._bar_5m_count += 1
+
+        # R1: 清理过老的入场记录
+        if self._recent_entries and self.dedup_bars > 0:
+            cutoff = self._bar_5m_count - self.dedup_bars * 2  # 保留 2x 窗口
+            while self._recent_entries and self._recent_entries[0]['bar_5m_count'] < cutoff:
+                self._recent_entries.pop(0)
 
         # B02: 冷却计数器递减
         if self._cooldown_remaining > 0:
@@ -817,9 +843,20 @@ class CtaChanPivotStrategy(CtaTemplate):
                 # 回踩点在 ZG 之上 = 回踩不破中枢高点
                 if p_now['price'] > ap['zg']:
                     if is_bull:
-                        sig = 'Buy'
-                        trigger_price = p_now['data']['high']
-                        stop_base = p_now['price']
+                        # R1: 同中枢入场去重 — 检查是否超限
+                        if self.max_pivot_entries > 0 and ap['entry_count'] >= self.max_pivot_entries:
+                            # 超限后需要更强突破: 触发价 > ZG + pivot_reentry_atr * ATR
+                            breakout_threshold = ap['zg'] + self.pivot_reentry_atr * self.atr
+                            if p_now['data']['high'] <= breakout_threshold:
+                                pass  # 不满足强突破条件，跳过
+                            else:
+                                sig = 'Buy'
+                                trigger_price = p_now['data']['high']
+                                stop_base = p_now['price']
+                        else:
+                            sig = 'Buy'
+                            trigger_price = p_now['data']['high']
+                            stop_base = p_now['price']
 
             # --- 3S 卖点 ---
             # R2: 向下离开中枢 + 回抽不破 ZD
@@ -838,9 +875,19 @@ class CtaChanPivotStrategy(CtaTemplate):
                         age = len(self._bi_points) - 1 - last_pivot.get('end_bi_idx', 0)
                         if age <= self.pivot_valid_range:
                             if is_bull:
-                                sig = 'Buy'
-                                trigger_price = p_now['data']['high']
-                                stop_base = p_now['price']
+                                # R1: 同中枢入场去重
+                                if self.max_pivot_entries > 0 and last_pivot.get('entry_count', 0) >= self.max_pivot_entries:
+                                    breakout_threshold = last_pivot['zg'] + self.pivot_reentry_atr * self.atr
+                                    if p_now['data']['high'] <= breakout_threshold:
+                                        pass  # 跳过
+                                    else:
+                                        sig = 'Buy'
+                                        trigger_price = p_now['data']['high']
+                                        stop_base = p_now['price']
+                                else:
+                                    sig = 'Buy'
+                                    trigger_price = p_now['data']['high']
+                                    stop_base = p_now['price']
             elif p_now['type'] == 'top':
                 if p_now['price'] < last_pivot['zd']:
                     if p_last['price'] < last_pivot['zd']:
@@ -878,6 +925,17 @@ class CtaChanPivotStrategy(CtaTemplate):
         # 信号过滤与设置
         # --------------------------------------------------------
         if sig and self.atr > 0:
+            # R1: 入场去重 — 检查近期是否在相同价格区域入过场
+            if sig == 'Buy' and self.dedup_bars > 0 and self._recent_entries:
+                dedup_dist = self.dedup_atr_mult * self.atr
+                for entry in reversed(self._recent_entries):
+                    bars_ago = self._bar_5m_count - entry['bar_5m_count']
+                    if bars_ago > self.dedup_bars:
+                        break  # 超出时间窗口
+                    if abs(trigger_price - entry['price']) < dedup_dist:
+                        sig = None  # 太近，去重
+                        break
+
             # B09: CloseLong 信号仅在持有多仓时有效
             if sig == 'CloseLong':
                 if self._position == 1:
@@ -987,15 +1045,8 @@ class CtaChanPivotStrategy(CtaTemplate):
                 self._trailing_active = False
                 self._pending_signal = None
                 self.signal = "平多"
-                # B02: 连亏计数
-                if self.cooldown_losses > 0:
-                    if pnl < 0:
-                        self._consecutive_losses += 1
-                        if self._consecutive_losses >= self.cooldown_losses:
-                            self._cooldown_remaining = self.cooldown_bars
-                            self._consecutive_losses = 0
-                    else:
-                        self._consecutive_losses = 0
+                # B02/R2: 更新连亏计数
+                self._update_loss_streak(pnl)
 
         elif signal['type'] == 'Sell':
             # 保留 Sell 逻辑以防万一（当前不应该被触发）
@@ -1034,8 +1085,18 @@ class CtaChanPivotStrategy(CtaTemplate):
 
         self._position = direction
         self._entry_price = price
+        self._initial_stop = self._stop_price  # R3: 记录初始止损
         self._trailing_active = False
         self._pending_signal = None
+
+        # R1: 递增当前中枢的入场计数 + 记录近期入场
+        if direction == 1:
+            if self._active_pivot is not None:
+                self._active_pivot['entry_count'] = self._active_pivot.get('entry_count', 0) + 1
+            self._recent_entries.append({
+                'price': price,
+                'bar_5m_count': self._bar_5m_count,
+            })
 
         # Debug: 记录开仓（仅实盘模式）
         if self._debugger and self.trading:
@@ -1090,30 +1151,53 @@ class CtaChanPivotStrategy(CtaTemplate):
             self._trailing_active = False
             self.signal = "止损"
 
-            # B02: 更新连亏计数（cooldown_losses > 0 时才启用）
-            if self.cooldown_losses > 0:
-                if pnl < 0:
-                    self._consecutive_losses += 1
-                    if self._consecutive_losses >= self.cooldown_losses:
-                        self._cooldown_remaining = self.cooldown_bars
-                        self._consecutive_losses = 0
-                else:
-                    self._consecutive_losses = 0
+            # B02/R2: 更新连亏计数
+            self._update_loss_streak(pnl)
 
             return True
 
         return False
 
+    def _update_loss_streak(self, pnl: float) -> None:
+        """B02/R2: 统一更新连亏计数和断路器."""
+        if pnl < 0:
+            self._consecutive_losses += 1
+            # R2: L2 断路器（更严）
+            if self.circuit_breaker_losses > 0 and self._consecutive_losses >= self.circuit_breaker_losses:
+                self._cooldown_remaining = self.circuit_breaker_bars
+                self._consecutive_losses = 0
+            # B02: L1 冷却（温和）
+            elif self.cooldown_losses > 0 and self._consecutive_losses >= self.cooldown_losses:
+                self._cooldown_remaining = self.cooldown_bars
+                # 不重置连亏计数，继续累积到 L2
+                if self.circuit_breaker_losses == 0:
+                    self._consecutive_losses = 0
+        else:
+            self._consecutive_losses = 0
+
     def _update_trailing_stop(self, bar: dict) -> None:
-        """更新移动止损."""
+        """R3: 两段式出场（分阶段移动止损）.
+
+        Phase 1: 浮盈 < 1R → 初始止损不动
+        Phase 2: 浮盈 ≥ 1R → 抬止损到 entry + lock_profit_atr * ATR（锁盈）
+        Phase 3: 浮盈 ≥ activate_mult * ATR → 启用 trailing（high - trailing_mult * ATR）
+        """
         if self.atr <= 0:
             return
 
         if self._position == 1:
             float_pnl = bar['close'] - self._entry_price
-        else:
+        elif self._position == -1:
             float_pnl = self._entry_price - bar['close']
+        else:
+            return
 
+        # 计算 1R = 初始止损距离
+        initial_risk = abs(self._entry_price - self._initial_stop)
+        if initial_risk <= 0:
+            initial_risk = self.atr  # fallback
+
+        # Phase 3: 启用 trailing（优先级最高）
         if not self._trailing_active:
             if float_pnl > (self.atr * self.atr_activate_mult):
                 self._trailing_active = True
@@ -1127,6 +1211,14 @@ class CtaChanPivotStrategy(CtaTemplate):
                 new_stop = bar['low'] + (self.atr * self.atr_trailing_mult)
                 if new_stop < self._stop_price:
                     self._stop_price = new_stop
+            return
+
+        # Phase 2: 浮盈 ≥ 1R → 锁盈（仅多头）
+        if self.lock_profit_atr > 0 and float_pnl >= initial_risk:
+            if self._position == 1:
+                lock_stop = self._entry_price + self.lock_profit_atr * self.atr
+                if lock_stop > self._stop_price:
+                    self._stop_price = lock_stop
 
     def on_trade(self, trade: TradeData) -> None:
         """成交回调."""
