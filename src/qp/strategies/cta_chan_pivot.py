@@ -79,8 +79,11 @@ class CtaChanPivotStrategy(CtaTemplate):
     fixed_volume: int = 1            # 固定手数
 
     # B02: 连亏冷却参数
-    cooldown_losses: int = 2         # 0 = 禁用冷却；连亏 N 笔后触发冷却
-    cooldown_bars: int = 20          # 冷却 M 根 5m bar
+    cooldown_losses: int = 3         # R1: 连亏 N 笔后触发冷却（2→3）
+    cooldown_bars: int = 40          # R1: 冷却 M 根 5m bar（20→40, ~3.3小时）
+    daily_loss_limit: float = 0.0    # R1: 当日亏损上限(点数), 超过后当日不再开仓; 0=禁用
+    min_hold_bars: int = 0           # R2: 最小持仓bar数(1m), 防止噪声短交易; 0=禁用
+    trade_interval: int = 0          # R4: 平仓后至少等N根5m bar才允许新信号; 0=禁用
 
     # B03: 止损 buffer 参数
     stop_buffer_atr_pct: float = 0.02  # 止损 buffer = max(pricetick, atr * pct)
@@ -98,7 +101,8 @@ class CtaChanPivotStrategy(CtaTemplate):
         "macd_fast", "macd_slow", "macd_signal",
         "atr_window", "atr_trailing_mult", "atr_activate_mult", "atr_entry_filter",
         "min_bi_gap", "pivot_valid_range", "fixed_volume",
-        "cooldown_losses", "cooldown_bars", "stop_buffer_atr_pct",
+        "cooldown_losses", "cooldown_bars", "daily_loss_limit", "min_hold_bars", "trade_interval",
+        "stop_buffer_atr_pct",
         "div_mode", "div_threshold",
         "debug", "debug_enabled", "debug_log_console",
     ]
@@ -194,6 +198,10 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._debugger: Optional[ChanDebugger] = None
         self._signal_type: str = ""  # 当前信号类型(用于debug)
         self._entry_zg: float = 0.0  # B13: 3B入场关联的中枢ZG（结构止损用）
+        self._daily_pnl: float = 0.0   # R1: 当日已实现PnL(点数)
+        self._current_date: str = ""   # R1: 当前交易日期
+        self._hold_bar_count: int = 0  # R2: 当前持仓已持有的1m bar数
+        self._trade_interval_remaining: int = 0  # R4: 交易间隔冷却
 
         logger.info("策略初始化: %s", strategy_name)
 
@@ -256,6 +264,16 @@ class CtaChanPivotStrategy(CtaTemplate):
         使用增量方式合成 5m/15m K 线并计算指标。
         """
         self.bar_count += 1
+
+        # R1: 日期切换时重置当日PnL
+        bar_date = str(bar.datetime.date())
+        if bar_date != self._current_date:
+            self._current_date = bar_date
+            self._daily_pnl = 0.0
+
+        # R2: 持仓bar计数
+        if self._position != 0:
+            self._hold_bar_count += 1
 
         # 转换为 dict 格式
         bar_dict = {
@@ -454,6 +472,10 @@ class CtaChanPivotStrategy(CtaTemplate):
         # B02: 冷却计数器递减
         if self._cooldown_remaining > 0:
             self._cooldown_remaining -= 1
+
+        # R4: 交易间隔计数器递减
+        if self._trade_interval_remaining > 0:
+            self._trade_interval_remaining -= 1
 
         # 更新指标
         self._update_macd_5m(bar['close'])
@@ -763,6 +785,14 @@ class CtaChanPivotStrategy(CtaTemplate):
         if self._cooldown_remaining > 0:
             return
 
+        # R1: 当日亏损超限时不生成新信号
+        if self.daily_loss_limit > 0 and self._daily_pnl < -self.daily_loss_limit:
+            return
+
+        # R4: 交易间隔冷却
+        if self._trade_interval_remaining > 0:
+            return
+
         # 获取笔端点
         p_now = self._bi_points[-1]   # 当前回踩点
         p_last = self._bi_points[-2]  # 前一极值点（离开段端点）
@@ -936,8 +966,14 @@ class CtaChanPivotStrategy(CtaTemplate):
                     )
                 self._position = 0
                 self._trailing_active = False
+                self._hold_bar_count = 0  # R2: 重置持仓计数
                 self._pending_signal = None
                 self.signal = "平多"
+                # R1: 更新当日PnL
+                self._daily_pnl += pnl
+                # R4: 设置交易间隔
+                if self.trade_interval > 0:
+                    self._trade_interval_remaining = self.trade_interval
                 # B02: 连亏计数
                 if self.cooldown_losses > 0:
                     if pnl < 0:
@@ -986,6 +1022,7 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._position = direction
         self._entry_price = price
         self._trailing_active = False
+        self._hold_bar_count = 0  # R2: 重置持仓计数
         self._pending_signal = None
 
         # B13: 记录3B入场关联的中枢ZG（结构止损）
@@ -1007,6 +1044,10 @@ class CtaChanPivotStrategy(CtaTemplate):
 
     def _check_stop_loss_1m(self, bar: dict) -> bool:
         """1分钟级别检查止损."""
+        # R2: 最小持仓保护 — 持仓不足min_hold_bars时不止损
+        if self.min_hold_bars > 0 and self._hold_bar_count < self.min_hold_bars:
+            return False
+
         sl_hit = False
         exit_price = 0.0
 
@@ -1045,7 +1086,15 @@ class CtaChanPivotStrategy(CtaTemplate):
 
             self._position = 0
             self._trailing_active = False
+            self._hold_bar_count = 0  # R2: 重置持仓计数
             self.signal = "止损"
+
+            # R1: 更新当日PnL
+            self._daily_pnl += pnl
+
+            # R4: 设置交易间隔
+            if self.trade_interval > 0:
+                self._trade_interval_remaining = self.trade_interval
 
             # B02: 更新连亏计数（cooldown_losses > 0 时才启用）
             if self.cooldown_losses > 0:
