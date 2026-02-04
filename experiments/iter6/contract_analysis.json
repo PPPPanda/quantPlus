@@ -1,0 +1,576 @@
+{
+  "market_stats": [
+    {
+      "contract": "p2601",
+      "trading_days": 88,
+      "total_return_pct": 3.35,
+      "max_range_pct": 17.24,
+      "daily_vol_pct": 1.115,
+      "ann_vol_pct": 17.7,
+      "up_days": 42,
+      "down_days": 43,
+      "up_ratio": 49.4,
+      "max_up_streak": 4,
+      "max_down_streak": 5,
+      "avg_daily_range_pct": 1.57,
+      "price_range": "8296-9736",
+      "monthly_returns": {
+        "2025-07": 7.0,
+        "2025-08": 4.55,
+        "2025-09": -0.75,
+        "2025-10": -8.46,
+        "2025-11": -0.28
+      }
+    },
+    {
+      "contract": "p2405",
+      "trading_days": 84,
+      "total_return_pct": 17.63,
+      "max_range_pct": 24.42,
+      "daily_vol_pct": 1.314,
+      "ann_vol_pct": 20.9,
+      "up_days": 51,
+      "down_days": 32,
+      "up_ratio": 61.4,
+      "max_up_streak": 9,
+      "max_down_streak": 5,
+      "avg_daily_range_pct": 1.89,
+      "price_range": "6860-8572",
+      "monthly_returns": {
+        "2023-12": -1.64,
+        "2024-01": -0.11,
+        "2024-02": 5.42,
+        "2024-03": 9.08,
+        "2024-04": 1.15
+      }
+    },
+    {
+      "contract": "p2209",
+      "trading_days": 84,
+      "total_return_pct": -25.56,
+      "max_range_pct": 43.65,
+      "daily_vol_pct": 2.642,
+      "ann_vol_pct": 41.9,
+      "up_days": 38,
+      "down_days": 45,
+      "up_ratio": 45.8,
+      "max_up_streak": 6,
+      "max_down_streak": 6,
+      "avg_daily_range_pct": 3.93,
+      "price_range": "7384-12378",
+      "monthly_returns": {
+        "2022-04": 9.63,
+        "2022-05": -3.0,
+        "2022-06": -21.59,
+        "2022-07": -4.88,
+        "2022-08": -1.21
+      }
+    },
+    {
+      "contract": "p2501",
+      "trading_days": 163,
+      "total_return_pct": 34.55,
+      "max_range_pct": 45.42,
+      "daily_vol_pct": 1.332,
+      "ann_vol_pct": 21.1,
+      "up_days": 90,
+      "down_days": 70,
+      "up_ratio": 56.2,
+      "max_up_streak": 7,
+      "max_down_streak": 5,
+      "avg_daily_range_pct": 2.05,
+      "price_range": "7226-10518",
+      "monthly_returns": {
+        "2024-04": -1.08,
+        "2024-05": 5.99,
+        "2024-06": -1.55,
+        "2024-07": -0.29,
+        "2024-08": 3.59,
+        "2024-09": 7.83,
+        "2024-10": 5.84,
+        "2024-11": 6.9,
+        "2024-12": -4.32
+      }
+    },
+    {
+      "contract": "p2505",
+      "trading_days": 83,
+      "total_return_pct": -8.57,
+      "max_range_pct": 14.98,
+      "daily_vol_pct": 1.483,
+      "ann_vol_pct": 23.5,
+      "up_days": 40,
+      "down_days": 40,
+      "up_ratio": 50.0,
+      "max_up_streak": 7,
+      "max_down_streak": 6,
+      "avg_daily_range_pct": 1.96,
+      "price_range": "8224-9658",
+      "monthly_returns": {
+        "2024-12": -9.97,
+        "2025-01": -2.49,
+        "2025-02": 6.24,
+        "2025-03": 0.55,
+        "2025-04": -3.66
+      }
+    },
+    {
+      "contract": "p2509",
+      "trading_days": 82,
+      "total_return_pct": 15.54,
+      "max_range_pct": 19.69,
+      "daily_vol_pct": 1.165,
+      "ann_vol_pct": 18.5,
+      "up_days": 46,
+      "down_days": 34,
+      "up_ratio": 57.5,
+      "max_up_streak": 4,
+      "max_down_streak": 3,
+      "avg_daily_range_pct": 1.49,
+      "price_range": "7812-9416",
+      "monthly_returns": {
+        "2025-04": 0.25,
+        "2025-05": 0.47,
+        "2025-06": 2.21,
+        "2025-07": 6.89,
+        "2025-08": 6.28
+      }
+    },
+    {
+      "contract": "p2301",
+      "trading_days": 82,
+      "total_return_pct": -7.04,
+      "max_range_pct": 22.62,
+      "daily_vol_pct": 2.239,
+      "ann_vol_pct": 35.5,
+      "up_days": 37,
+      "down_days": 41,
+      "up_ratio": 47.4,
+      "max_up_streak": 4,
+      "max_down_streak": 5,
+      "avg_daily_range_pct": 2.97,
+      "price_range": "6882-8778",
+      "monthly_returns": {
+        "2022-08": 0.71,
+        "2022-09": -17.01,
+        "2022-10": 7.01,
+        "2022-11": 5.47,
+        "2022-12": -8.78
+      }
+    }
+  ],
+  "trade_stats": [
+    {
+      "contract": "p2601",
+      "total_trades": 63,
+      "wins": 29,
+      "losses": 34,
+      "win_rate": 46.0,
+      "avg_win": 71.0,
+      "avg_loss": -17.9,
+      "total_pnl": 1450.0,
+      "profit_factor": 3.38,
+      "avg_duration_min": 816.0,
+      "short_trades_pct": 20.6,
+      "medium_trades_pct": 22.2,
+      "long_trades_pct": 57.1,
+      "monthly_pnl": {
+        "2025-07": {
+          "count": 19,
+          "pnl": 524.0,
+          "wr": 53.0
+        },
+        "2025-08": {
+          "count": 13,
+          "pnl": 860.0,
+          "wr": 54.0
+        },
+        "2025-09": {
+          "count": 16,
+          "pnl": 182.0,
+          "wr": 50.0
+        },
+        "2025-10": {
+          "count": 11,
+          "pnl": -48.0,
+          "wr": 36.0
+        },
+        "2025-11": {
+          "count": 4,
+          "pnl": -68.0,
+          "wr": 0.0
+        }
+      },
+      "worst_streaks": [
+        {
+          "length": 9,
+          "pnl": -132.0
+        },
+        {
+          "length": 3,
+          "pnl": -88.0
+        },
+        {
+          "length": 4,
+          "pnl": -88.0
+        }
+      ]
+    },
+    {
+      "contract": "p2405",
+      "total_trades": 69,
+      "wins": 27,
+      "losses": 42,
+      "win_rate": 39.1,
+      "avg_win": 50.7,
+      "avg_loss": -16.1,
+      "total_pnl": 692.0,
+      "profit_factor": 2.02,
+      "avg_duration_min": 413.0,
+      "short_trades_pct": 27.5,
+      "medium_trades_pct": 21.7,
+      "long_trades_pct": 50.7,
+      "monthly_pnl": {
+        "2023-12": {
+          "count": 13,
+          "pnl": 164.0,
+          "wr": 54.0
+        },
+        "2024-01": {
+          "count": 19,
+          "pnl": 70.0,
+          "wr": 32.0
+        },
+        "2024-02": {
+          "count": 16,
+          "pnl": 128.0,
+          "wr": 31.0
+        },
+        "2024-03": {
+          "count": 18,
+          "pnl": 350.0,
+          "wr": 44.0
+        },
+        "2024-04": {
+          "count": 3,
+          "pnl": -20.0,
+          "wr": 33.0
+        }
+      },
+      "worst_streaks": [
+        {
+          "length": 10,
+          "pnl": -170.0
+        },
+        {
+          "length": 6,
+          "pnl": -170.0
+        },
+        {
+          "length": 4,
+          "pnl": -64.0
+        }
+      ]
+    },
+    {
+      "contract": "p2209",
+      "total_trades": 56,
+      "wins": 19,
+      "losses": 37,
+      "win_rate": 33.9,
+      "avg_win": 104.1,
+      "avg_loss": -47.6,
+      "total_pnl": 216.0,
+      "profit_factor": 1.12,
+      "avg_duration_min": 533.0,
+      "short_trades_pct": 28.6,
+      "medium_trades_pct": 30.4,
+      "long_trades_pct": 41.1,
+      "monthly_pnl": {
+        "2022-04": {
+          "count": 9,
+          "pnl": 262.0,
+          "wr": 44.0
+        },
+        "2022-05": {
+          "count": 15,
+          "pnl": -414.0,
+          "wr": 20.0
+        },
+        "2022-06": {
+          "count": 13,
+          "pnl": -90.0,
+          "wr": 31.0
+        },
+        "2022-07": {
+          "count": 14,
+          "pnl": 358.0,
+          "wr": 36.0
+        },
+        "2022-08": {
+          "count": 5,
+          "pnl": 100.0,
+          "wr": 60.0
+        }
+      },
+      "worst_streaks": [
+        {
+          "length": 7,
+          "pnl": -360.0
+        },
+        {
+          "length": 6,
+          "pnl": -312.0
+        },
+        {
+          "length": 5,
+          "pnl": -288.0
+        }
+      ]
+    },
+    {
+      "contract": "p2501",
+      "total_trades": 142,
+      "wins": 58,
+      "losses": 84,
+      "win_rate": 40.8,
+      "avg_win": 61.3,
+      "avg_loss": -24.5,
+      "total_pnl": 1500.0,
+      "profit_factor": 1.73,
+      "avg_duration_min": 653.0,
+      "short_trades_pct": 28.9,
+      "medium_trades_pct": 24.6,
+      "long_trades_pct": 46.5,
+      "monthly_pnl": {
+        "2024-04": {
+          "count": 4,
+          "pnl": -54.0,
+          "wr": 50.0
+        },
+        "2024-05": {
+          "count": 13,
+          "pnl": 258.0,
+          "wr": 46.0
+        },
+        "2024-06": {
+          "count": 16,
+          "pnl": -98.0,
+          "wr": 25.0
+        },
+        "2024-07": {
+          "count": 24,
+          "pnl": 108.0,
+          "wr": 38.0
+        },
+        "2024-08": {
+          "count": 23,
+          "pnl": 478.0,
+          "wr": 57.0
+        },
+        "2024-09": {
+          "count": 16,
+          "pnl": 556.0,
+          "wr": 50.0
+        },
+        "2024-10": {
+          "count": 15,
+          "pnl": -12.0,
+          "wr": 33.0
+        },
+        "2024-11": {
+          "count": 17,
+          "pnl": 374.0,
+          "wr": 47.0
+        },
+        "2024-12": {
+          "count": 14,
+          "pnl": -110.0,
+          "wr": 21.0
+        }
+      },
+      "worst_streaks": [
+        {
+          "length": 7,
+          "pnl": -274.0
+        },
+        {
+          "length": 8,
+          "pnl": -232.0
+        },
+        {
+          "length": 3,
+          "pnl": -152.0
+        }
+      ]
+    },
+    {
+      "contract": "p2505",
+      "total_trades": 59,
+      "wins": 22,
+      "losses": 37,
+      "win_rate": 37.3,
+      "avg_win": 78.0,
+      "avg_loss": -19.7,
+      "total_pnl": 986.0,
+      "profit_factor": 2.35,
+      "avg_duration_min": 756.0,
+      "short_trades_pct": 33.9,
+      "medium_trades_pct": 23.7,
+      "long_trades_pct": 42.4,
+      "monthly_pnl": {
+        "2024-12": {
+          "count": 9,
+          "pnl": 74.0,
+          "wr": 33.0
+        },
+        "2025-01": {
+          "count": 15,
+          "pnl": 252.0,
+          "wr": 33.0
+        },
+        "2025-02": {
+          "count": 14,
+          "pnl": 290.0,
+          "wr": 43.0
+        },
+        "2025-03": {
+          "count": 15,
+          "pnl": 180.0,
+          "wr": 40.0
+        },
+        "2025-04": {
+          "count": 6,
+          "pnl": 190.0,
+          "wr": 33.0
+        }
+      },
+      "worst_streaks": [
+        {
+          "length": 9,
+          "pnl": -192.0
+        },
+        {
+          "length": 4,
+          "pnl": -108.0
+        },
+        {
+          "length": 5,
+          "pnl": -84.0
+        }
+      ]
+    },
+    {
+      "contract": "p2509",
+      "total_trades": 61,
+      "wins": 25,
+      "losses": 36,
+      "win_rate": 41.0,
+      "avg_win": 42.5,
+      "avg_loss": -19.4,
+      "total_pnl": 362.0,
+      "profit_factor": 1.52,
+      "avg_duration_min": 745.0,
+      "short_trades_pct": 23.0,
+      "medium_trades_pct": 23.0,
+      "long_trades_pct": 54.1,
+      "monthly_pnl": {
+        "2025-04": {
+          "count": 8,
+          "pnl": -50.0,
+          "wr": 38.0
+        },
+        "2025-05": {
+          "count": 13,
+          "pnl": 110.0,
+          "wr": 54.0
+        },
+        "2025-06": {
+          "count": 15,
+          "pnl": -18.0,
+          "wr": 27.0
+        },
+        "2025-07": {
+          "count": 17,
+          "pnl": 372.0,
+          "wr": 53.0
+        },
+        "2025-08": {
+          "count": 8,
+          "pnl": -52.0,
+          "wr": 25.0
+        }
+      },
+      "worst_streaks": [
+        {
+          "length": 4,
+          "pnl": -146.0
+        },
+        {
+          "length": 6,
+          "pnl": -104.0
+        },
+        {
+          "length": 6,
+          "pnl": -80.0
+        }
+      ]
+    },
+    {
+      "contract": "p2301",
+      "total_trades": 55,
+      "wins": 13,
+      "losses": 42,
+      "win_rate": 23.6,
+      "avg_win": 62.6,
+      "avg_loss": -29.9,
+      "total_pnl": -442.0,
+      "profit_factor": 0.65,
+      "avg_duration_min": 412.0,
+      "short_trades_pct": 36.4,
+      "medium_trades_pct": 29.1,
+      "long_trades_pct": 34.5,
+      "monthly_pnl": {
+        "2022-08": {
+          "count": 10,
+          "pnl": -200.0,
+          "wr": 10.0
+        },
+        "2022-09": {
+          "count": 13,
+          "pnl": 6.0,
+          "wr": 15.0
+        },
+        "2022-10": {
+          "count": 11,
+          "pnl": 126.0,
+          "wr": 36.0
+        },
+        "2022-11": {
+          "count": 17,
+          "pnl": -296.0,
+          "wr": 29.0
+        },
+        "2022-12": {
+          "count": 4,
+          "pnl": -78.0,
+          "wr": 25.0
+        }
+      },
+      "worst_streaks": [
+        {
+          "length": 14,
+          "pnl": -418.0
+        },
+        {
+          "length": 7,
+          "pnl": -306.0
+        },
+        {
+          "length": 9,
+          "pnl": -232.0
+        }
+      ]
+    }
+  ]
+}
