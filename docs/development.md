@@ -1431,3 +1431,167 @@ apps.append(RiskManagerApp)      # 最后加载 → 风控在最外层
 **影响**：同一 `on_bar` 中的多笔委托可能全部通过风控检查，实际委托数超过设定上限。
 
 **缓解**：如需严格限制，可在自定义规则中增加**发单计数器**（在 `check_allowed` 内递增，不依赖异步回报）。
+
+---
+
+## 16. 常见问题与故障排除
+
+### uv sync / uv run 失败
+
+#### 问题 1：pyproject.toml 依赖冲突
+
+**现象**：`uv sync` 或 `uv run` 报依赖解析错误，或 `ModuleNotFoundError: No module named 'vnpy'`。
+
+**根因**：`pyproject.toml` 中添加了与 vnpy 子模块冲突的依赖版本约束。
+
+**典型错误改动**（不要这样做）：
+
+```toml
+# ❌ 错误：添加过于严格的 numpy/pandas 约束
+dependencies = [
+    "numpy>=2.4.1",    # vnpy 要求 numpy>=2.2.3
+    "pandas>=2.3.3",   # 版本约束冲突
+    "pillow>=12.1.0",
+]
+```
+
+**正确做法**：主项目 `pyproject.toml` 的 `dependencies` 应保持最小化，让 uv 从 vnpy 子模块自动解析 numpy/pandas 版本。
+
+**修复步骤**：
+
+```bash
+# 1. 撤销 pyproject.toml 和 uv.lock 的未提交改动
+git checkout pyproject.toml uv.lock
+
+# 2. 清理 uv 缓存（如果缓存被占用，加 --force）
+uv cache clean --force
+
+# 3. 重新同步依赖
+uv sync --all-extras
+```
+
+#### 问题 2：uv 缓存被占用
+
+**现象**：`uv cache clean` 报 `Cache is currently in-use, waiting for other uv processes to finish`。
+
+**根因**：有 Python 进程正在使用 `.venv` 目录。
+
+**修复步骤**：
+
+```powershell
+# 1. 查找占用 .venv 的 Python 进程
+Get-Process | Where-Object { $_.Path -like '*quantPlus*' }
+
+# 2. 结束占用进程
+Stop-Process -Id <PID> -Force
+
+# 3. 重试
+uv cache clean --force
+uv sync --all-extras
+```
+
+#### 问题 3：权限错误（拒绝访问）
+
+**现象**：`Failed to install: xxx.whl` + `拒绝访问 (os error -2147024891)`。
+
+**根因**：
+1. 有进程占用 `.venv` 目录中的文件
+2. 防病毒软件阻止写入
+3. 文件系统权限问题
+
+**修复步骤**：
+
+```powershell
+# 1. 结束所有 Python 进程
+Get-Process python* | Stop-Process -Force
+
+# 2. 临时禁用防病毒软件的实时保护（可选）
+
+# 3. 删除 .venv 目录重建
+Remove-Item -Recurse -Force .venv
+uv sync --all-extras
+```
+
+### 策略/模块导入失败
+
+#### 问题：ModuleNotFoundError: No module named 'vnpy'
+
+**可能原因**：
+
+1. **未安装 all-extras**：vnpy 在 `[project.optional-dependencies].trade` 中，需要 `uv sync --all-extras`
+2. **pyproject.toml 被改坏**：检查 `[tool.uv.sources]` 是否还有 vnpy 的 editable 配置
+3. **git submodule 未初始化**：`vendor/vnpy` 目录为空
+
+**验证命令**：
+
+```bash
+# 检查 vnpy 是否安装
+uv pip list | grep vnpy
+
+# 检查 submodule 状态
+git submodule status
+
+# 如果 submodule 未初始化
+git submodule update --init --recursive
+```
+
+#### 问题：ModuleNotFoundError: No module named 'qp'
+
+**可能原因**：quantplus 包未正确安装为 editable 模式。
+
+**验证命令**：
+
+```bash
+# 检查 quantplus 安装状态
+uv pip list | grep quantplus
+
+# 应显示类似：quantplus 0.1.0 (editable)
+```
+
+**修复**：
+
+```bash
+uv sync --reinstall
+```
+
+### 回测脚本无法运行
+
+#### 问题：vnpy 模块能导入，但回测脚本报错
+
+**常见原因**：
+
+1. **数据文件不存在**：检查 `data/analyse/` 目录
+2. **CSV 格式不匹配**：datetime 列名或格式与策略期望不一致
+3. **合约代码错误**：如 `p2509.DCE` 写成 `P2509.DCE`（大小写敏感）
+
+**排查步骤**：
+
+```bash
+# 检查数据文件
+ls data/analyse/wind/
+ls data/analyse/
+
+# 检查 CSV 格式
+head -3 data/analyse/wind/p2509_1min_*.csv
+```
+
+### Git 相关问题
+
+#### 问题：vendor/vnpy 显示为 modified 但无实际改动
+
+**原因**：submodule 的 HEAD 与父仓库记录的 commit 不一致。
+
+**修复**：
+
+```bash
+# 方法1：恢复到父仓库记录的 commit
+git submodule update --init
+
+# 方法2：如果确实要更新 submodule
+cd vendor/vnpy
+git checkout main
+git pull
+cd ../..
+git add vendor/vnpy
+git commit -m "chore: update vnpy submodule"
+```
