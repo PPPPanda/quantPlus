@@ -1,0 +1,137 @@
+{
+  "best_base": {
+    "circuit_breaker_losses": 7,
+    "circuit_breaker_bars": 70,
+    "div_threshold": 0.39,
+    "max_pullback_atr": 3.0
+  },
+  "baseline_total": 13497.5314,
+  "p2401_search": [
+    {
+      "name": "ef10",
+      "pts": -215.9092,
+      "improve": 456.96459999999996,
+      "setting": {
+        "atr_entry_filter": 1.0
+      }
+    },
+    {
+      "name": "cd2_40",
+      "pts": -448.84760000000006,
+      "improve": 224.0261999999999,
+      "setting": {
+        "cooldown_losses": 2,
+        "cooldown_bars": 40
+      }
+    },
+    {
+      "name": "cb3_120",
+      "pts": -453.35159999999996,
+      "improve": 219.5222,
+      "setting": {
+        "circuit_breaker_losses": 3,
+        "circuit_breaker_bars": 120
+      }
+    },
+    {
+      "name": "cb5_100_ef15",
+      "pts": -479.8226000000001,
+      "improve": 193.05119999999988,
+      "setting": {
+        "circuit_breaker_losses": 5,
+        "circuit_breaker_bars": 100,
+        "atr_entry_filter": 1.5
+      }
+    },
+    {
+      "name": "dd6_5_80",
+      "pts": -565.4044,
+      "improve": 107.46939999999995,
+      "setting": {
+        "dd_window_trades": 6,
+        "dd_threshold_atr": 5.0,
+        "dd_pause_bars": 80
+      }
+    },
+    {
+      "name": "dd8_6_60",
+      "pts": -624.8856,
+      "improve": 47.988200000000006,
+      "setting": {
+        "dd_window_trades": 8,
+        "dd_threshold_atr": 6.0,
+        "dd_pause_bars": 60
+      }
+    },
+    {
+      "name": "cb4_100",
+      "pts": -649.8762,
+      "improve": 22.99759999999992,
+      "setting": {
+        "circuit_breaker_losses": 4,
+        "circuit_breaker_bars": 100
+      }
+    },
+    {
+      "name": "cb5_70",
+      "pts": -672.8738,
+      "improve": 0.0,
+      "setting": {
+        "circuit_breaker_losses": 5,
+        "circuit_breaker_bars": 70
+      }
+    },
+    {
+      "name": "cb5_100",
+      "pts": -672.8738,
+      "improve": 0.0,
+      "setting": {
+        "circuit_breaker_losses": 5,
+        "circuit_breaker_bars": 100
+      }
+    },
+    {
+      "name": "cb_esc",
+      "pts": -672.8738,
+      "improve": 0.0,
+      "setting": {
+        "cb_escalation": true,
+        "cb_max_level": 3
+      }
+    },
+    {
+      "name": "cd3_30",
+      "pts": -688.8674000000001,
+      "improve": -15.993600000000129,
+      "setting": {
+        "cooldown_losses": 3,
+        "cooldown_bars": 30
+      }
+    },
+    {
+      "name": "ef15",
+      "pts": -688.9232,
+      "improve": -16.04939999999999,
+      "setting": {
+        "atr_entry_filter": 1.5
+      }
+    },
+    {
+      "name": "cb5_100_dd6",
+      "pts": -906.8026,
+      "improve": -233.92880000000002,
+      "setting": {
+        "circuit_breaker_losses": 5,
+        "circuit_breaker_bars": 100,
+        "dd_window_trades": 6,
+        "dd_threshold_atr": 5.0,
+        "dd_pause_bars": 60
+      }
+    }
+  ],
+  "top3": [
+    "ef10",
+    "cd2_40",
+    "cb3_120"
+  ]
+}

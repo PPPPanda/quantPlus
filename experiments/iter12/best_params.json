@@ -1,0 +1,17 @@
+{
+  "description": "Iter12 best parameter set (12/13 contracts pass)",
+  "params": {
+    "circuit_breaker_losses": 7,
+    "circuit_breaker_bars": 70,
+    "div_threshold": 0.39,
+    "max_pullback_atr": 3.5
+  },
+  "results": {
+    "total_points": 13891.3,
+    "total_pass": true,
+    "neg_pass": false,
+    "blocking_contract": "p2401",
+    "p2401_points": -672.9,
+    "contracts_pass_count": "12/13"
+  }
+}

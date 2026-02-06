@@ -1,0 +1,417 @@
+{
+  "p2201": {
+    "backtest": {
+      "trades_count": 114,
+      "total_pnl": 0,
+      "points": 0.0,
+      "sharpe": -0.8254476740984996,
+      "max_dd_pct": -6167.633999999962
+    },
+    "analysis": {
+      "contract": "p2201",
+      "total_trades": 56,
+      "win_rate": 33.9,
+      "avg_win_pts": 81.4,
+      "avg_loss_pts": -40.6,
+      "profit_factor": 1.03,
+      "max_consecutive_losses": 10,
+      "worst_streak_pnl_pts": -534.0,
+      "monthly_breakdown": {
+        "2021-08": {
+          "count": 8,
+          "pnl_pts": -480.0,
+          "wins": 0
+        },
+        "2021-09": {
+          "count": 12,
+          "pnl_pts": 318.0,
+          "wins": 5
+        },
+        "2021-10": {
+          "count": 11,
+          "pnl_pts": -92.0,
+          "wins": 4
+        },
+        "2021-11": {
+          "count": 19,
+          "pnl_pts": 280.0,
+          "wins": 8
+        },
+        "2021-12": {
+          "count": 6,
+          "pnl_pts": 18.0,
+          "wins": 2
+        }
+      },
+      "worst_5_trades": [
+        {
+          "entry": "2021-08-19 13:38:00+08:00",
+          "exit": "2021-08-19 21:03:00+08:00",
+          "pnl_pts": -174.0,
+          "entry_price": 8206.0,
+          "exit_price": 8032.0
+        },
+        {
+          "entry": "2021-08-30 09:03:00+08:00",
+          "exit": "2021-08-30 10:14:00+08:00",
+          "pnl_pts": -120.0,
+          "entry_price": 8372.0,
+          "exit_price": 8252.0
+        },
+        {
+          "entry": "2021-12-07 13:33:00+08:00",
+          "exit": "2021-12-07 14:35:00+08:00",
+          "pnl_pts": -92.0,
+          "entry_price": 9686.0,
+          "exit_price": 9594.0
+        },
+        {
+          "entry": "2021-09-08 21:16:00+08:00",
+          "exit": "2021-09-09 09:02:00+08:00",
+          "pnl_pts": -90.0,
+          "entry_price": 8500.0,
+          "exit_price": 8410.0
+        },
+        {
+          "entry": "2021-11-29 10:43:00+08:00",
+          "exit": "2021-11-29 13:35:00+08:00",
+          "pnl_pts": -72.0,
+          "entry_price": 9600.0,
+          "exit_price": 9528.0
+        }
+      ],
+      "loss_streaks": [
+        {
+          "length": 10,
+          "total_pnl_pts": -534.0
+        },
+        {
+          "length": 4,
+          "total_pnl_pts": -148.0
+        },
+        {
+          "length": 4,
+          "total_pnl_pts": -142.0
+        },
+        {
+          "length": 3,
+          "total_pnl_pts": -114.0
+        },
+        {
+          "length": 3,
+          "total_pnl_pts": -114.0
+        }
+      ]
+    }
+  },
+  "p2305": {
+    "backtest": {
+      "trades_count": 96,
+      "total_pnl": 0,
+      "points": 0.0,
+      "sharpe": -0.9900792767973279,
+      "max_dd_pct": -4263.537999999942
+    },
+    "analysis": {
+      "contract": "p2305",
+      "total_trades": 47,
+      "win_rate": 31.9,
+      "avg_win_pts": 55.9,
+      "avg_loss_pts": -29.6,
+      "profit_factor": 0.89,
+      "max_consecutive_losses": 12,
+      "worst_streak_pnl_pts": -340.0,
+      "monthly_breakdown": {
+        "2023-01": {
+          "count": 11,
+          "pnl_pts": -218.0,
+          "wins": 4
+        },
+        "2023-02": {
+          "count": 13,
+          "pnl_pts": 92.0,
+          "wins": 4
+        },
+        "2023-03": {
+          "count": 16,
+          "pnl_pts": -84.0,
+          "wins": 4
+        },
+        "2023-04": {
+          "count": 7,
+          "pnl_pts": 102.0,
+          "wins": 3
+        }
+      },
+      "worst_5_trades": [
+        {
+          "entry": "2023-03-15 09:08:00+08:00",
+          "exit": "2023-03-15 21:02:00+08:00",
+          "pnl_pts": -100.0,
+          "entry_price": 7866.0,
+          "exit_price": 7766.0
+        },
+        {
+          "entry": "2023-01-18 22:28:00+08:00",
+          "exit": "2023-01-19 09:34:00+08:00",
+          "pnl_pts": -84.0,
+          "entry_price": 7908.0,
+          "exit_price": 7824.0
+        },
+        {
+          "entry": "2023-01-05 10:03:00+08:00",
+          "exit": "2023-01-05 10:14:00+08:00",
+          "pnl_pts": -62.0,
+          "entry_price": 8182.0,
+          "exit_price": 8120.0
+        },
+        {
+          "entry": "2023-02-15 11:23:00+08:00",
+          "exit": "2023-02-15 13:32:00+08:00",
+          "pnl_pts": -56.0,
+          "entry_price": 7922.0,
+          "exit_price": 7866.0
+        },
+        {
+          "entry": "2023-01-11 21:02:00+08:00",
+          "exit": "2023-01-11 22:53:00+08:00",
+          "pnl_pts": -50.0,
+          "entry_price": 7808.0,
+          "exit_price": 7758.0
+        }
+      ],
+      "loss_streaks": [
+        {
+          "length": 12,
+          "total_pnl_pts": -340.0
+        },
+        {
+          "length": 4,
+          "total_pnl_pts": -128.0
+        },
+        {
+          "length": 4,
+          "total_pnl_pts": -110.0
+        },
+        {
+          "length": 2,
+          "total_pnl_pts": -100.0
+        },
+        {
+          "length": 2,
+          "total_pnl_pts": -78.0
+        }
+      ]
+    }
+  },
+  "p2309": {
+    "backtest": {
+      "trades_count": 100,
+      "total_pnl": 0,
+      "points": 0.0,
+      "sharpe": -0.8316738881491602,
+      "max_dd_pct": -4312.380000000005
+    },
+    "analysis": {
+      "contract": "p2309",
+      "total_trades": 49,
+      "win_rate": 32.7,
+      "avg_win_pts": 53.6,
+      "avg_loss_pts": -24.8,
+      "profit_factor": 1.05,
+      "max_consecutive_losses": 7,
+      "worst_streak_pnl_pts": -214.0,
+      "monthly_breakdown": {
+        "2023-04": {
+          "count": 4,
+          "pnl_pts": -102.0,
+          "wins": 0
+        },
+        "2023-05": {
+          "count": 15,
+          "pnl_pts": 124.0,
+          "wins": 7
+        },
+        "2023-06": {
+          "count": 14,
+          "pnl_pts": 286.0,
+          "wins": 6
+        },
+        "2023-07": {
+          "count": 13,
+          "pnl_pts": -164.0,
+          "wins": 3
+        },
+        "2023-08": {
+          "count": 3,
+          "pnl_pts": -104.0,
+          "wins": 0
+        }
+      },
+      "worst_5_trades": [
+        {
+          "entry": "2023-07-12 22:38:00+08:00",
+          "exit": "2023-07-13 09:49:00+08:00",
+          "pnl_pts": -94.0,
+          "entry_price": 7530.0,
+          "exit_price": 7436.0
+        },
+        {
+          "entry": "2023-08-07 09:48:00+08:00",
+          "exit": "2023-08-07 10:32:00+08:00",
+          "pnl_pts": -78.0,
+          "entry_price": 7608.0,
+          "exit_price": 7530.0
+        },
+        {
+          "entry": "2023-05-15 13:33:00+08:00",
+          "exit": "2023-05-16 11:18:00+08:00",
+          "pnl_pts": -64.0,
+          "entry_price": 6886.0,
+          "exit_price": 6822.0
+        },
+        {
+          "entry": "2023-04-28 13:39:00+08:00",
+          "exit": "2023-04-28 14:19:00+08:00",
+          "pnl_pts": -40.0,
+          "entry_price": 6848.0,
+          "exit_price": 6808.0
+        },
+        {
+          "entry": "2023-07-28 22:03:00+08:00",
+          "exit": "2023-07-28 22:48:00+08:00",
+          "pnl_pts": -36.0,
+          "entry_price": 7606.0,
+          "exit_price": 7570.0
+        }
+      ],
+      "loss_streaks": [
+        {
+          "length": 7,
+          "total_pnl_pts": -214.0
+        },
+        {
+          "length": 5,
+          "total_pnl_pts": -162.0
+        },
+        {
+          "length": 4,
+          "total_pnl_pts": -114.0
+        },
+        {
+          "length": 4,
+          "total_pnl_pts": -102.0
+        },
+        {
+          "length": 2,
+          "total_pnl_pts": -54.0
+        }
+      ]
+    }
+  },
+  "p2401": {
+    "backtest": {
+      "trades_count": 111,
+      "total_pnl": 0,
+      "points": 0.0,
+      "sharpe": -3.5797710344145326,
+      "max_dd_pct": -7384.93200000003
+    },
+    "analysis": {
+      "contract": "p2401",
+      "total_trades": 54,
+      "win_rate": 35.2,
+      "avg_win_pts": 35.8,
+      "avg_loss_pts": -26.1,
+      "profit_factor": 0.75,
+      "max_consecutive_losses": 9,
+      "worst_streak_pnl_pts": -238.0,
+      "monthly_breakdown": {
+        "2023-08": {
+          "count": 8,
+          "pnl_pts": -42.0,
+          "wins": 2
+        },
+        "2023-09": {
+          "count": 13,
+          "pnl_pts": -126.0,
+          "wins": 3
+        },
+        "2023-10": {
+          "count": 12,
+          "pnl_pts": -12.0,
+          "wins": 5
+        },
+        "2023-11": {
+          "count": 16,
+          "pnl_pts": -40.0,
+          "wins": 8
+        },
+        "2023-12": {
+          "count": 5,
+          "pnl_pts": -12.0,
+          "wins": 1
+        }
+      },
+      "worst_5_trades": [
+        {
+          "entry": "2023-10-23 22:28:00+08:00",
+          "exit": "2023-10-24 09:04:00+08:00",
+          "pnl_pts": -72.0,
+          "entry_price": 7178.0,
+          "exit_price": 7106.0
+        },
+        {
+          "entry": "2023-11-01 22:18:00+08:00",
+          "exit": "2023-11-02 09:02:00+08:00",
+          "pnl_pts": -62.0,
+          "entry_price": 7158.0,
+          "exit_price": 7096.0
+        },
+        {
+          "entry": "2023-08-21 10:33:00+08:00",
+          "exit": "2023-08-21 14:05:00+08:00",
+          "pnl_pts": -58.0,
+          "entry_price": 7716.0,
+          "exit_price": 7658.0
+        },
+        {
+          "entry": "2023-08-29 10:14:00+08:00",
+          "exit": "2023-08-29 14:52:00+08:00",
+          "pnl_pts": -50.0,
+          "entry_price": 7812.0,
+          "exit_price": 7762.0
+        },
+        {
+          "entry": "2023-11-10 10:49:00+08:00",
+          "exit": "2023-11-10 10:56:00+08:00",
+          "pnl_pts": -44.0,
+          "entry_price": 7356.0,
+          "exit_price": 7312.0
+        }
+      ],
+      "loss_streaks": [
+        {
+          "length": 9,
+          "total_pnl_pts": -238.0
+        },
+        {
+          "length": 4,
+          "total_pnl_pts": -124.0
+        },
+        {
+          "length": 3,
+          "total_pnl_pts": -114.0
+        },
+        {
+          "length": 2,
+          "total_pnl_pts": -72.0
+        },
+        {
+          "length": 3,
+          "total_pnl_pts": -60.0
+        }
+      ]
+    }
+  }
+}

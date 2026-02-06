@@ -1,0 +1,23 @@
+{
+  "p2401.DCE": {
+    "total_return": -0.6870486000000064,
+    "sharpe_ratio": -3.7311398373324933,
+    "max_drawdown": -7429.140000000014,
+    "total_trade_count": "103",
+    "total_pnl": 0
+  },
+  "p2601.DCE": {
+    "total_return": 0.7910646000000021,
+    "sharpe_ratio": 2.384232727626109,
+    "max_drawdown": -2381.0040000000736,
+    "total_trade_count": "102",
+    "total_pnl": 0
+  },
+  "p2209.DCE": {
+    "total_return": 7.728605600000016,
+    "sharpe_ratio": 4.68881758188086,
+    "max_drawdown": -17229.304000000004,
+    "total_trade_count": "102",
+    "total_pnl": 0
+  }
+}

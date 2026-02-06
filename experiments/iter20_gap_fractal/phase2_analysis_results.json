@@ -1,0 +1,241 @@
+{
+  "analysis": {
+    "p2209": {
+      "total_gaps": 18,
+      "holiday_gaps": 2,
+      "weekend_gaps": 16,
+      "large_gaps": 4,
+      "medium_gaps": 5,
+      "small_gaps": 9,
+      "up_gaps": 5,
+      "down_gaps": 13,
+      "consistent": 14,
+      "inconsistent": 4,
+      "holiday_consistent": 1,
+      "holiday_total": 2,
+      "weekend_consistent": 13,
+      "weekend_total": 16,
+      "large_gap_immediate": 3,
+      "large_gap_delayed": 1,
+      "failure_cases": [
+        {
+          "date": "2022-04-25",
+          "gap_direction": "down",
+          "gap_pct": -0.916955017301038,
+          "first_fractal_type": "top",
+          "is_holiday": false
+        },
+        {
+          "date": "2022-06-06",
+          "gap_direction": "down",
+          "gap_pct": -0.09948598905654121,
+          "first_fractal_type": "top",
+          "is_holiday": true
+        },
+        {
+          "date": "2022-06-13",
+          "gap_direction": "down",
+          "gap_pct": -0.2646903123345686,
+          "first_fractal_type": "top",
+          "is_holiday": false
+        },
+        {
+          "date": "2022-08-15",
+          "gap_direction": "down",
+          "gap_pct": -0.49371633752244165,
+          "first_fractal_type": "top",
+          "is_holiday": false
+        }
+      ],
+      "holiday_failures": [
+        {
+          "date": "2022-06-06",
+          "gap_pct": -0.09948598905654121,
+          "gap_direction": "down",
+          "fractal_type": "top"
+        }
+      ],
+      "consistency_rate": 0.7777777777777778,
+      "holiday_consistency_rate": 0.5,
+      "weekend_consistency_rate": 0.8125,
+      "large_gap_immediate_rate": 0.75
+    },
+    "p2401": {
+      "total_gaps": 16,
+      "holiday_gaps": 1,
+      "weekend_gaps": 15,
+      "large_gaps": 1,
+      "medium_gaps": 5,
+      "small_gaps": 10,
+      "up_gaps": 8,
+      "down_gaps": 8,
+      "consistent": 15,
+      "inconsistent": 1,
+      "holiday_consistent": 1,
+      "holiday_total": 1,
+      "weekend_consistent": 14,
+      "weekend_total": 15,
+      "large_gap_immediate": 1,
+      "large_gap_delayed": 0,
+      "failure_cases": [
+        {
+          "date": "2023-09-11",
+          "gap_direction": "down",
+          "gap_pct": -0.02615746795710175,
+          "first_fractal_type": "top",
+          "is_holiday": false
+        }
+      ],
+      "holiday_failures": [],
+      "consistency_rate": 0.9375,
+      "holiday_consistency_rate": 1.0,
+      "weekend_consistency_rate": 0.9333333333333333,
+      "large_gap_immediate_rate": 1.0
+    },
+    "p2405": {
+      "total_gaps": 17,
+      "holiday_gaps": 3,
+      "weekend_gaps": 14,
+      "large_gaps": 0,
+      "medium_gaps": 4,
+      "small_gaps": 13,
+      "up_gaps": 6,
+      "down_gaps": 11,
+      "consistent": 14,
+      "inconsistent": 3,
+      "holiday_consistent": 2,
+      "holiday_total": 3,
+      "weekend_consistent": 12,
+      "weekend_total": 14,
+      "large_gap_immediate": 0,
+      "large_gap_delayed": 0,
+      "failure_cases": [
+        {
+          "date": "2024-01-02",
+          "gap_direction": "up",
+          "gap_pct": 0.19757267852102736,
+          "first_fractal_type": "bottom",
+          "is_holiday": true
+        },
+        {
+          "date": "2024-02-26",
+          "gap_direction": "down",
+          "gap_pct": -0.0547945205479452,
+          "first_fractal_type": "top",
+          "is_holiday": false
+        },
+        {
+          "date": "2024-04-01",
+          "gap_direction": "down",
+          "gap_pct": 0.0,
+          "first_fractal_type": "top",
+          "is_holiday": false
+        }
+      ],
+      "holiday_failures": [
+        {
+          "date": "2024-01-02",
+          "gap_pct": 0.19757267852102736,
+          "gap_direction": "up",
+          "fractal_type": "bottom"
+        }
+      ],
+      "consistency_rate": 0.8235294117647058,
+      "holiday_consistency_rate": 0.6666666666666666,
+      "weekend_consistency_rate": 0.8571428571428571,
+      "large_gap_immediate_rate": 0
+    },
+    "p2601": {
+      "total_gaps": 18,
+      "holiday_gaps": 1,
+      "weekend_gaps": 17,
+      "large_gaps": 1,
+      "medium_gaps": 2,
+      "small_gaps": 15,
+      "up_gaps": 7,
+      "down_gaps": 11,
+      "consistent": 16,
+      "inconsistent": 2,
+      "holiday_consistent": 1,
+      "holiday_total": 1,
+      "weekend_consistent": 15,
+      "weekend_total": 17,
+      "large_gap_immediate": 1,
+      "large_gap_delayed": 0,
+      "failure_cases": [
+        {
+          "date": "2025-07-21",
+          "gap_direction": "down",
+          "gap_pct": -0.6879715934309809,
+          "first_fractal_type": "top",
+          "is_holiday": false
+        },
+        {
+          "date": "2025-11-03",
+          "gap_direction": "up",
+          "gap_pct": 0.04622140050843541,
+          "first_fractal_type": "bottom",
+          "is_holiday": false
+        }
+      ],
+      "holiday_failures": [],
+      "consistency_rate": 0.8888888888888888,
+      "holiday_consistency_rate": 1.0,
+      "weekend_consistency_rate": 0.8823529411764706,
+      "large_gap_immediate_rate": 1.0
+    }
+  },
+  "patterns": {
+    "pattern_1_holiday_reversal": {
+      "description": "节假日跳空后首个分型反向（最危险）",
+      "impact": "HIGH",
+      "case_count": 2
+    },
+    "pattern_2_large_gap_delay": {
+      "description": "大跳空(>1%)分型延迟，入场时机错误",
+      "impact": "MEDIUM",
+      "case_count": 1
+    },
+    "pattern_3_weekend_fake_fractal": {
+      "description": "普通周末的假分型（较少）",
+      "impact": "LOW",
+      "case_count": 8
+    }
+  },
+  "recommendations": [
+    {
+      "id": "R1",
+      "priority": "HIGH",
+      "title": "节假日跳空专项处理",
+      "problem": "2次节假日跳空后分型反向",
+      "solution": [
+        "方案A: 延长节后冷却期 (gap_cooldown_bars: 6→12)",
+        "方案B: 节后首个分型降权 (gap_confidence_mult: 0.4→0.2)",
+        "方案C: 节后中枢状态重置 (会话边界机制)"
+      ],
+      "expected_improvement": "减少节后30分钟内的假信号"
+    },
+    {
+      "id": "R2",
+      "priority": "MEDIUM",
+      "title": "大跳空分型确认机制",
+      "problem": "1次大跳空分型延迟形成",
+      "solution": [
+        "方案A: 大跳空后延长确认期 (gap_confirm_bars: 2→4)",
+        "方案B: 大跳空后ATR加权 (已有S27, 需验证)"
+      ],
+      "expected_improvement": "避免追高/追低入场"
+    },
+    {
+      "id": "R3",
+      "priority": "INFO",
+      "title": "关键数据汇总",
+      "data": {
+        "holiday_consistency": "79.2%",
+        "weekend_consistency": "87.1%",
+        "gap": "8.0%"
+      },
+      "insight": "节假日比周末低8.0%的一致性，这是核心问题"
+    }
+  ]
+}

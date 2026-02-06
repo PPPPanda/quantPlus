@@ -1,0 +1,304 @@
+{
+  "timestamp": "2026-02-06T01:55:22.944518",
+  "baseline": {
+    "settings": {
+      "debug_enabled": false,
+      "debug_log_console": false,
+      "cooldown_losses": 2,
+      "cooldown_bars": 20,
+      "atr_activate_mult": 2.5,
+      "atr_trailing_mult": 3.0,
+      "atr_entry_filter": 2.0,
+      "circuit_breaker_losses": 7,
+      "circuit_breaker_bars": 70,
+      "div_threshold": 0.39,
+      "max_pullback_atr": 3.2,
+      "bridge_bar_enabled": false
+    },
+    "results": [
+      {
+        "contract": "p2201",
+        "bars": 28409,
+        "trades": "110",
+        "total_pnl": -3462.5280000000007,
+        "points": -346.2528000000001,
+        "sharpe": -0.8050481993156464,
+        "return_pct": -0.346252800000002,
+        "max_dd_pct": -0.5831195999999996
+      },
+      {
+        "contract": "p2205",
+        "bars": 27026,
+        "trades": "94",
+        "total_pnl": 20796.966,
+        "points": 2079.6966,
+        "sharpe": 3.4984007485264788,
+        "return_pct": 2.079696600000003,
+        "max_dd_pct": -0.39148920575204116
+      },
+      {
+        "contract": "p2209",
+        "bars": 28415,
+        "trades": "102",
+        "total_pnl": 77286.056,
+        "points": 7728.6056,
+        "sharpe": 4.68881758188086,
+        "return_pct": 7.728605600000016,
+        "max_dd_pct": -1.7204479072194447
+      },
+      {
+        "contract": "p2301",
+        "bars": 27743,
+        "trades": "88",
+        "total_pnl": 1626.6059999999995,
+        "points": 162.66059999999996,
+        "sharpe": 0.5032395340461424,
+        "return_pct": 0.1626606000000086,
+        "max_dd_pct": -0.33561270027760565
+      },
+      {
+        "contract": "p2305",
+        "bars": 23288,
+        "trades": "86",
+        "total_pnl": -836.1619999999998,
+        "points": -83.61619999999998,
+        "sharpe": -0.3852376771071034,
+        "return_pct": -0.08361620000000292,
+        "max_dd_pct": -0.4227569999999949
+      },
+      {
+        "contract": "p2309",
+        "bars": 26222,
+        "trades": "92",
+        "total_pnl": -2791.0180000000005,
+        "points": -279.1018,
+        "sharpe": -1.274560163956635,
+        "return_pct": -0.2791018000000034,
+        "max_dd_pct": -0.44046272092599076
+      },
+      {
+        "contract": "p2401",
+        "bars": 27684,
+        "trades": "103",
+        "total_pnl": -6870.486,
+        "points": -687.0486,
+        "sharpe": -3.7311398373324933,
+        "return_pct": -0.6870486000000064,
+        "max_dd_pct": -0.7424991998520073
+      },
+      {
+        "contract": "p2405",
+        "bars": 28508,
+        "trades": "131",
+        "total_pnl": 7124.724,
+        "points": 712.4724,
+        "sharpe": 2.7993255685049294,
+        "return_pct": 0.7124724000000082,
+        "max_dd_pct": -0.1850911690855977
+      },
+      {
+        "contract": "p2409",
+        "bars": 50249,
+        "trades": "198",
+        "total_pnl": 4060.016,
+        "points": 406.0016,
+        "sharpe": 1.1353205153102146,
+        "return_pct": 0.4060015999999944,
+        "max_dd_pct": -0.33094247044966957
+      },
+      {
+        "contract": "p2501",
+        "bars": 55413,
+        "trades": "245",
+        "total_pnl": 13271.686,
+        "points": 1327.1686,
+        "sharpe": 2.2309841412499143,
+        "return_pct": 1.327168599999995,
+        "max_dd_pct": -0.391031113644558
+      },
+      {
+        "contract": "p2505",
+        "bars": 28230,
+        "trades": "110",
+        "total_pnl": 1883.012000000001,
+        "points": 188.3012000000001,
+        "sharpe": 0.5870656672572879,
+        "return_pct": 0.18830119999999617,
+        "max_dd_pct": -0.4101311351331816
+      },
+      {
+        "contract": "p2509",
+        "bars": 27914,
+        "trades": "90",
+        "total_pnl": 2501.4359999999997,
+        "points": 250.14359999999996,
+        "sharpe": 1.372395811631862,
+        "return_pct": 0.2501435999999968,
+        "max_dd_pct": -0.16585146505871307
+      },
+      {
+        "contract": "p2601",
+        "bars": 30237,
+        "trades": "102",
+        "total_pnl": 7910.646000000001,
+        "points": 791.0646,
+        "sharpe": 2.384232727626109,
+        "return_pct": 0.7910646000000021,
+        "max_dd_pct": -0.23567491624820158
+      }
+    ],
+    "total_points": 12250.095399999998
+  },
+  "bridge_bar": {
+    "settings": {
+      "debug_enabled": false,
+      "debug_log_console": false,
+      "cooldown_losses": 2,
+      "cooldown_bars": 20,
+      "atr_activate_mult": 2.5,
+      "atr_trailing_mult": 3.0,
+      "atr_entry_filter": 2.0,
+      "circuit_breaker_losses": 7,
+      "circuit_breaker_bars": 70,
+      "div_threshold": 0.39,
+      "max_pullback_atr": 3.2,
+      "bridge_bar_enabled": true,
+      "bridge_gap_threshold": 1.5
+    },
+    "results": [
+      {
+        "contract": "p2201",
+        "bars": 28409,
+        "trades": "114",
+        "total_pnl": -3277.810000000001,
+        "points": -327.78100000000006,
+        "sharpe": -0.7639018568342199,
+        "return_pct": -0.32778100000000476,
+        "max_dd_pct": -0.6167305999999982
+      },
+      {
+        "contract": "p2205",
+        "bars": 27026,
+        "trades": "92",
+        "total_pnl": 19372.904,
+        "points": 1937.2903999999999,
+        "sharpe": 2.689210318358747,
+        "return_pct": 1.9372903999999913,
+        "max_dd_pct": -0.7515225263204204
+      },
+      {
+        "contract": "p2209",
+        "bars": 28415,
+        "trades": "104",
+        "total_pnl": 79043.096,
+        "points": 7904.3096000000005,
+        "sharpe": 4.833636216517322,
+        "return_pct": 7.904309599999992,
+        "max_dd_pct": -1.7104844837818742
+      },
+      {
+        "contract": "p2301",
+        "bars": 27743,
+        "trades": "90",
+        "total_pnl": 2249.9320000000002,
+        "points": 224.99320000000003,
+        "sharpe": 0.6896145217588309,
+        "return_pct": 0.224993200000001,
+        "max_dd_pct": -0.31149987377033633
+      },
+      {
+        "contract": "p2305",
+        "bars": 23288,
+        "trades": "88",
+        "total_pnl": -2371.808,
+        "points": -237.1808,
+        "sharpe": -1.1947338636016325,
+        "return_pct": -0.23718079999999198,
+        "max_dd_pct": -0.47633199999999487
+      },
+      {
+        "contract": "p2309",
+        "bars": 26222,
+        "trades": "94",
+        "total_pnl": -2287.676000000001,
+        "points": -228.76760000000007,
+        "sharpe": -1.0401580593357764,
+        "return_pct": -0.22876760000000163,
+        "max_dd_pct": -0.41945180264884757
+      },
+      {
+        "contract": "p2401",
+        "bars": 27684,
+        "trades": "101",
+        "total_pnl": -6334.912,
+        "points": -633.4912,
+        "sharpe": -3.4756682149434455,
+        "return_pct": -0.6334912000000026,
+        "max_dd_pct": -0.6889717032021185
+      },
+      {
+        "contract": "p2405",
+        "bars": 28508,
+        "trades": "131",
+        "total_pnl": 7124.724,
+        "points": 712.4724,
+        "sharpe": 2.7993255685049294,
+        "return_pct": 0.7124724000000082,
+        "max_dd_pct": -0.1850911690855977
+      },
+      {
+        "contract": "p2409",
+        "bars": 50249,
+        "trades": "200",
+        "total_pnl": 4182.603999999999,
+        "points": 418.26039999999995,
+        "sharpe": 1.1522959601830847,
+        "return_pct": 0.4182604000000145,
+        "max_dd_pct": -0.35219586733412217
+      },
+      {
+        "contract": "p2501",
+        "bars": 55413,
+        "trades": "241",
+        "total_pnl": 15464.894,
+        "points": 1546.4894,
+        "sharpe": 2.6048922739835567,
+        "return_pct": 1.5464893999999951,
+        "max_dd_pct": -0.3706162132212396
+      },
+      {
+        "contract": "p2505",
+        "bars": 28230,
+        "trades": "111",
+        "total_pnl": -1076.443999999999,
+        "points": -107.6443999999999,
+        "sharpe": -0.34910568282390264,
+        "return_pct": -0.10764440000000652,
+        "max_dd_pct": -0.41134121004387725
+      },
+      {
+        "contract": "p2509",
+        "bars": 27914,
+        "trades": "90",
+        "total_pnl": 3441.5739999999996,
+        "points": 344.15739999999994,
+        "sharpe": 1.6700818538340847,
+        "return_pct": 0.3441574000000003,
+        "max_dd_pct": -0.20092617938418106
+      },
+      {
+        "contract": "p2601",
+        "bars": 30237,
+        "trades": "104",
+        "total_pnl": 9113.206000000002,
+        "points": 911.3206000000002,
+        "sharpe": 2.6721332152852795,
+        "return_pct": 0.9113206000000096,
+        "max_dd_pct": -0.23539472361388575
+      }
+    ],
+    "total_points": 12464.428400000003
+  },
+  "diff": 214.33300000000418,
+  "conclusion": "effective"
+}

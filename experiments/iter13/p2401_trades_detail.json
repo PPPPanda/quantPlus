@@ -1,0 +1,533 @@
+{
+  "summary": {
+    "total_pnl_pts": -938.0,
+    "trades": 55,
+    "win_rate": 45.45454545454545,
+    "avg_win": 59.04,
+    "avg_loss": -80.46666666666667
+  },
+  "monthly": {
+    "2023-08": {
+      "trades": 8,
+      "wins": 2,
+      "pnl_pts": -42.0
+    },
+    "2023-09": {
+      "trades": 15,
+      "wins": 5,
+      "pnl_pts": -894.0
+    },
+    "2023-10": {
+      "trades": 12,
+      "wins": 6,
+      "pnl_pts": 36.0
+    },
+    "2023-11": {
+      "trades": 16,
+      "wins": 10,
+      "pnl_pts": 56.0
+    },
+    "2023-12": {
+      "trades": 4,
+      "wins": 2,
+      "pnl_pts": -94.0
+    }
+  },
+  "trades": [
+    {
+      "open_time": "2023-08-17 21:56:00+08:00",
+      "close_time": "2023-08-18 10:39:00+08:00",
+      "direction": "LONG",
+      "open_price": 7602.0,
+      "close_price": 7624.0,
+      "pts": 22.0,
+      "hold_minutes": 763.0
+    },
+    {
+      "open_time": "2023-08-21 10:33:00+08:00",
+      "close_time": "2023-08-21 14:05:00+08:00",
+      "direction": "LONG",
+      "open_price": 7716.0,
+      "close_price": 7658.0,
+      "pts": -58.0,
+      "hold_minutes": 212.0
+    },
+    {
+      "open_time": "2023-08-23 14:13:00+08:00",
+      "close_time": "2023-08-23 14:29:00+08:00",
+      "direction": "LONG",
+      "open_price": 7584.0,
+      "close_price": 7570.0,
+      "pts": -14.0,
+      "hold_minutes": 16.0
+    },
+    {
+      "open_time": "2023-08-25 14:48:00+08:00",
+      "close_time": "2023-08-28 09:25:00+08:00",
+      "direction": "LONG",
+      "open_price": 7736.0,
+      "close_price": 7856.0,
+      "pts": 120.0,
+      "hold_minutes": 3997.0
+    },
+    {
+      "open_time": "2023-08-29 10:14:00+08:00",
+      "close_time": "2023-08-29 14:52:00+08:00",
+      "direction": "LONG",
+      "open_price": 7812.0,
+      "close_price": 7762.0,
+      "pts": -50.0,
+      "hold_minutes": 278.0
+    },
+    {
+      "open_time": "2023-08-30 10:05:00+08:00",
+      "close_time": "2023-08-30 10:39:00+08:00",
+      "direction": "LONG",
+      "open_price": 7838.0,
+      "close_price": 7814.0,
+      "pts": -24.0,
+      "hold_minutes": 34.0
+    },
+    {
+      "open_time": "2023-08-30 21:53:00+08:00",
+      "close_time": "2023-08-30 22:24:00+08:00",
+      "direction": "LONG",
+      "open_price": 7878.0,
+      "close_price": 7862.0,
+      "pts": -16.0,
+      "hold_minutes": 31.0
+    },
+    {
+      "open_time": "2023-08-31 21:13:00+08:00",
+      "close_time": "2023-08-31 21:28:00+08:00",
+      "direction": "LONG",
+      "open_price": 7912.0,
+      "close_price": 7890.0,
+      "pts": -22.0,
+      "hold_minutes": 15.0
+    },
+    {
+      "open_time": "2023-09-01 21:19:00+08:00",
+      "close_time": "2023-09-05 09:46:00+08:00",
+      "direction": "LONG",
+      "open_price": 7900.0,
+      "close_price": 7736.0,
+      "pts": -164.0,
+      "hold_minutes": 5067.0
+    },
+    {
+      "open_time": "2023-09-05 09:08:00+08:00",
+      "close_time": "2023-09-05 10:32:00+08:00",
+      "direction": "LONG",
+      "open_price": 7764.0,
+      "close_price": 7704.0,
+      "pts": -60.0,
+      "hold_minutes": 84.0
+    },
+    {
+      "open_time": "2023-09-05 10:08:00+08:00",
+      "close_time": "2023-09-06 10:55:00+08:00",
+      "direction": "LONG",
+      "open_price": 7738.0,
+      "close_price": 7744.0,
+      "pts": 6.0,
+      "hold_minutes": 1487.0
+    },
+    {
+      "open_time": "2023-09-05 22:48:00+08:00",
+      "close_time": "2023-09-06 22:48:00+08:00",
+      "direction": "LONG",
+      "open_price": 7764.0,
+      "close_price": 7696.0,
+      "pts": -68.0,
+      "hold_minutes": 1440.0
+    },
+    {
+      "open_time": "2023-09-06 22:33:00+08:00",
+      "close_time": "2023-09-12 11:09:00+08:00",
+      "direction": "LONG",
+      "open_price": 7710.0,
+      "close_price": 7450.0,
+      "pts": -260.0,
+      "hold_minutes": 7956.0
+    },
+    {
+      "open_time": "2023-09-12 10:13:00+08:00",
+      "close_time": "2023-09-14 13:56:00+08:00",
+      "direction": "LONG",
+      "open_price": 7480.0,
+      "close_price": 7458.0,
+      "pts": -22.0,
+      "hold_minutes": 3103.0
+    },
+    {
+      "open_time": "2023-09-14 22:21:00+08:00",
+      "close_time": "2023-09-15 09:40:00+08:00",
+      "direction": "LONG",
+      "open_price": 7512.0,
+      "close_price": 7530.0,
+      "pts": 18.0,
+      "hold_minutes": 679.0
+    },
+    {
+      "open_time": "2023-09-15 21:53:00+08:00",
+      "close_time": "2023-09-19 09:33:00+08:00",
+      "direction": "LONG",
+      "open_price": 7374.0,
+      "close_price": 7292.0,
+      "pts": -82.0,
+      "hold_minutes": 5020.0
+    },
+    {
+      "open_time": "2023-09-19 09:19:00+08:00",
+      "close_time": "2023-09-20 10:13:00+08:00",
+      "direction": "LONG",
+      "open_price": 7314.0,
+      "close_price": 7322.0,
+      "pts": 8.0,
+      "hold_minutes": 1494.0
+    },
+    {
+      "open_time": "2023-09-19 14:38:00+08:00",
+      "close_time": "2023-09-20 11:06:00+08:00",
+      "direction": "LONG",
+      "open_price": 7284.0,
+      "close_price": 7300.0,
+      "pts": 16.0,
+      "hold_minutes": 1228.0
+    },
+    {
+      "open_time": "2023-09-20 10:14:00+08:00",
+      "close_time": "2023-09-22 09:09:00+08:00",
+      "direction": "LONG",
+      "open_price": 7308.0,
+      "close_price": 7200.0,
+      "pts": -108.0,
+      "hold_minutes": 2815.0
+    },
+    {
+      "open_time": "2023-09-21 22:59:00+08:00",
+      "close_time": "2023-09-25 09:02:00+08:00",
+      "direction": "LONG",
+      "open_price": 7216.0,
+      "close_price": 7282.0,
+      "pts": 66.0,
+      "hold_minutes": 4923.0
+    },
+    {
+      "open_time": "2023-09-22 22:00:00+08:00",
+      "close_time": "2023-09-26 14:31:00+08:00",
+      "direction": "LONG",
+      "open_price": 7260.0,
+      "close_price": 7244.0,
+      "pts": -16.0,
+      "hold_minutes": 5311.0
+    },
+    {
+      "open_time": "2023-09-26 10:43:00+08:00",
+      "close_time": "2023-09-27 10:56:00+08:00",
+      "direction": "LONG",
+      "open_price": 7256.0,
+      "close_price": 7252.0,
+      "pts": -4.0,
+      "hold_minutes": 1453.0
+    },
+    {
+      "open_time": "2023-09-27 10:00:00+08:00",
+      "close_time": "2023-10-10 21:57:00+08:00",
+      "direction": "LONG",
+      "open_price": 7272.0,
+      "close_price": 7048.0,
+      "pts": -224.0,
+      "hold_minutes": 19437.0
+    },
+    {
+      "open_time": "2023-10-10 14:54:00+08:00",
+      "close_time": "2023-10-12 21:48:00+08:00",
+      "direction": "LONG",
+      "open_price": 7076.0,
+      "close_price": 7134.0,
+      "pts": 58.0,
+      "hold_minutes": 3294.0
+    },
+    {
+      "open_time": "2023-10-12 14:08:00+08:00",
+      "close_time": "2023-10-16 09:52:00+08:00",
+      "direction": "LONG",
+      "open_price": 7114.0,
+      "close_price": 7318.0,
+      "pts": 204.0,
+      "hold_minutes": 5504.0
+    },
+    {
+      "open_time": "2023-10-13 22:48:00+08:00",
+      "close_time": "2023-10-18 13:42:00+08:00",
+      "direction": "LONG",
+      "open_price": 7306.0,
+      "close_price": 7360.0,
+      "pts": 54.0,
+      "hold_minutes": 6654.0
+    },
+    {
+      "open_time": "2023-10-18 10:04:00+08:00",
+      "close_time": "2023-10-18 14:24:00+08:00",
+      "direction": "LONG",
+      "open_price": 7358.0,
+      "close_price": 7378.0,
+      "pts": 20.0,
+      "hold_minutes": 260.0
+    },
+    {
+      "open_time": "2023-10-18 13:46:00+08:00",
+      "close_time": "2023-10-19 13:53:00+08:00",
+      "direction": "LONG",
+      "open_price": 7368.0,
+      "close_price": 7368.0,
+      "pts": 0.0,
+      "hold_minutes": 1447.0
+    },
+    {
+      "open_time": "2023-10-19 13:41:00+08:00",
+      "close_time": "2023-10-20 21:36:00+08:00",
+      "direction": "LONG",
+      "open_price": 7380.0,
+      "close_price": 7208.0,
+      "pts": -172.0,
+      "hold_minutes": 1915.0
+    },
+    {
+      "open_time": "2023-10-20 14:58:00+08:00",
+      "close_time": "2023-10-24 09:04:00+08:00",
+      "direction": "LONG",
+      "open_price": 7226.0,
+      "close_price": 7106.0,
+      "pts": -120.0,
+      "hold_minutes": 5406.0
+    },
+    {
+      "open_time": "2023-10-23 22:28:00+08:00",
+      "close_time": "2023-10-25 09:38:00+08:00",
+      "direction": "LONG",
+      "open_price": 7178.0,
+      "close_price": 7054.0,
+      "pts": -124.0,
+      "hold_minutes": 2110.0
+    },
+    {
+      "open_time": "2023-10-24 21:58:00+08:00",
+      "close_time": "2023-10-26 22:08:00+08:00",
+      "direction": "LONG",
+      "open_price": 7076.0,
+      "close_price": 7244.0,
+      "pts": 168.0,
+      "hold_minutes": 2890.0
+    },
+    {
+      "open_time": "2023-10-26 10:56:00+08:00",
+      "close_time": "2023-10-27 22:03:00+08:00",
+      "direction": "LONG",
+      "open_price": 7096.0,
+      "close_price": 7278.0,
+      "pts": 182.0,
+      "hold_minutes": 2107.0
+    },
+    {
+      "open_time": "2023-10-27 21:48:00+08:00",
+      "close_time": "2023-11-01 10:13:00+08:00",
+      "direction": "LONG",
+      "open_price": 7288.0,
+      "close_price": 7080.0,
+      "pts": -208.0,
+      "hold_minutes": 6505.0
+    },
+    {
+      "open_time": "2023-10-31 22:18:00+08:00",
+      "close_time": "2023-11-02 09:02:00+08:00",
+      "direction": "LONG",
+      "open_price": 7122.0,
+      "close_price": 7096.0,
+      "pts": -26.0,
+      "hold_minutes": 2084.0
+    },
+    {
+      "open_time": "2023-11-01 22:18:00+08:00",
+      "close_time": "2023-11-07 09:02:00+08:00",
+      "direction": "LONG",
+      "open_price": 7158.0,
+      "close_price": 7360.0,
+      "pts": 202.0,
+      "hold_minutes": 7844.0
+    },
+    {
+      "open_time": "2023-11-06 21:38:00+08:00",
+      "close_time": "2023-11-07 11:30:00+08:00",
+      "direction": "LONG",
+      "open_price": 7350.0,
+      "close_price": 7406.0,
+      "pts": 56.0,
+      "hold_minutes": 832.0
+    },
+    {
+      "open_time": "2023-11-07 09:33:00+08:00",
+      "close_time": "2023-11-07 14:21:00+08:00",
+      "direction": "LONG",
+      "open_price": 7378.0,
+      "close_price": 7366.0,
+      "pts": -12.0,
+      "hold_minutes": 288.0
+    },
+    {
+      "open_time": "2023-11-07 13:43:00+08:00",
+      "close_time": "2023-11-10 10:32:00+08:00",
+      "direction": "LONG",
+      "open_price": 7408.0,
+      "close_price": 7344.0,
+      "pts": -64.0,
+      "hold_minutes": 4129.0
+    },
+    {
+      "open_time": "2023-11-09 22:53:00+08:00",
+      "close_time": "2023-11-10 10:56:00+08:00",
+      "direction": "LONG",
+      "open_price": 7302.0,
+      "close_price": 7312.0,
+      "pts": 10.0,
+      "hold_minutes": 723.0
+    },
+    {
+      "open_time": "2023-11-10 10:49:00+08:00",
+      "close_time": "2023-11-10 22:44:00+08:00",
+      "direction": "LONG",
+      "open_price": 7356.0,
+      "close_price": 7402.0,
+      "pts": 46.0,
+      "hold_minutes": 715.0
+    },
+    {
+      "open_time": "2023-11-10 14:23:00+08:00",
+      "close_time": "2023-11-13 09:19:00+08:00",
+      "direction": "LONG",
+      "open_price": 7388.0,
+      "close_price": 7398.0,
+      "pts": 10.0,
+      "hold_minutes": 4016.0
+    },
+    {
+      "open_time": "2023-11-10 22:58:00+08:00",
+      "close_time": "2023-11-17 21:16:00+08:00",
+      "direction": "LONG",
+      "open_price": 7426.0,
+      "close_price": 7476.0,
+      "pts": 50.0,
+      "hold_minutes": 9978.0
+    },
+    {
+      "open_time": "2023-11-17 14:33:00+08:00",
+      "close_time": "2023-11-20 13:59:00+08:00",
+      "direction": "LONG",
+      "open_price": 7494.0,
+      "close_price": 7470.0,
+      "pts": -24.0,
+      "hold_minutes": 4286.0
+    },
+    {
+      "open_time": "2023-11-20 09:38:00+08:00",
+      "close_time": "2023-11-21 10:40:00+08:00",
+      "direction": "LONG",
+      "open_price": 7470.0,
+      "close_price": 7530.0,
+      "pts": 60.0,
+      "hold_minutes": 1502.0
+    },
+    {
+      "open_time": "2023-11-20 21:09:00+08:00",
+      "close_time": "2023-11-22 13:52:00+08:00",
+      "direction": "LONG",
+      "open_price": 7484.0,
+      "close_price": 7496.0,
+      "pts": 12.0,
+      "hold_minutes": 2443.0
+    },
+    {
+      "open_time": "2023-11-22 09:58:00+08:00",
+      "close_time": "2023-11-28 10:32:00+08:00",
+      "direction": "LONG",
+      "open_price": 7492.0,
+      "close_price": 7412.0,
+      "pts": -80.0,
+      "hold_minutes": 8674.0
+    },
+    {
+      "open_time": "2023-11-27 22:48:00+08:00",
+      "close_time": "2023-11-28 10:58:00+08:00",
+      "direction": "LONG",
+      "open_price": 7388.0,
+      "close_price": 7394.0,
+      "pts": 6.0,
+      "hold_minutes": 730.0
+    },
+    {
+      "open_time": "2023-11-28 10:43:00+08:00",
+      "close_time": "2023-11-30 22:07:00+08:00",
+      "direction": "LONG",
+      "open_price": 7430.0,
+      "close_price": 7346.0,
+      "pts": -84.0,
+      "hold_minutes": 3564.0
+    },
+    {
+      "open_time": "2023-11-30 09:04:00+08:00",
+      "close_time": "2023-12-01 09:02:00+08:00",
+      "direction": "LONG",
+      "open_price": 7296.0,
+      "close_price": 7316.0,
+      "pts": 20.0,
+      "hold_minutes": 1438.0
+    },
+    {
+      "open_time": "2023-11-30 22:08:00+08:00",
+      "close_time": "2023-12-04 14:54:00+08:00",
+      "direction": "LONG",
+      "open_price": 7344.0,
+      "close_price": 7192.0,
+      "pts": -152.0,
+      "hold_minutes": 5326.0
+    },
+    {
+      "open_time": "2023-12-04 14:18:00+08:00",
+      "close_time": "2023-12-05 09:45:00+08:00",
+      "direction": "LONG",
+      "open_price": 7210.0,
+      "close_price": 7182.0,
+      "pts": -28.0,
+      "hold_minutes": 1167.0
+    },
+    {
+      "open_time": "2023-12-04 23:00:00+08:00",
+      "close_time": "2023-12-08 21:25:00+08:00",
+      "direction": "LONG",
+      "open_price": 7196.0,
+      "close_price": 7068.0,
+      "pts": -128.0,
+      "hold_minutes": 5665.0
+    },
+    {
+      "open_time": "2023-12-08 09:08:00+08:00",
+      "close_time": "2023-12-11 21:58:00+08:00",
+      "direction": "LONG",
+      "open_price": 7018.0,
+      "close_price": 7078.0,
+      "pts": 60.0,
+      "hold_minutes": 5090.0
+    },
+    {
+      "open_time": "2023-12-11 21:45:00+08:00",
+      "close_time": "2023-12-12 10:32:00+08:00",
+      "direction": "LONG",
+      "open_price": 7092.0,
+      "close_price": 7094.0,
+      "pts": 2.0,
+      "hold_minutes": 767.0
+    }
+  ]
+}

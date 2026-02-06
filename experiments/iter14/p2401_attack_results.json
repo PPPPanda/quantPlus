@@ -1,0 +1,172 @@
+[
+  {
+    "name": "atr_pct_005",
+    "pts": 0.0,
+    "improve": 672.8738,
+    "setting": {
+      "min_atr_pct": 0.005
+    }
+  },
+  {
+    "name": "atr_pct_006",
+    "pts": 0.0,
+    "improve": 672.8738,
+    "setting": {
+      "min_atr_pct": 0.006
+    }
+  },
+  {
+    "name": "atr_pct_007",
+    "pts": 0.0,
+    "improve": 672.8738,
+    "setting": {
+      "min_atr_pct": 0.007
+    }
+  },
+  {
+    "name": "atr006_sb005",
+    "pts": 0.0,
+    "improve": 672.8738,
+    "setting": {
+      "min_atr_pct": 0.006,
+      "stop_buffer_atr_pct": 0.05
+    }
+  },
+  {
+    "name": "cd3_40",
+    "pts": -487.80640000000005,
+    "improve": 185.0673999999999,
+    "setting": {
+      "cooldown_losses": 3,
+      "cooldown_bars": 40
+    }
+  },
+  {
+    "name": "sb008",
+    "pts": -668.8742,
+    "improve": 3.9995999999999867,
+    "setting": {
+      "stop_buffer_atr_pct": 0.08
+    }
+  },
+  {
+    "name": "sb010",
+    "pts": -670.874,
+    "improve": 1.9997999999999365,
+    "setting": {
+      "stop_buffer_atr_pct": 0.1
+    }
+  },
+  {
+    "name": "baseline",
+    "pts": -672.8738,
+    "improve": 0.0,
+    "setting": {}
+  },
+  {
+    "name": "sb005",
+    "pts": -672.8738,
+    "improve": 0.0,
+    "setting": {
+      "stop_buffer_atr_pct": 0.05
+    }
+  },
+  {
+    "name": "ef25",
+    "pts": -672.8738,
+    "improve": 0.0,
+    "setting": {
+      "atr_entry_filter": 2.5
+    }
+  },
+  {
+    "name": "ef30",
+    "pts": -672.8738,
+    "improve": 0.0,
+    "setting": {
+      "atr_entry_filter": 3.0
+    }
+  },
+  {
+    "name": "mpe1",
+    "pts": -672.8738,
+    "improve": 0.0,
+    "setting": {
+      "max_pivot_entries": 1
+    }
+  },
+  {
+    "name": "cd3_30",
+    "pts": -688.8674000000001,
+    "improve": -15.993600000000129,
+    "setting": {
+      "cooldown_losses": 3,
+      "cooldown_bars": 30
+    }
+  },
+  {
+    "name": "sb005_cd3_30",
+    "pts": -688.8674000000001,
+    "improve": -15.993600000000129,
+    "setting": {
+      "stop_buffer_atr_pct": 0.05,
+      "cooldown_losses": 3,
+      "cooldown_bars": 30
+    }
+  },
+  {
+    "name": "cd3_30_mpe1",
+    "pts": -688.8674000000001,
+    "improve": -15.993600000000129,
+    "setting": {
+      "cooldown_losses": 3,
+      "cooldown_bars": 30,
+      "max_pivot_entries": 1
+    }
+  },
+  {
+    "name": "sb005_mpe1_cd3_30",
+    "pts": -688.8674000000001,
+    "improve": -15.993600000000129,
+    "setting": {
+      "stop_buffer_atr_pct": 0.05,
+      "max_pivot_entries": 1,
+      "cooldown_losses": 3,
+      "cooldown_bars": 30
+    }
+  },
+  {
+    "name": "sb008_mhb3",
+    "pts": -690.872,
+    "improve": -17.998199999999997,
+    "setting": {
+      "stop_buffer_atr_pct": 0.08,
+      "min_hold_bars": 3
+    }
+  },
+  {
+    "name": "mhb3",
+    "pts": -694.8716000000001,
+    "improve": -21.997800000000097,
+    "setting": {
+      "min_hold_bars": 3
+    }
+  },
+  {
+    "name": "mhb4",
+    "pts": -734.8676,
+    "improve": -61.99380000000008,
+    "setting": {
+      "min_hold_bars": 4
+    }
+  },
+  {
+    "name": "trail25_act20",
+    "pts": -884.4474,
+    "improve": -211.57360000000006,
+    "setting": {
+      "atr_trailing_mult": 2.5,
+      "atr_activate_mult": 2.0
+    }
+  }
+]

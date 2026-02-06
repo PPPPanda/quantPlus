@@ -1,0 +1,239 @@
+[
+  {
+    "name": "baseline",
+    "pts": -183.61499999999995,
+    "improve": 0.0,
+    "passed": "False",
+    "setting": {}
+  },
+  {
+    "name": "div035",
+    "pts": -183.61499999999995,
+    "improve": 0.0,
+    "passed": "False",
+    "setting": {
+      "div_threshold": 0.35
+    }
+  },
+  {
+    "name": "div037",
+    "pts": -183.61499999999995,
+    "improve": 0.0,
+    "passed": "False",
+    "setting": {
+      "div_threshold": 0.37
+    }
+  },
+  {
+    "name": "div040",
+    "pts": -183.61499999999995,
+    "improve": 0.0,
+    "passed": "False",
+    "setting": {
+      "div_threshold": 0.4
+    }
+  },
+  {
+    "name": "div042",
+    "pts": -183.61499999999995,
+    "improve": 0.0,
+    "passed": "False",
+    "setting": {
+      "div_threshold": 0.42
+    }
+  },
+  {
+    "name": "div045",
+    "pts": -199.27939999999998,
+    "improve": -15.664400000000029,
+    "passed": "False",
+    "setting": {
+      "div_threshold": 0.45
+    }
+  },
+  {
+    "name": "mpa28",
+    "pts": -321.9848,
+    "improve": -138.36980000000005,
+    "passed": "False",
+    "setting": {
+      "max_pullback_atr": 2.8
+    }
+  },
+  {
+    "name": "mpa32",
+    "pts": -120.69279999999999,
+    "improve": 62.92219999999996,
+    "passed": "True",
+    "setting": {
+      "max_pullback_atr": 3.2
+    }
+  },
+  {
+    "name": "mpa35",
+    "pts": -146.27339999999998,
+    "improve": 37.34159999999997,
+    "passed": "True",
+    "setting": {
+      "max_pullback_atr": 3.5
+    }
+  },
+  {
+    "name": "mpa40",
+    "pts": -146.27339999999998,
+    "improve": 37.34159999999997,
+    "passed": "True",
+    "setting": {
+      "max_pullback_atr": 4.0
+    }
+  },
+  {
+    "name": "cb7_80",
+    "pts": -183.61499999999995,
+    "improve": 0.0,
+    "passed": "False",
+    "setting": {
+      "circuit_breaker_bars": 80
+    }
+  },
+  {
+    "name": "cb7_90",
+    "pts": -183.61499999999995,
+    "improve": 0.0,
+    "passed": "False",
+    "setting": {
+      "circuit_breaker_bars": 90
+    }
+  },
+  {
+    "name": "cb6_70",
+    "pts": -259.70539999999994,
+    "improve": -76.09039999999999,
+    "passed": "False",
+    "setting": {
+      "circuit_breaker_losses": 6
+    }
+  },
+  {
+    "name": "cb8_70",
+    "pts": -251.16819999999998,
+    "improve": -67.55320000000003,
+    "passed": "False",
+    "setting": {
+      "circuit_breaker_losses": 8
+    }
+  },
+  {
+    "name": "sb003",
+    "pts": -183.61499999999995,
+    "improve": 0.0,
+    "passed": "False",
+    "setting": {
+      "stop_buffer_atr_pct": 0.03
+    }
+  },
+  {
+    "name": "sb004",
+    "pts": -183.61499999999995,
+    "improve": 0.0,
+    "passed": "False",
+    "setting": {
+      "stop_buffer_atr_pct": 0.04
+    }
+  },
+  {
+    "name": "sb005",
+    "pts": -183.61499999999995,
+    "improve": 0.0,
+    "passed": "False",
+    "setting": {
+      "stop_buffer_atr_pct": 0.05
+    }
+  },
+  {
+    "name": "trail32",
+    "pts": -229.61040000000003,
+    "improve": -45.995400000000075,
+    "passed": "False",
+    "setting": {
+      "atr_trailing_mult": 3.2
+    }
+  },
+  {
+    "name": "trail35",
+    "pts": -210.06640000000002,
+    "improve": -26.451400000000064,
+    "passed": "False",
+    "setting": {
+      "atr_trailing_mult": 3.5
+    }
+  },
+  {
+    "name": "cd3_20",
+    "pts": -192.7256,
+    "improve": -9.110600000000034,
+    "passed": "False",
+    "setting": {
+      "cooldown_losses": 3,
+      "cooldown_bars": 20
+    }
+  },
+  {
+    "name": "mhb2",
+    "pts": -183.61499999999995,
+    "improve": 0.0,
+    "passed": "False",
+    "setting": {
+      "min_hold_bars": 2
+    }
+  },
+  {
+    "name": "mhb3",
+    "pts": -278.05960000000005,
+    "improve": -94.4446000000001,
+    "passed": "False",
+    "setting": {
+      "min_hold_bars": 3
+    }
+  },
+  {
+    "name": "div042_sb003",
+    "pts": -183.61499999999995,
+    "improve": 0.0,
+    "passed": "False",
+    "setting": {
+      "div_threshold": 0.42,
+      "stop_buffer_atr_pct": 0.03
+    }
+  },
+  {
+    "name": "div042_mpa35",
+    "pts": -146.27339999999998,
+    "improve": 37.34159999999997,
+    "passed": "True",
+    "setting": {
+      "div_threshold": 0.42,
+      "max_pullback_atr": 3.5
+    }
+  },
+  {
+    "name": "sb003_mhb2",
+    "pts": -183.61499999999995,
+    "improve": 0.0,
+    "passed": "False",
+    "setting": {
+      "stop_buffer_atr_pct": 0.03,
+      "min_hold_bars": 2
+    }
+  },
+  {
+    "name": "div040_sb004",
+    "pts": -183.61499999999995,
+    "improve": 0.0,
+    "passed": "False",
+    "setting": {
+      "div_threshold": 0.4,
+      "stop_buffer_atr_pct": 0.04
+    }
+  }
+]

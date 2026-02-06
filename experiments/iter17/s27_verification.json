@@ -1,0 +1,111 @@
+{
+  "timestamp": "2026-02-05T15:20:57.473424",
+  "baseline_setting": {
+    "debug_enabled": false,
+    "debug_log_console": false,
+    "cooldown_losses": 2,
+    "cooldown_bars": 20,
+    "atr_activate_mult": 2.5,
+    "atr_trailing_mult": 3.0,
+    "atr_entry_filter": 2.0,
+    "circuit_breaker_losses": 7,
+    "circuit_breaker_bars": 70,
+    "max_pullback_atr": 3.2,
+    "gap_threshold_atr": 0.0,
+    "atr_boost_factor": 1.0,
+    "atr_boost_bars": 0
+  },
+  "s27_setting": {
+    "debug_enabled": false,
+    "debug_log_console": false,
+    "cooldown_losses": 2,
+    "cooldown_bars": 20,
+    "atr_activate_mult": 2.5,
+    "atr_trailing_mult": 3.0,
+    "atr_entry_filter": 2.0,
+    "circuit_breaker_losses": 7,
+    "circuit_breaker_bars": 70,
+    "max_pullback_atr": 3.2,
+    "gap_threshold_atr": 1.5,
+    "atr_boost_factor": 1.5,
+    "atr_boost_bars": 6
+  },
+  "p2209_delta": 0.0,
+  "p2209_gaps": [
+    {
+      "date": "2022-07-18",
+      "gap": 164.0,
+      "gap_pct": 2.1,
+      "day_range": 610.0,
+      "gap_ratio": 0.27
+    },
+    {
+      "date": "2022-07-11",
+      "gap": 162.0,
+      "gap_pct": 1.97,
+      "day_range": 480.0,
+      "gap_ratio": 0.34
+    },
+    {
+      "date": "2022-05-16",
+      "gap": 136.0,
+      "gap_pct": 1.17,
+      "day_range": 380.0,
+      "gap_ratio": 0.36
+    },
+    {
+      "date": "2022-04-26",
+      "gap": 128.0,
+      "gap_pct": 1.17,
+      "day_range": 560.0,
+      "gap_ratio": 0.23
+    },
+    {
+      "date": "2022-07-04",
+      "gap": 126.0,
+      "gap_pct": 1.42,
+      "day_range": 372.0,
+      "gap_ratio": 0.34
+    },
+    {
+      "date": "2022-07-15",
+      "gap": 110.0,
+      "gap_pct": 1.46,
+      "day_range": 406.0,
+      "gap_ratio": 0.27
+    },
+    {
+      "date": "2022-08-01",
+      "gap": 110.0,
+      "gap_pct": 1.26,
+      "day_range": 286.0,
+      "gap_ratio": 0.38
+    },
+    {
+      "date": "2022-06-27",
+      "gap": 108.0,
+      "gap_pct": 1.16,
+      "day_range": 394.0,
+      "gap_ratio": 0.27
+    },
+    {
+      "date": "2022-06-22",
+      "gap": 100.0,
+      "gap_pct": 0.99,
+      "day_range": 688.0,
+      "gap_ratio": 0.15
+    },
+    {
+      "date": "2022-06-01",
+      "gap": 98.0,
+      "gap_pct": 0.83,
+      "day_range": 274.0,
+      "gap_ratio": 0.36
+    }
+  ],
+  "avg_atr_proxy": 394.4,
+  "s27_triggers": [],
+  "total_baseline": 12174.6,
+  "total_s27": 12063.7,
+  "total_delta": -110.9,
+  "passed": 

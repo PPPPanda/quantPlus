@@ -1,0 +1,160 @@
+{
+  "contract": "p2401",
+  "baseline_stats": {
+    "trades": 111,
+    "total_pnl": -6728.74,
+    "points": -672.87,
+    "sharpe": -3.58,
+    "return_pct": -0.67,
+    "max_dd_pct": -0.74
+  },
+  "gap_events": [
+    {
+      "datetime": "2023-08-21 09:00:00",
+      "gap_atr": 6.76,
+      "gap": 50.0,
+      "in_fractal": true
+    },
+    {
+      "datetime": "2023-08-28 09:00:00",
+      "gap_atr": 4.46,
+      "gap": 38.0,
+      "in_fractal": true
+    },
+    {
+      "datetime": "2023-09-18 09:00:00",
+      "gap_atr": 4.52,
+      "gap": 34.0,
+      "in_fractal": true
+    },
+    {
+      "datetime": "2023-10-09 09:00:00",
+      "gap_atr": 16.71,
+      "gap": -158.0,
+      "in_fractal": false
+    },
+    {
+      "datetime": "2023-10-16 09:00:00",
+      "gap_atr": 6.61,
+      "gap": 48.0,
+      "in_fractal": true
+    },
+    {
+      "datetime": "2023-10-23 09:00:00",
+      "gap_atr": 6.55,
+      "gap": -44.0,
+      "in_fractal": false
+    },
+    {
+      "datetime": "2023-10-30 09:00:00",
+      "gap_atr": 4.31,
+      "gap": 26.0,
+      "in_fractal": true
+    },
+    {
+      "datetime": "2023-11-06 09:00:00",
+      "gap_atr": 5.38,
+      "gap": -32.0,
+      "in_fractal": true
+    },
+    {
+      "datetime": "2023-11-27 09:00:00",
+      "gap_atr": 4.81,
+      "gap": -32.0,
+      "in_fractal": true
+    },
+    {
+      "datetime": "2023-12-04 09:00:00",
+      "gap_atr": 7.42,
+      "gap": -46.0,
+      "in_fractal": true
+    },
+    {
+      "datetime": "2023-12-11 09:00:00",
+      "gap_atr": 7.35,
+      "gap": -50.0,
+      "in_fractal": true
+    }
+  ],
+  "monthly_distribution": {
+    "2023-08": {
+      "count": 2,
+      "total_gap": 88.0,
+      "in_fractal": 2
+    },
+    "2023-09": {
+      "count": 1,
+      "total_gap": 34.0,
+      "in_fractal": 1
+    },
+    "2023-10": {
+      "count": 4,
+      "total_gap": 276.0,
+      "in_fractal": 2
+    },
+    "2023-11": {
+      "count": 2,
+      "total_gap": 64.0,
+      "in_fractal": 2
+    },
+    "2023-12": {
+      "count": 2,
+      "total_gap": 96.0,
+      "in_fractal": 2
+    }
+  },
+  "impact_estimate": {
+    "total_gaps": 11,
+    "gaps_in_fractal": 9,
+    "estimated_affected_trades": 1.3566666666666667
+  },
+  "risk_analysis": {
+    "high_risk_count": 5,
+    "moderate_risk_count": 5,
+    "low_risk_count": 1,
+    "high_risk_events": [
+      {
+        "datetime": "2023-08-21 09:00:00",
+        "gap_atr": 6.76,
+        "gap": 50.0,
+        "in_fractal": true
+      },
+      {
+        "datetime": "2023-10-16 09:00:00",
+        "gap_atr": 6.61,
+        "gap": 48.0,
+        "in_fractal": true
+      },
+      {
+        "datetime": "2023-11-06 09:00:00",
+        "gap_atr": 5.38,
+        "gap": -32.0,
+        "in_fractal": true
+      },
+      {
+        "datetime": "2023-12-04 09:00:00",
+        "gap_atr": 7.42,
+        "gap": -46.0,
+        "in_fractal": true
+      },
+      {
+        "datetime": "2023-12-11 09:00:00",
+        "gap_atr": 7.35,
+        "gap": -50.0,
+        "in_fractal": true
+      }
+    ]
+  },
+  "correlation": {
+    "impact_vs_pnl": -0.4681679255029138,
+    "interpretation": "负相关"
+  },
+  "conclusion": {
+    "gap_is_major_cause": false,
+    "gap_contribution_pct": 20,
+    "impact_rate": 81.8,
+    "total_gaps": 11,
+    "gaps_in_fractal": 9,
+    "recommended_action": "增加高分型影响率合约的冷却期"
+  }
+}

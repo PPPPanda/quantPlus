@@ -1,0 +1,533 @@
+{
+  "contract_stats": {
+    "p2201": {
+      "total_gaps": 9,
+      "gaps_in_fractal": 4,
+      "impact_rate": 0.4444444444444444,
+      "avg_gap_atr": 7.065782400169472,
+      "max_gap_atr": 24.433962264150946,
+      "min_gap_atr": 3.2
+    },
+    "p2205": {
+      "total_gaps": 10,
+      "gaps_in_fractal": 4,
+      "impact_rate": 0.4,
+      "avg_gap_atr": 6.018316298488207,
+      "max_gap_atr": 11.933471933471933,
+      "min_gap_atr": 3.228155339805825
+    },
+    "p2209": {
+      "total_gaps": 9,
+      "gaps_in_fractal": 4,
+      "impact_rate": 0.4444444444444444,
+      "avg_gap_atr": 4.914138816128513,
+      "max_gap_atr": 9.074074074074074,
+      "min_gap_atr": 3.106508875739645
+    },
+    "p2301": {
+      "total_gaps": 5,
+      "gaps_in_fractal": 2,
+      "impact_rate": 0.4,
+      "avg_gap_atr": 12.361057976347729,
+      "max_gap_atr": 33.079268292682926,
+      "min_gap_atr": 3.491686460807601
+    },
+    "p2305": {
+      "total_gaps": 7,
+      "gaps_in_fractal": 5,
+      "impact_rate": 0.7142857142857143,
+      "avg_gap_atr": 5.765489966501383,
+      "max_gap_atr": 9.574468085106382,
+      "min_gap_atr": 3.5941320293398533
+    },
+    "p2309": {
+      "total_gaps": 8,
+      "gaps_in_fractal": 6,
+      "impact_rate": 0.75,
+      "avg_gap_atr": 6.476063358510148,
+      "max_gap_atr": 11.54054054054054,
+      "min_gap_atr": 3.255813953488372
+    },
+    "p2401": {
+      "total_gaps": 11,
+      "gaps_in_fractal": 9,
+      "impact_rate": 0.8181818181818182,
+      "avg_gap_atr": 6.808676977571267,
+      "max_gap_atr": 16.706948640483382,
+      "min_gap_atr": 4.312796208530806
+    },
+    "p2405": {
+      "total_gaps": 8,
+      "gaps_in_fractal": 4,
+      "impact_rate": 0.5,
+      "avg_gap_atr": 5.720510712372405,
+      "max_gap_atr": 7.882882882882884,
+      "min_gap_atr": 3.700440528634361
+    },
+    "p2409": {
+      "total_gaps": 15,
+      "gaps_in_fractal": 9,
+      "impact_rate": 0.6,
+      "avg_gap_atr": 5.9929720955809085,
+      "max_gap_atr": 9.799999999999999,
+      "min_gap_atr": 3.3333333333333335
+    },
+    "p2501": {
+      "total_gaps": 12,
+      "gaps_in_fractal": 6,
+      "impact_rate": 0.5,
+      "avg_gap_atr": 7.213507671246743,
+      "max_gap_atr": 23.704292527821938,
+      "min_gap_atr": 3.2083333333333335
+    },
+    "p2505": {
+      "total_gaps": 8,
+      "gaps_in_fractal": 4,
+      "impact_rate": 0.5,
+      "avg_gap_atr": 8.919946177767486,
+      "max_gap_atr": 29.491525423728813,
+      "min_gap_atr": 3.1226765799256504
+    },
+    "p2509": {
+      "total_gaps": 9,
+      "gaps_in_fractal": 6,
+      "impact_rate": 0.6666666666666666,
+      "avg_gap_atr": 6.807691449306281,
+      "max_gap_atr": 17.5,
+      "min_gap_atr": 3.7378640776699026
+    },
+    "p2601": {
+      "total_gaps": 8,
+      "gaps_in_fractal": 4,
+      "impact_rate": 0.5,
+      "avg_gap_atr": 13.122488531665196,
+      "max_gap_atr": 60.84615384615385,
+      "min_gap_atr": 4.139784946236559
+    }
+  },
+  "gap_distribution": {
+    "total": 119,
+    "tier1": {
+      "count": 108,
+      "impact_rate": 0.5648148148148148,
+      "threshold": "<10 ATR"
+    },
+    "tier2": {
+      "count": 9,
+      "impact_rate": 0.5555555555555556,
+      "threshold": "10-30 ATR"
+    },
+    "tier3": {
+      "count": 2,
+      "impact_rate": 0.5,
+      "threshold": ">=30 ATR"
+    }
+  },
+  "p2401_analysis": {
+    "total_gaps": 11,
+    "gaps_in_fractal": 9,
+    "impact_rate": 0.8181818181818182,
+    "gap_details": [
+      {
+        "datetime": "2023-08-21 09:00:00",
+        "gap": 50.0,
+        "gap_atr": 6.756756756756756,
+        "hours_gap": 58.000277777777775,
+        "gap_in_fractal": true,
+        "compression_ratio": 0.5666666666666667,
+        "total_fractals": 14
+      },
+      {
+        "datetime": "2023-08-28 09:00:00",
+        "gap": 38.0,
+        "gap_atr": 4.4630872483221475,
+        "hours_gap": 58.000277777777775,
+        "gap_in_fractal": true,
+        "compression_ratio": 0.5833333333333334,
+        "total_fractals": 15
+      },
+      {
+        "datetime": "2023-09-18 09:00:00",
+        "gap": 34.0,
+        "gap_atr": 4.524714828897339,
+        "hours_gap": 58.000277777777775,
+        "gap_in_fractal": true,
+        "compression_ratio": 0.55,
+        "total_fractals": 13
+      },
+      {
+        "datetime": "2023-10-09 09:00:00",
+        "gap": -158.0,
+        "gap_atr": 16.706948640483382,
+        "hours_gap": 258.01666666666665,
+        "gap_in_fractal": false,
+        "compression_ratio": 0.5666666666666667,
+        "total_fractals": 15
+      },
+      {
+        "datetime": "2023-10-16 09:00:00",
+        "gap": 48.0,
+        "gap_atr": 6.6141732283464565,
+        "hours_gap": 58.000277777777775,
+        "gap_in_fractal": true,
+        "compression_ratio": 0.55,
+        "total_fractals": 14
+      },
+      {
+        "datetime": "2023-10-23 09:00:00",
+        "gap": -44.0,
+        "gap_atr": 6.553191489361702,
+        "hours_gap": 58.000277777777775,
+        "gap_in_fractal": false,
+        "compression_ratio": 0.5666666666666667,
+        "total_fractals": 14
+      },
+      {
+        "datetime": "2023-10-30 09:00:00",
+        "gap": 26.0,
+        "gap_atr": 4.312796208530806,
+        "hours_gap": 58.000277777777775,
+        "gap_in_fractal": true,
+        "compression_ratio": 0.5166666666666667,
+        "total_fractals": 15
+      },
+      {
+        "datetime": "2023-11-06 09:00:00",
+        "gap": -32.0,
+        "gap_atr": 5.384615384615384,
+        "hours_gap": 58.000277777777775,
+        "gap_in_fractal": true,
+        "compression_ratio": 0.5166666666666667,
+        "total_fractals": 16
+      },
+      {
+        "datetime": "2023-11-27 09:00:00",
+        "gap": -32.0,
+        "gap_atr": 4.806866952789699,
+        "hours_gap": 58.016666666666666,
+        "gap_in_fractal": true,
+        "compression_ratio": 0.6166666666666667,
+        "total_fractals": 13
+      },
+      {
+        "datetime": "2023-12-04 09:00:00",
+        "gap": -46.0,
+        "gap_atr": 7.419354838709677,
+        "hours_gap": 58.000277777777775,
+        "gap_in_fractal": true,
+        "compression_ratio": 0.5833333333333334,
+        "total_fractals": 15
+      },
+      {
+        "datetime": "2023-12-11 09:00:00",
+        "gap": -50.0,
+        "gap_atr": 7.352941176470589,
+        "hours_gap": 58.016666666666666,
+        "gap_in_fractal": true,
+        "compression_ratio": 0.48333333333333334,
+        "total_fractals": 16
+      }
+    ],
+    "comparison": {
+      "p2201": {
+        "total": 9,
+        "in_fractal": 4,
+        "impact_rate": 0.4444444444444444
+      },
+      "p2205": {
+        "total": 10,
+        "in_fractal": 4,
+        "impact_rate": 0.4
+      },
+      "p2209": {
+        "total": 9,
+        "in_fractal": 4,
+        "impact_rate": 0.4444444444444444
+      },
+      "p2301": {
+        "total": 5,
+        "in_fractal": 2,
+        "impact_rate": 0.4
+      },
+      "p2305": {
+        "total": 7,
+        "in_fractal": 5,
+        "impact_rate": 0.7142857142857143
+      },
+      "p2309": {
+        "total": 8,
+        "in_fractal": 6,
+        "impact_rate": 0.75
+      },
+      "p2405": {
+        "total": 8,
+        "in_fractal": 4,
+        "impact_rate": 0.5
+      },
+      "p2409": {
+        "total": 15,
+        "in_fractal": 9,
+        "impact_rate": 0.6
+      },
+      "p2501": {
+        "total": 12,
+        "in_fractal": 6,
+        "impact_rate": 0.5
+      },
+      "p2505": {
+        "total": 8,
+        "in_fractal": 4,
+        "impact_rate": 0.5
+      },
+      "p2509": {
+        "total": 9,
+        "in_fractal": 6,
+        "impact_rate": 0.6666666666666666
+      },
+      "p2601": {
+        "total": 8,
+        "in_fractal": 4,
+        "impact_rate": 0.5
+      }
+    }
+  },
+  "risk_scores": {
+    "p2401": {
+      "total_score": 76.0,
+      "impact_score": 81.82,
+      "atr_score": 68.09,
+      "freq_score": 73.33,
+      "impact_rate": 81.82,
+      "avg_gap_atr": 6.81,
+      "total_gaps": 11
+    },
+    "p2409": {
+      "total_score": 67.98,
+      "impact_score": 60.0,
+      "atr_score": 59.93,
+      "freq_score": 100.0,
+      "impact_rate": 60.0,
+      "avg_gap_atr": 5.99,
+      "total_gaps": 15
+    },
+    "p2309": {
+      "total_score": 67.59,
+      "impact_score": 75.0,
+      "atr_score": 64.76,
+      "freq_score": 53.33,
+      "impact_rate": 75.0,
+      "avg_gap_atr": 6.48,
+      "total_gaps": 8
+    },
+    "p2509": {
+      "total_score": 65.76,
+      "impact_score": 66.67,
+      "atr_score": 68.08,
+      "freq_score": 60.0,
+      "impact_rate": 66.67,
+      "avg_gap_atr": 6.81,
+      "total_gaps": 9
+    },
+    "p2601": {
+      "total_score": 65.67,
+      "impact_score": 50.0,
+      "atr_score": 100,
+      "freq_score": 53.33,
+      "impact_rate": 50.0,
+      "avg_gap_atr": 13.12,
+      "total_gaps": 8
+    },
+    "p2501": {
+      "total_score": 62.64,
+      "impact_score": 50.0,
+      "atr_score": 72.14,
+      "freq_score": 80.0,
+      "impact_rate": 50.0,
+      "avg_gap_atr": 7.21,
+      "total_gaps": 12
+    },
+    "p2505": {
+      "total_score": 62.43,
+      "impact_score": 50.0,
+      "atr_score": 89.2,
+      "freq_score": 53.33,
+      "impact_rate": 50.0,
+      "avg_gap_atr": 8.92,
+      "total_gaps": 8
+    },
+    "p2305": {
+      "total_score": 62.34,
+      "impact_score": 71.43,
+      "atr_score": 57.65,
+      "freq_score": 46.67,
+      "impact_rate": 71.43,
+      "avg_gap_atr": 5.77,
+      "total_gaps": 7
+    },
+    "p2301": {
+      "total_score": 56.67,
+      "impact_score": 40.0,
+      "atr_score": 100,
+      "freq_score": 33.33,
+      "impact_rate": 40.0,
+      "avg_gap_atr": 12.36,
+      "total_gaps": 5
+    },
+    "p2201": {
+      "total_score": 55.42,
+      "impact_score": 44.44,
+      "atr_score": 70.66,
+      "freq_score": 60.0,
+      "impact_rate": 44.44,
+      "avg_gap_atr": 7.07,
+      "total_gaps": 9
+    },
+    "p2405": {
+      "total_score": 52.83,
+      "impact_score": 50.0,
+      "atr_score": 57.21,
+      "freq_score": 53.33,
+      "impact_rate": 50.0,
+      "avg_gap_atr": 5.72,
+      "total_gaps": 8
+    },
+    "p2205": {
+      "total_score": 51.39,
+      "impact_score": 40.0,
+      "atr_score": 60.18,
+      "freq_score": 66.67,
+      "impact_rate": 40.0,
+      "avg_gap_atr": 6.02,
+      "total_gaps": 10
+    },
+    "p2209": {
+      "total_score": 48.96,
+      "impact_score": 44.44,
+      "atr_score": 49.14,
+      "freq_score": 60.0,
+      "impact_rate": 44.44,
+      "avg_gap_atr": 4.91,
+      "total_gaps": 9
+    }
+  },
+  "threshold_suggestions": {
+    "percentiles": {
+      "p25": 4.14,
+      "p50": 5.43,
+      "p75": 7.54,
+      "p90": 9.8
+    },
+    "threshold_analysis": [
+      {
+        "tier1_threshold": 10,
+        "tier2_threshold": 15,
+        "tier1_count": 108,
+        "tier2_count": 4,
+        "tier3_count": 7,
+        "tier1_impact": 56.48,
+        "tier2_impact": 100.0,
+        "tier3_impact": 28.57,
+        "discrimination": 114.95
+      },
+      {
+        "tier1_threshold": 10,
+        "tier2_threshold": 20,
+        "tier1_count": 108,
+        "tier2_count": 6,
+        "tier3_count": 5,
+        "tier1_impact": 56.48,
+        "tier2_impact": 66.67,
+        "tier3_impact": 40.0,
+        "discrimination": 36.85
+      },
+      {
+        "tier1_threshold": 10,
+        "tier2_threshold": 25,
+        "tier1_count": 108,
+        "tier2_count": 8,
+        "tier3_count": 3,
+        "tier1_impact": 56.48,
+        "tier2_impact": 62.5,
+        "tier3_impact": 33.33,
+        "discrimination": 35.19
+      },
+      {
+        "tier1_threshold": 5,
+        "tier2_threshold": 15,
+        "tier1_count": 54,
+        "tier2_count": 58,
+        "tier3_count": 7,
+        "tier1_impact": 62.96,
+        "tier2_impact": 53.45,
+        "tier3_impact": 28.57,
+        "discrimination": 34.39
+      },
+      {
+        "tier1_threshold": 6,
+        "tier2_threshold": 15,
+        "tier1_count": 67,
+        "tier2_count": 45,
+        "tier3_count": 7,
+        "tier1_impact": 59.7,
+        "tier2_impact": 55.56,
+        "tier3_impact": 28.57,
+        "discrimination": 31.13
+      },
+      {
+        "tier1_threshold": 8,
+        "tier2_threshold": 15,
+        "tier1_count": 94,
+        "tier2_count": 18,
+        "tier3_count": 7,
+        "tier1_impact": 58.51,
+        "tier2_impact": 55.56,
+        "tier3_impact": 28.57,
+        "discrimination": 29.94
+      },
+      {
+        "tier1_threshold": 5,
+        "tier2_threshold": 25,
+        "tier1_count": 54,
+        "tier2_count": 62,
+        "tier3_count": 3,
+        "tier1_impact": 62.96,
+        "tier2_impact": 51.61,
+        "tier3_impact": 33.33,
+        "discrimination": 29.63
+      },
+      {
+        "tier1_threshold": 7,
+        "tier2_threshold": 15,
+        "tier1_count": 81,
+        "tier2_count": 31,
+        "tier3_count": 7,
+        "tier1_impact": 58.02,
+        "tier2_impact": 58.06,
+        "tier3_impact": 28.57,
+        "discrimination": 29.53
+      },
+      {
+        "tier1_threshold": 6,
+        "tier2_threshold": 25,
+        "tier1_count": 67,
+        "tier2_count": 49,
+        "tier3_count": 3,
+        "tier1_impact": 59.7,
+        "tier2_impact": 53.06,
+        "tier3_impact": 33.33,
+        "discrimination": 26.37
+      },
+      {
+        "tier1_threshold": 8,
+        "tier2_threshold": 25,
+        "tier1_count": 94,
+        "tier2_count": 22,
+        "tier3_count": 3,
+        "tier1_impact": 58.51,
+        "tier2_impact": 50.0,
+        "tier3_impact": 33.33,
+        "discrimination": 25.18
+      }
+    ]
+  }
+}

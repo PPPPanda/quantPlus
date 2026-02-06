@@ -430,3 +430,12 @@ cd work/quant/quantPlus
 # 保存结果
 .venv/Scripts/python.exe scripts/run_7bench.py --output=experiments/test.json
 ```
+
+
+
+## 十一  备注：
+1. 工作日 节假日之前需要平仓 （（受马来影响）注意开盘容易跳水）
+2. 连输冷却器太简单
+3. 研究一个止盈策略，目前只看到止损策略
+4. 研究代码内部做多做空是否是严格对称的，理论上做多赚钱做空应该也赚钱
+5. 下载豆油数据做同类分析

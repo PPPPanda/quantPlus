@@ -80,46 +80,76 @@ class CtaChanPivotStrategy(CtaTemplate):
     # 合约参数
     fixed_volume: int = 1            # 固定手数
 
-    # B02/R2: 分层连亏断路器
-    cooldown_losses: int = 2         # 0 = 禁用冷却；L1 连亏后触发温和限制
-    cooldown_bars: int = 20          # L1 冷却 M 根 5m bar
-    circuit_breaker_losses: int = 6  # R2: L2 连亏后暂停（0=禁用）
-    circuit_breaker_bars: int = 60   # R2: L2 暂停 M 根 5m bar（≈300 分钟）
+    # =========================================================================
+    # iter14 基线参数（已验证：TOTAL=13667.9 pts, 12/13合约通过）
+    # =========================================================================
 
-    # R3: 两段式出场 — 锁盈参数
+    # B02/R2: 分层连亏断路器
+    # - L1（轻度冷却）：连亏 cooldown_losses 次后，暂停 cooldown_bars 根 5m bar
+    # - L2（硬断路器）：连亏 circuit_breaker_losses 次后，暂停 circuit_breaker_bars 根 5m bar
+    cooldown_losses: int = 2         # L1 连亏阈值（0=禁用）
+    cooldown_bars: int = 20          # L1 冷却期（5m bar 数）
+    circuit_breaker_losses: int = 7  # L2 连亏阈值（iter14 基线：7）
+    circuit_breaker_bars: int = 70   # L2 冷却期（iter14 基线：70，约 350 分钟）
+
+    # R3: 两段式出场 — 锁盈参数（iter14 禁用）
     lock_profit_atr: float = 0.0       # 浮盈≥1R时锁盈: 止损抬到 entry + N*ATR（0=禁用）
 
-    # S5: 最小持仓保护（开仓后前N根5m bar止损距离加宽）
-    min_hold_bars: int = 2             # 0=禁用; >0时开仓后前N根5m bar止损距离乘以2
+    # S5: 最小持仓保护
+    # - 开仓后前 N 根 5m bar 止损距离加宽（×2），避免噪音止损
+    min_hold_bars: int = 2             # 保护期长度（0=禁用）
 
-    # S4: 3B回踩深度要求 — 回踩点不能离ZG太远
-    max_pullback_atr: float = 4.0      # 0=禁用; >0时3B回踩点必须 < ZG + N*ATR
+    # S4: 3B回踩深度过滤
+    # - 3B 信号要求回踩点与中枢高点 ZG 的距离 < N×ATR
+    # - 过滤远离中枢的虚假回踩信号
+    max_pullback_atr: float = 3.2      # iter14 基线：3.2
 
-    # S7: 结构trailing — trailing激活后用笔低点作为止损参考
-    use_bi_trailing: bool = True       # True时trailing优先用最近bottom - buffer
+    # S7: 结构 trailing — 激活后用笔低点作为止损参考
+    use_bi_trailing: bool = True       # 优先用最近 bottom - buffer 作为 trailing stop
 
-    # B03: 止损 buffer 参数
-    stop_buffer_atr_pct: float = 0.02  # 止损 buffer = max(pricetick, atr * pct)
+    # B03: 止损 buffer
+    # - 止损价 = 计算止损 - buffer
+    # - buffer = max(pricetick, atr × stop_buffer_atr_pct)
+    stop_buffer_atr_pct: float = 0.02  # ATR 比例（2%）
 
     # R1: 入场去重（价格区域+时间窗口）
-    max_pivot_entries: int = 2         # 同一中枢最多入场次数（0=禁用限制）
-    pivot_reentry_atr: float = 0.6     # 超限后需突破中枢上沿 + N*ATR 才放行
-    dedup_bars: int = 0                # 去重时间窗口（5m bar 数）; 0=禁用
-    dedup_atr_mult: float = 1.5        # 去重价格距离（ATR 倍数）
+    max_pivot_entries: int = 2         # 同一中枢最多入场次数（0=禁用）
+    pivot_reentry_atr: float = 0.6     # 超限后需突破中枢上沿 + N×ATR 才放行
+    dedup_bars: int = 0                # 时间去重窗口（0=禁用）
+    dedup_atr_mult: float = 1.5        # 价格去重距离（ATR 倍数）
 
-    # B10: 背驰模式参数（面积背驰 + diff 混合）
-    div_mode: int = 1                  # 0=baseline(仅diff), 1=OR(diff或面积背驰), 2=AND, 3=仅面积背驰
-    div_threshold: float = 0.50        # 面积背驰阈值：当前笔面积 < 前同向笔面积 * threshold 视为背驰
+    # B10: 背驰模式参数
+    # - div_mode: 0=仅 diff, 1=OR(diff 或面积), 2=AND, 3=仅面积
+    # - div_threshold: 面积背驰阈值（当前笔面积 < 前笔 × threshold）
+    div_mode: int = 1                  # OR 模式
+    div_threshold: float = 0.39        # iter14 基线：0.39
 
-    # S8: 走势段(segment)背驰参数
-    seg_enabled: bool = False          # True=用segment背驰替代原2B/2S; False=保持原逻辑
-    seg_div_ratio: float = 0.82        # 段背驰阈值：area2/area1 <= ratio 视为背驰(2B)
-    seg_div_ratio_sell: float = 0.78   # 段背驰阈值(2S平多)
-    seg_min_bi: int = 3                # 段最小笔数（过短的段不参与背驰比较）
-    seg_price_tol: float = 0.003       # 价格容差：创新低/新高的允许偏差（比例）
+    # =========================================================================
+    # iter14 后实验性功能（已验证无效或有副作用，保留代码但禁用）
+    # =========================================================================
 
-    # S9: 2B入场histogram确认门
-    hist_gate: int = 0                 # 0=禁用; 1=2B需histogram>0; 2=2B需histogram上拐
+    # S8: 走势段背驰（iter8 验证无效）
+    seg_enabled: bool = False          # False=禁用
+    seg_div_ratio: float = 0.82
+    seg_div_ratio_sell: float = 0.78
+    seg_min_bi: int = 3
+    seg_price_tol: float = 0.003
+
+    # S9: histogram 确认门（未验证）
+    hist_gate: int = 0                 # 0=禁用
+
+    # S26/S26b: 跳空安全网（iter17 添加，效果有限）
+    gap_extreme_atr: float = 0.0       # 0=禁用（原值 1.5）
+    gap_cooldown_bars: int = 6
+    gap_tier1_atr: float = 10.0
+    gap_tier2_atr: float = 30.0
+
+    # S27: 跳空重置包含方向（iter20 验证灾难性失败）
+    gap_reset_inclusion: bool = False  # 必须 False
+
+    # B28: Bridge Bar（iter21 添加，+214pts 但波动大）
+    bridge_bar_enabled: bool = False   # 禁用回到 iter14 基线
+    bridge_gap_threshold: float = 1.5
 
     # 调试
     debug: bool = False
@@ -142,6 +172,8 @@ class CtaChanPivotStrategy(CtaTemplate):
         "div_mode", "div_threshold",
         "seg_enabled", "seg_div_ratio", "seg_div_ratio_sell", "seg_min_bi", "seg_price_tol",
         "hist_gate",
+        "gap_extreme_atr", "gap_cooldown_bars", "gap_tier1_atr", "gap_tier2_atr", "gap_reset_inclusion",
+        "bridge_bar_enabled", "bridge_gap_threshold",
         "debug", "debug_enabled", "debug_log_console",
     ]
 
@@ -236,6 +268,9 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._consecutive_losses: int = 0
         self._cooldown_remaining: int = 0  # 剩余冷却 5m bar 数
 
+        # S26: 极端跳空安全网状态
+        self._gap_cooldown_remaining: int = 0  # 极端跳空后剩余冷却 5m bar 数
+
         # 5m bar 计数
         self._bar_5m_count: int = 0
 
@@ -249,6 +284,9 @@ class CtaChanPivotStrategy(CtaTemplate):
         # S8: 走势段(segment)缓存
         self._segments: list[dict] = []           # 已完成的走势段列表
         self._seg_last_bi_count: int = 0          # 上次构建segments时的笔数
+
+        # B28: Bridge Bar 状态
+        self._last_5m_bar: Optional[dict] = None  # 上一根5分钟K线（用于检测跳空）
 
         # Debug工具
         self._debugger: Optional[ChanDebugger] = None
@@ -531,6 +569,32 @@ class CtaChanPivotStrategy(CtaTemplate):
         if self._cooldown_remaining > 0:
             self._cooldown_remaining -= 1
 
+        # S26/S26b: 跳空检测 + 分级冷却
+        if self._gap_cooldown_remaining > 0:
+            self._gap_cooldown_remaining -= 1
+        # 检测跳空（使用上一根 5m bar 的收盘价）
+        if self._prev_close_5m > 0 and self.atr > 0:
+            gap = abs(bar['open'] - self._prev_close_5m)
+            gap_atr = gap / self.atr
+            # S26b 分级冷却：中等跳空最危险
+            if gap_atr >= self.gap_extreme_atr:
+                if gap_atr < self.gap_tier1_atr:
+                    # 中等跳空(1.5-10x)：最危险，长冷却
+                    cooldown = self.gap_cooldown_bars  # 默认6
+                elif gap_atr < self.gap_tier2_atr:
+                    # 大跳空(10-30x)：短冷却
+                    cooldown = max(3, self.gap_cooldown_bars // 2)
+                else:
+                    # 极大跳空(>30x)：反而安全，无冷却
+                    cooldown = 0
+                if cooldown > 0:
+                    self._gap_cooldown_remaining = cooldown
+                    self.write_log(f"[S26c] 跳空: gap={gap:.0f} ({gap_atr:.1f}x ATR), 冷却{cooldown}根bar")
+                    # S27: 跳空后重置包含方向（避免方向污染）
+                    if self.gap_reset_inclusion:
+                        self._inclusion_dir = 0
+                        self.write_log(f"[S27] 重置包含方向")
+
         # 更新指标
         self._update_macd_5m(bar['close'])
         self._update_atr(bar)
@@ -550,6 +614,33 @@ class CtaChanPivotStrategy(CtaTemplate):
                 dea_15m=self._prev_dea_15m
             )
 
+        # B28: Bridge Bar 插入（把跳空显式建模为最低级别走势连接）
+        if self.bridge_bar_enabled and self._last_5m_bar is not None and self.atr > 0:
+            last_close = self._last_5m_bar['close']
+            gap = bar['open'] - last_close
+            gap_abs = abs(gap)
+            gap_atr = gap_abs / self.atr
+            
+            if gap_atr >= self.bridge_gap_threshold:
+                # 构建 bridge bar
+                bridge_data = {
+                    'datetime': bar['datetime'],  # 使用当前时间
+                    'high': max(last_close, bar['open']),
+                    'low': min(last_close, bar['open']),
+                    'close': bar['open'],
+                    'diff': self.diff_5m,
+                    'atr': self.atr,
+                    'diff_15m': self._prev_diff_15m,
+                    'dea_15m': self._prev_dea_15m,
+                    'is_bridge': True,
+                    'bridge_gap_atr': gap_atr,
+                    'bridge_direction': 'up' if gap > 0 else 'down',
+                }
+                # 先处理 bridge bar
+                self._process_inclusion(bridge_data)
+                if self.debug_log_console:
+                    self.write_log(f"[B28] Bridge Bar: gap={gap:.0f} ({gap_atr:.1f}x ATR), dir={bridge_data['bridge_direction']}")
+
         # 构建当前 bar 数据（包含指标）
         bar_data = {
             'datetime': bar['datetime'],
@@ -560,6 +651,7 @@ class CtaChanPivotStrategy(CtaTemplate):
             'atr': self.atr,
             'diff_15m': self._prev_diff_15m,
             'dea_15m': self._prev_dea_15m,
+            'is_bridge': False,
         }
 
         # 1. 包含处理
@@ -567,6 +659,9 @@ class CtaChanPivotStrategy(CtaTemplate):
 
         # 2. 严格笔处理
         new_bi = self._process_bi()
+        
+        # 保存当前bar用于下次跳空检测
+        self._last_5m_bar = bar
 
         # 3. 更新移动止损（5分钟级别，仅实盘模式）
         if self.trading and self._position != 0:
@@ -656,6 +751,14 @@ class CtaChanPivotStrategy(CtaTemplate):
 
             self._k_lines.append(new_bar)
 
+    def _count_real_bars(self, start_idx: int, end_idx: int) -> int:
+        """B28: 计算两个索引之间的真实bar数量（排除bridge bar）."""
+        count = 0
+        for i in range(start_idx, min(end_idx + 1, len(self._k_lines))):
+            if not self._k_lines[i].get('is_bridge', False):
+                count += 1
+        return count
+
     def _process_bi(self) -> Optional[dict]:
         """严格笔处理."""
         if len(self._k_lines) < 3:
@@ -702,7 +805,13 @@ class CtaChanPivotStrategy(CtaTemplate):
             return None
         else:
             # 异向成笔（严格笔要求间隔 >= min_bi_gap）
-            if cand['idx'] - last['idx'] >= self.min_bi_gap:
+            # B28: 使用真实bar计数（排除bridge bar）而非简单index距离
+            if self.bridge_bar_enabled:
+                real_gap = self._count_real_bars(last['idx'], cand['idx']) - 1
+            else:
+                real_gap = cand['idx'] - last['idx']
+            
+            if real_gap >= self.min_bi_gap:
                 self._bi_points.append(cand)
                 # B10: 保存当前笔段面积并重置
                 self._bi_macd_areas.append(self._current_bi_macd_area)
@@ -1016,6 +1125,10 @@ class CtaChanPivotStrategy(CtaTemplate):
 
         # B02: 冷却期间不生成新信号
         if self._cooldown_remaining > 0:
+            return
+
+        # S26: 极端跳空冷却期间不生成新信号
+        if self._gap_cooldown_remaining > 0:
             return
 
         # 获取笔端点

@@ -1,0 +1,67 @@
+{
+  "total_trades": 350,
+  "total_pnl": 2078.0,
+  "avg_hold_bars": 106.07714285714286,
+  "winner_avg_hold": 183.57460317460317,
+  "loser_avg_hold": 62.48482142857142,
+  "long_hold_pnl": 5816.0,
+  "short_hold_pnl": -3738.0,
+  "holding_distribution": [
+    {
+      "hold_group": "<5",
+      "trades": 75,
+      "total_pnl": -1766.0,
+      "avg_pnl": -23.546666666666667,
+      "win_rate": 4.0
+    },
+    {
+      "hold_group": "5-10",
+      "trades": 44,
+      "total_pnl": -1208.0,
+      "avg_pnl": -27.454545454545453,
+      "win_rate": 11.363636363636363
+    },
+    {
+      "hold_group": "10-20",
+      "trades": 29,
+      "total_pnl": -698.0,
+      "avg_pnl": -24.06896551724138,
+      "win_rate": 27.586206896551722
+    },
+    {
+      "hold_group": "20-50",
+      "trades": 40,
+      "total_pnl": -66.0,
+      "avg_pnl": -1.65,
+      "win_rate": 50.0
+    },
+    {
+      "hold_group": "50-100",
+      "trades": 52,
+      "total_pnl": -838.0,
+      "avg_pnl": -16.115384615384617,
+      "win_rate": 38.46153846153847
+    },
+    {
+      "hold_group": "100-200",
+      "trades": 71,
+      "total_pnl": 2832.0,
+      "avg_pnl": 39.88732394366197,
+      "win_rate": 56.33802816901409
+    },
+    {
+      "hold_group": "200-500",
+      "trades": 19,
+      "total_pnl": 3002.0,
+      "avg_pnl": 158.0,
+      "win_rate": 89.47368421052632
+    },
+    {
+      "hold_group": ">500",
+      "trades": 20,
+      "total_pnl": 820.0,
+      "avg_pnl": 41.0,
+      "win_rate": 65.0
+    }
+  ]
+}

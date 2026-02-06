@@ -1,0 +1,35 @@
+{
+  "p2201": {
+    "baseline_pts": -119.60620000000017,
+    "short_pts": -506.3785999999999,
+    "delta": -386.7723999999997,
+    "baseline_longs": 57,
+    "short_longs": 55,
+    "short_shorts": 8,
+    "lost_profitable_longs": 2,
+    "missed_profit": 362.0,
+    "short_raw_pnl": 172.0
+  },
+  "p2601": {
+    "baseline_pts": 1212.1082000000001,
+    "short_pts": 913.8986000000001,
+    "delta": -298.2096,
+    "baseline_longs": 56,
+    "short_longs": 55,
+    "short_shorts": 11,
+    "lost_profitable_longs": 1,
+    "missed_profit": 134.0,
+    "short_raw_pnl": 292.0
+  },
+  "p2401": {
+    "baseline_pts": -672.8738,
+    "short_pts": -559.0652,
+    "delta": 113.80859999999996,
+    "baseline_longs": 55,
+    "short_longs": 53,
+    "short_shorts": 10,
+    "lost_profitable_longs": 1,
+    "missed_profit": 58.0,
+    "short_raw_pnl": -358.0
+  }
+}

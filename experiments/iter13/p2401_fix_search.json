@@ -1,0 +1,198 @@
+{
+  "baseline": -672.8738,
+  "results": [
+    {
+      "name": "atr_008",
+      "setting": {
+        "min_atr_pct": 0.008
+      },
+      "pts": 0.0,
+      "improve": 672.8738
+    },
+    {
+      "name": "atr_010",
+      "setting": {
+        "min_atr_pct": 0.01
+      },
+      "pts": 0.0,
+      "improve": 672.8738
+    },
+    {
+      "name": "atr_012",
+      "setting": {
+        "min_atr_pct": 0.012
+      },
+      "pts": 0.0,
+      "improve": 672.8738
+    },
+    {
+      "name": "atr_015",
+      "setting": {
+        "min_atr_pct": 0.015
+      },
+      "pts": 0.0,
+      "improve": 672.8738
+    },
+    {
+      "name": "cb4_40",
+      "setting": {
+        "circuit_breaker_losses": 4,
+        "circuit_breaker_bars": 40
+      },
+      "pts": -489.3534000000001,
+      "improve": 183.52039999999988
+    },
+    {
+      "name": "cb3_60",
+      "setting": {
+        "circuit_breaker_losses": 3,
+        "circuit_breaker_bars": 60
+      },
+      "pts": -623.7552,
+      "improve": 49.118600000000015
+    },
+    {
+      "name": "cb4_80",
+      "setting": {
+        "circuit_breaker_losses": 4,
+        "circuit_breaker_bars": 80
+      },
+      "pts": -649.8762,
+      "improve": 22.99759999999992
+    },
+    {
+      "name": "cb3_100",
+      "setting": {
+        "circuit_breaker_losses": 3,
+        "circuit_breaker_bars": 100
+      },
+      "pts": -420.8196000000001,
+      "improve": 252.05419999999987
+    },
+    {
+      "name": "dd8_6",
+      "setting": {
+        "dd_window_trades": 8,
+        "dd_threshold_atr": 6.0,
+        "dd_pause_bars": 60
+      },
+      "pts": -624.8856,
+      "improve": 47.988200000000006
+    },
+    {
+      "name": "dd10_8",
+      "setting": {
+        "dd_window_trades": 10,
+        "dd_threshold_atr": 8.0,
+        "dd_pause_bars": 80
+      },
+      "pts": -694.0600000000001,
+      "improve": -21.1862000000001
+    },
+    {
+      "name": "dd6_5",
+      "setting": {
+        "dd_window_trades": 6,
+        "dd_threshold_atr": 5.0,
+        "dd_pause_bars": 80
+      },
+      "pts": -565.4044,
+      "improve": 107.46939999999995
+    },
+    {
+      "name": "warm30",
+      "setting": {
+        "warmup_bars": 30
+      },
+      "pts": -672.8738,
+      "improve": 0.0
+    },
+    {
+      "name": "warm60",
+      "setting": {
+        "warmup_bars": 60
+      },
+      "pts": -672.8738,
+      "improve": 0.0
+    },
+    {
+      "name": "ef30",
+      "setting": {
+        "atr_entry_filter": 3.0
+      },
+      "pts": -682.3416,
+      "improve": -9.467800000000011
+    },
+    {
+      "name": "ef15",
+      "setting": {
+        "atr_entry_filter": 1.5
+      },
+      "pts": -521.3596,
+      "improve": 151.51419999999996
+    },
+    {
+      "name": "trail25",
+      "setting": {
+        "atr_trailing_mult": 2.5,
+        "atr_activate_mult": 2.0
+      },
+      "pts": -884.4474,
+      "improve": -211.57360000000006
+    },
+    {
+      "name": "atr010_cb4",
+      "setting": {
+        "min_atr_pct": 0.01,
+        "circuit_breaker_losses": 4,
+        "circuit_breaker_bars": 60
+      },
+      "pts": 0.0,
+      "improve": 672.8738
+    },
+    {
+      "name": "atr012_cb3_dd",
+      "setting": {
+        "min_atr_pct": 0.012,
+        "circuit_breaker_losses": 3,
+        "circuit_breaker_bars": 80,
+        "dd_window_trades": 8,
+        "dd_threshold_atr": 6.0,
+        "dd_pause_bars": 60
+      },
+      "pts": 0.0,
+      "improve": 672.8738
+    },
+    {
+      "name": "atr015_cb3_warm",
+      "setting": {
+        "min_atr_pct": 0.015,
+        "circuit_breaker_losses": 3,
+        "circuit_breaker_bars": 80,
+        "warmup_bars": 30
+      },
+      "pts": 0.0,
+      "improve": 672.8738
+    },
+    {
+      "name": "kitchen_sink",
+      "setting": {
+        "min_atr_pct": 0.012,
+        "circuit_breaker_losses": 3,
+        "circuit_breaker_bars": 100,
+        "dd_window_trades": 6,
+        "dd_threshold_atr": 5.0,
+        "dd_pause_bars": 80,
+        "warmup_bars": 30,
+        "atr_entry_filter": 1.5
+      },
+      "pts": 0.0,
+      "improve": 672.8738
+    }
+  ],
+  "top3": [
+    "atr_008",
+    "atr_010",
+    "atr_012"
+  ]
+}

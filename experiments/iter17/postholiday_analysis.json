@@ -1,0 +1,115 @@
+{
+  "summary": {
+    "total_trades": 356,
+    "post_holiday_count": 9,
+    "normal_count": 347
+  },
+  "post_holiday": {
+    "count": 9,
+    "win_rate": 66.66666666666666,
+    "total_pnl": -714.1999999999999,
+    "avg_pnl": -79.35555555555555,
+    "trades": [
+      {
+        "date": "2022-04-06",
+        "entry_time": "2022-04-06 21:33:00+08:00",
+        "exit_time": "2022-04-07 09:02:00+08:00",
+        "pnl": -63.8,
+        "is_winner": false,
+        "contract": "p2205",
+        "direction": "LONG",
+        "holiday": "清明"
+      },
+      {
+        "date": "2022-05-05",
+        "entry_time": "2022-05-05 09:05:00+08:00",
+        "exit_time": "2022-05-09 13:59:00+08:00",
+        "pnl": -535.8,
+        "is_winner": false,
+        "contract": "p2209",
+        "direction": "LONG",
+        "holiday": "劳动节"
+      },
+      {
+        "date": "2022-05-05",
+        "entry_time": "2022-05-05 22:04:00+08:00",
+        "exit_time": "2022-05-10 21:06:00+08:00",
+        "pnl": -501.8,
+        "is_winner": false,
+        "contract": "p2209",
+        "direction": "LONG",
+        "holiday": "劳动节"
+      },
+      {
+        "date": "2022-06-06",
+        "entry_time": "2022-06-06 21:13:00+08:00",
+        "exit_time": "2022-06-07 22:27:00+08:00",
+        "pnl": 76.2,
+        "is_winner": true,
+        "contract": "p2209",
+        "direction": "LONG",
+        "holiday": "端午"
+      },
+      {
+        "date": "2022-09-13",
+        "entry_time": "2022-09-13 09:53:00+08:00",
+        "exit_time": "2022-09-14 09:02:00+08:00",
+        "pnl": 112.2,
+        "is_winner": true,
+        "contract": "p2301",
+        "direction": "LONG",
+        "holiday": "中秋"
+      },
+      {
+        "date": "2023-01-30",
+        "entry_time": "2023-01-30 10:03:00+08:00",
+        "exit_time": "2023-01-30 14:11:00+08:00",
+        "pnl": 18.2,
+        "is_winner": true,
+        "contract": "p2305",
+        "direction": "LONG",
+        "holiday": "春节"
+      },
+      {
+        "date": "2023-05-04",
+        "entry_time": "2023-05-04 13:59:00+08:00",
+        "exit_time": "2023-05-04 22:05:00+08:00",
+        "pnl": 62.2,
+        "is_winner": true,
+        "contract": "p2309",
+        "direction": "LONG",
+        "holiday": "劳动节"
+      },
+      {
+        "date": "2023-05-04",
+        "entry_time": "2023-05-04 22:16:00+08:00",
+        "exit_time": "2023-05-05 09:33:00+08:00",
+        "pnl": 0.19999999999999996,
+        "is_winner": true,
+        "contract": "p2309",
+        "direction": "LONG",
+        "holiday": "劳动节"
+      },
+      {
+        "date": "2023-06-26",
+        "entry_time": "2023-06-26 11:03:00+08:00",
+        "exit_time": "2023-06-26 22:45:00+08:00",
+        "pnl": 118.2,
+        "is_winner": true,
+        "contract": "p2309",
+        "direction": "LONG",
+        "holiday": "端午"
+      }
+    ]
+  },
+  "normal": {
+    "count": 347,
+    "win_rate": 41.210374639769455,
+    "total_pnl": -1214.6,
+    "avg_pnl": -3.5002881844380402
+  },
+  "comparison": {
+    "win_rate_diff": 25.456292026897202,
+    "avg_pnl_diff": -75.85526737111752
+  }
+}

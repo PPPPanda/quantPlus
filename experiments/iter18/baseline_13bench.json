@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-02-05T16:21:34+08:00",
+  "iteration": "iter18-baseline",
+  "settings": {
+    "debug_enabled": false,
+    "debug_log_console": false,
+    "cooldown_losses": 2,
+    "cooldown_bars": 20,
+    "atr_activate_mult": 2.5,
+    "atr_trailing_mult": 3.0,
+    "atr_entry_filter": 2.0
+  },
+  "total_pnl": 131836,
+  "total_pts": 13183.6,
+  "ex_p2209_pts": 5657.4,
+  "status": "FAIL",
+  "fail_reason": "p2201, p2401 below -180 pts",
+  "contracts": {
+    "p2201": {"pnl": -3019, "pts": -301.9, "trades": 112, "sharpe": -0.75, "bars": 28409, "source": "Wind", "status": "FAIL"},
+    "p2205": {"pnl": 18805, "pts": 1880.5, "trades": 102, "sharpe": 3.04, "bars": 27026, "source": "Wind", "status": "OK"},
+    "p2209": {"pnl": 75262, "pts": 7526.2, "trades": 108, "sharpe": 4.55, "bars": 28415, "source": "Wind", "status": "OK"},
+    "p2301": {"pnl": 1122, "pts": 112.2, "trades": 96, "sharpe": 0.36, "bars": 27743, "source": "Wind", "status": "OK"},
+    "p2305": {"pnl": -1127, "pts": -112.7, "trades": 90, "sharpe": -0.53, "bars": 23288, "source": "Wind", "status": "WARN"},
+    "p2309": {"pnl": -1434, "pts": -143.4, "trades": 98, "sharpe": -0.60, "bars": 26222, "source": "Wind", "status": "WARN"},
+    "p2401": {"pnl": -7845, "pts": -784.5, "trades": 105, "sharpe": -4.07, "bars": 27684, "source": "Wind", "status": "FAIL"},
+    "p2405": {"pnl": 9050, "pts": 905.0, "trades": 133, "sharpe": 2.68, "bars": 28508, "source": "Wind", "status": "OK"},
+    "p2409": {"pnl": 3855, "pts": 385.5, "trades": 220, "sharpe": 1.08, "bars": 50249, "source": "Wind", "status": "OK"},
+    "p2501": {"pnl": 15267, "pts": 1526.7, "trades": 257, "sharpe": 2.32, "bars": 55413, "source": "Wind", "status": "OK"},
+    "p2505": {"pnl": 9950, "pts": 995.0, "trades": 116, "sharpe": 2.66, "bars": 28230, "source": "Wind", "status": "OK"},
+    "p2509": {"pnl": 1571, "pts": 157.1, "trades": 96, "sharpe": 0.85, "bars": 27914, "source": "Wind", "status": "OK"},
+    "p2601": {"pnl": 10379, "pts": 1037.9, "trades": 112, "sharpe": 2.87, "bars": 30237, "source": "XT", "status": "OK"}
+  },
+  "notes": [
+    "当前基线 TOTAL=13183.6 pts",
+    "除p2209 = 5657.4 pts，已超过目标5600",
+    "负收益合约：p2201(-301.9), p2305(-112.7), p2309(-143.4), p2401(-784.5)",
+    "p2401 是最大问题，需要重点分析",
+    "Wind 全量 12 合约测试完成，p2601 使用 XT 数据源"
+  ]
+}

@@ -1,0 +1,206 @@
+{
+  "baseline_pts": -672.8738,
+  "grid": [
+    {
+      "sma_period": 60,
+      "deviation": 0.01,
+      "pts": -644.4712,
+      "trades": 0,
+      "improve": 28.402600000000007
+    },
+    {
+      "sma_period": 60,
+      "deviation": 0.015,
+      "pts": -719.4652,
+      "trades": 0,
+      "improve": -46.59140000000002
+    },
+    {
+      "sma_period": 60,
+      "deviation": 0.02,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 60,
+      "deviation": 0.025,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 60,
+      "deviation": 0.03,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 60,
+      "deviation": 0.035,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 60,
+      "deviation": 0.04,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 90,
+      "deviation": 0.01,
+      "pts": -666.4654,
+      "trades": 0,
+      "improve": 6.408399999999915
+    },
+    {
+      "sma_period": 90,
+      "deviation": 0.015,
+      "pts": -719.4652,
+      "trades": 0,
+      "improve": -46.59140000000002
+    },
+    {
+      "sma_period": 90,
+      "deviation": 0.02,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 90,
+      "deviation": 0.025,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 90,
+      "deviation": 0.03,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 90,
+      "deviation": 0.035,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 90,
+      "deviation": 0.04,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 120,
+      "deviation": 0.01,
+      "pts": -598.0376,
+      "trades": 0,
+      "improve": 74.83619999999996
+    },
+    {
+      "sma_period": 120,
+      "deviation": 0.015,
+      "pts": -728.0028,
+      "trades": 0,
+      "improve": -55.12900000000002
+    },
+    {
+      "sma_period": 120,
+      "deviation": 0.02,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 120,
+      "deviation": 0.025,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 120,
+      "deviation": 0.03,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 120,
+      "deviation": 0.035,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 120,
+      "deviation": 0.04,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 180,
+      "deviation": 0.01,
+      "pts": -705.4412,
+      "trades": 0,
+      "improve": -32.56740000000002
+    },
+    {
+      "sma_period": 180,
+      "deviation": 0.015,
+      "pts": -606.4173999999999,
+      "trades": 0,
+      "improve": 66.45640000000003
+    },
+    {
+      "sma_period": 180,
+      "deviation": 0.02,
+      "pts": -681.4114,
+      "trades": 0,
+      "improve": -8.537599999999998
+    },
+    {
+      "sma_period": 180,
+      "deviation": 0.025,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 180,
+      "deviation": 0.03,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 180,
+      "deviation": 0.035,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    },
+    {
+      "sma_period": 180,
+      "deviation": 0.04,
+      "pts": -672.8738,
+      "trades": 0,
+      "improve": 0.0
+    }
+  ],
+  "best": {
+    "sma": 120,
+    "dev": 0.01,
+    "pts": -598.0376
+  }
+}

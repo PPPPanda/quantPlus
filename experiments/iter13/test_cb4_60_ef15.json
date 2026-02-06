@@ -1,0 +1,21 @@
+{
+  "setting": {
+    "circuit_breaker_losses": 4,
+    "circuit_breaker_bars": 60,
+    "atr_entry_filter": 1.5
+  },
+  "total_pts": 10644.399800000001,
+  "neg": [
+    "p2201(-451.2)",
+    "p2301(-243.7)",
+    "p2305(-144.3)",
+    "p2309(-122.3)",
+    "p2401(-669.3)"
+  ],
+  "below_180": [
+    "p2201",
+    "p2301",
+    "p2401"
+  ],
+  "status": "FAIL"
+}

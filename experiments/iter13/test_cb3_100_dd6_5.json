@@ -1,0 +1,24 @@
+{
+  "setting": {
+    "circuit_breaker_losses": 3,
+    "circuit_breaker_bars": 100,
+    "dd_window_trades": 6,
+    "dd_threshold_atr": 5.0,
+    "dd_pause_bars": 80
+  },
+  "total_pts": 9220.658999999998,
+  "neg": [
+    "p2201(-505.9)",
+    "p2301(-137.0)",
+    "p2305(-572.4)",
+    "p2309(-436.2)",
+    "p2401(-399.9)"
+  ],
+  "below_180": [
+    "p2201",
+    "p2305",
+    "p2309",
+    "p2401"
+  ],
+  "status": "FAIL"
+}

@@ -1,0 +1,80 @@
+{
+  "p2601": {
+    "contract": "p2601",
+    "total_pnl": 11160.0,
+    "total_pts": 1116.0,
+    "trades": 59,
+    "winners": 31,
+    "losers": 28,
+    "loss_clusters": 5,
+    "overnight_trades": 19,
+    "overnight_pnl": 11940.0
+  },
+  "p2405": {
+    "contract": "p2405",
+    "total_pnl": 5380.0,
+    "total_pts": 538.0,
+    "trades": 66,
+    "winners": 26,
+    "losers": 38,
+    "loss_clusters": 11,
+    "overnight_trades": 22,
+    "overnight_pnl": 6560.0
+  },
+  "p2209": {
+    "contract": "p2209",
+    "total_pnl": 1100.0,
+    "total_pts": 110.0,
+    "trades": 54,
+    "winners": 17,
+    "losers": 37,
+    "loss_clusters": 9,
+    "overnight_trades": 12,
+    "overnight_pnl": 6600.0
+  },
+  "p2501": {
+    "contract": "p2501",
+    "total_pnl": 17140.0,
+    "total_pts": 1714.0,
+    "trades": 137,
+    "winners": 59,
+    "losers": 74,
+    "loss_clusters": 20,
+    "overnight_trades": 40,
+    "overnight_pnl": 16100.0
+  },
+  "p2505": {
+    "contract": "p2505",
+    "total_pnl": 11100.0,
+    "total_pts": 1110.0,
+    "trades": 58,
+    "winners": 24,
+    "losers": 33,
+    "loss_clusters": 10,
+    "overnight_trades": 14,
+    "overnight_pnl": 13680.0
+  },
+  "p2509": {
+    "contract": "p2509",
+    "total_pnl": 3420.0,
+    "total_pts": 342.0,
+    "trades": 53,
+    "winners": 21,
+    "losers": 31,
+    "loss_clusters": 8,
+    "overnight_trades": 20,
+    "overnight_pnl": 4380.0
+  },
+  "p2301": {
+    "contract": "p2301",
+    "total_pnl": 5340.0,
+    "total_pts": 534.0,
+    "trades": 48,
+    "winners": 17,
+    "losers": 31,
+    "loss_clusters": 6,
+    "overnight_trades": 12,
+    "overnight_pnl": 9420.0
+  },
+  "_overnight_total_pnl": 68680.0
+}
