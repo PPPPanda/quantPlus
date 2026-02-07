@@ -573,7 +573,8 @@ class CtaChanPivotStrategy(CtaTemplate):
         if self._gap_cooldown_remaining > 0:
             self._gap_cooldown_remaining -= 1
         # 检测跳空（使用上一根 5m bar 的收盘价）
-        if self._prev_close_5m > 0 and self.atr > 0:
+        # 注意：gap_extreme_atr = 0 表示禁用跳空检测
+        if self.gap_extreme_atr > 0 and self._prev_close_5m > 0 and self.atr > 0:
             gap = abs(bar['open'] - self._prev_close_5m)
             gap_atr = gap / self.atr
             # S26b 分级冷却：中等跳空最危险
