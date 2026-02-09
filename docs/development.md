@@ -1351,6 +1351,47 @@ def _update_5m_bar(self, bar: dict) -> Optional[dict]:
 2. **对齐方式**：只保留两个数据源都有数据的交易日（date-aligned），排除数据缺失导致的差异
 3. **结果**：在 overlap 区间内，Wind 与 XT 的回测指标**完全一致**（收益率差异 +0.00，Sharpe 差异 +0.00）
 
+---
+
+## 15. CTP 测试环境 Patch 记录
+
+### vnpy_ctp StatusMsg 日志增强 (2026-02-09)
+
+**问题**：非交易时段下单时，VN Trader 日志只显示"已撤销"，无法看到 CTP 返回的具体错误原因（如"不在交易时间"）。
+
+**原因**：`vnpy_ctp/gateway/ctp_gateway.py` 原代码在 `onRtnOrder` 中过滤了 `StatusMsg == "已撤单"` 的情况，导致正常撤单和异常撤单（非交易时段、资金不足等被 CTP 拒绝后自动撤销）无法区分。
+
+**修改文件**：`.venv/Lib/site-packages/vnpy_ctp/gateway/ctp_gateway.py`
+
+**原代码（约 703-709 行）**：
+```python
+if (
+    data["OrderStatus"] == THOST_FTDC_OST_Canceled
+    and data["StatusMsg"] != "已撤单"       # 正常撤单
+):
+    status_msg: str = data["StatusMsg"]
+    self.gateway.write_log(f"委托 {orderid} 状态更新，{status_msg}")
+```
+
+**修改后**：
+```python
+# 特殊情况撤单（非交易时段、资金不足等）的日志输出
+# [PATCH] 总是输出 StatusMsg，便于查看 CTP 返回的具体错误原因
+if data["OrderStatus"] == THOST_FTDC_OST_Canceled:
+    status_msg: str = data["StatusMsg"]
+    self.gateway.write_log(f"委托 {orderid} 状态更新，{status_msg}")
+```
+
+**效果**：
+- 正常撤单：日志显示"委托 xxx 状态更新，已撤单"
+- 非交易时段：日志显示"委托 xxx 状态更新，不在交易时间"（或其他 CTP 错误信息）
+- 资金不足：日志显示"委托 xxx 状态更新，CTP:资金不足"
+
+**注意**：
+- 此修改仅影响 CTPTEST 环境（穿透式认证测试）
+- 用于获取程序化交易系统认证所需的错误处理截图
+- `pip install` 或 `uv sync` 会覆盖此修改，需重新应用
+
 > 这证明了归一化 + session-aware 合成方案成功消除了数据源差异，策略结果完全可复现。
 
 ---
