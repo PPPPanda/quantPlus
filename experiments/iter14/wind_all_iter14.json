@@ -1,0 +1,187 @@
+{
+  "setting": {
+    "debug": false,
+    "debug_enabled": false,
+    "debug_log_console": false,
+    "macd_fast": 12,
+    "macd_slow": 26,
+    "macd_signal": 9,
+    "atr_window": 14,
+    "atr_trailing_mult": 3.0,
+    "atr_activate_mult": 2.5,
+    "atr_entry_filter": 2.0,
+    "min_bi_gap": 4,
+    "pivot_valid_range": 6,
+    "fixed_volume": 1,
+    "cooldown_losses": 2,
+    "cooldown_bars": 20,
+    "circuit_breaker_losses": 7,
+    "circuit_breaker_bars": 70,
+    "lock_profit_atr": 0.0,
+    "min_hold_bars": 2,
+    "max_pullback_atr": 3.2,
+    "use_bi_trailing": true,
+    "stop_buffer_atr_pct": 0.02,
+    "max_pivot_entries": 2,
+    "pivot_reentry_atr": 0.6,
+    "dedup_bars": 0,
+    "dedup_atr_mult": 1.5,
+    "div_mode": 1,
+    "div_threshold": 0.39,
+    "seg_enabled": false,
+    "hist_gate": 0,
+    "gap_extreme_atr": 0.0,
+    "gap_reset_inclusion": false,
+    "bridge_bar_enabled": false
+  },
+  "bt_params": {
+    "interval": "Interval.MINUTE",
+    "rate": "0.0001",
+    "slippage": "1.0",
+    "size": "10.0",
+    "pricetick": "2.0",
+    "capital": "100000.0"
+  },
+  "results": [
+    {
+      "contract": "p2601",
+      "source": "XT",
+      "pnl": 11461.2,
+      "pts": 1146.1,
+      "trades": 114,
+      "sharpe": 3.21,
+      "ret_pct": 11.46,
+      "max_dd_pct": -2.09
+    },
+    {
+      "contract": "p2201",
+      "source": "Wind",
+      "pnl": -1136.1,
+      "pts": -113.6,
+      "trades": 114,
+      "sharpe": -0.24,
+      "ret_pct": -1.14,
+      "max_dd_pct": -5.73
+    },
+    {
+      "contract": "p2205",
+      "source": "Wind",
+      "pnl": 22090.0,
+      "pts": 2209.0,
+      "trades": 106,
+      "sharpe": 2.94,
+      "ret_pct": 22.09,
+      "max_dd_pct": -4.96
+    },
+    {
+      "contract": "p2209",
+      "source": "Wind",
+      "pnl": 75262.3,
+      "pts": 7526.2,
+      "trades": 108,
+      "sharpe": 3.82,
+      "ret_pct": 75.26,
+      "max_dd_pct": -18.36
+    },
+    {
+      "contract": "p2301",
+      "source": "Wind",
+      "pnl": 1582.1,
+      "pts": 158.2,
+      "trades": 96,
+      "sharpe": 0.48,
+      "ret_pct": 1.58,
+      "max_dd_pct": -3.23
+    },
+    {
+      "contract": "p2305",
+      "source": "Wind",
+      "pnl": -1206.9,
+      "pts": -120.7,
+      "trades": 90,
+      "sharpe": -0.55,
+      "ret_pct": -1.21,
+      "max_dd_pct": -4.43
+    },
+    {
+      "contract": "p2309",
+      "source": "Wind",
+      "pnl": -1434.3,
+      "pts": -143.4,
+      "trades": 98,
+      "sharpe": -0.6,
+      "ret_pct": -1.43,
+      "max_dd_pct": -2.62
+    },
+    {
+      "contract": "p2401",
+      "source": "Wind",
+      "pnl": -6728.7,
+      "pts": -672.9,
+      "trades": 111,
+      "sharpe": -3.57,
+      "ret_pct": -6.73,
+      "max_dd_pct": -7.34
+    },
+    {
+      "contract": "p2405",
+      "source": "Wind",
+      "pnl": 8884.9,
+      "pts": 888.5,
+      "trades": 139,
+      "sharpe": 2.68,
+      "ret_pct": 8.88,
+      "max_dd_pct": -2.06
+    },
+    {
+      "contract": "p2409",
+      "source": "Wind",
+      "pnl": 3348.9,
+      "pts": 334.9,
+      "trades": 218,
+      "sharpe": 0.95,
+      "ret_pct": 3.35,
+      "max_dd_pct": -3.34
+    },
+    {
+      "contract": "p2501",
+      "source": "Wind",
+      "pnl": 13532.1,
+      "pts": 1353.2,
+      "trades": 261,
+      "sharpe": 2.25,
+      "ret_pct": 13.53,
+      "max_dd_pct": -3.73
+    },
+    {
+      "contract": "p2505",
+      "source": "Wind",
+      "pnl": 8952.6,
+      "pts": 895.3,
+      "trades": 118,
+      "sharpe": 2.46,
+      "ret_pct": 8.95,
+      "max_dd_pct": -2.52
+    },
+    {
+      "contract": "p2509",
+      "source": "Wind",
+      "pnl": 2071.4,
+      "pts": 207.1,
+      "trades": 96,
+      "sharpe": 1.11,
+      "ret_pct": 2.07,
+      "max_dd_pct": -1.83
+    }
+  ],
+  "total_pnl": 136679.5,
+  "total_pts": 13668.0,
+  "p2601_pts": 1146.1,
+  "p2209_pts": 7526.2,
+  "neg_contracts": [
+    "p2201",
+    "p2305",
+    "p2309",
+    "p2401"
+  ]
+}

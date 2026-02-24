@@ -24,6 +24,7 @@ trade = [
     "vnpy-datarecorder>=1.1.0",
     "vnpy-riskmanager>=2.0.0",
     "vnpy-chartwizard>=1.1.0",
+    "vnpy-spreadtrading>=1.1.0",
     "vnpy-paperaccount>=1.0.0",
     "openbb>=4.6.0",
 ]

@@ -2470,6 +2470,7 @@ trade = [
     { name = "vnpy-datarecorder" },
     { name = "vnpy-paperaccount" },
     { name = "vnpy-riskmanager" },
+    { name = "vnpy-spreadtrading" },
     { name = "vnpy-sqlite" },
 ]
 
@@ -2494,6 +2495,7 @@ requires-dist = [
     { name = "vnpy-datarecorder", marker = "extra == 'trade'", specifier = ">=1.1.0" },
     { name = "vnpy-paperaccount", marker = "extra == 'trade'", specifier = ">=1.0.0" },
     { name = "vnpy-riskmanager", marker = "extra == 'trade'", specifier = ">=2.0.0" },
+    { name = "vnpy-spreadtrading", marker = "extra == 'trade'", specifier = ">=1.1.0" },
     { name = "vnpy-sqlite", marker = "extra == 'trade'", specifier = ">=1.1.0" },
     { name = "xtquant", marker = "extra == 'datafeed'", specifier = ">=1.0.0" },
 ]
@@ -3199,6 +3201,21 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/8d/57/cd70c0b38d28ea4998b920ffb80b1951dd3fc7e5782f5843a1a3496cf857/vnpy_riskmanager-2.0.0.tar.gz", hash = "sha256:5611305d84e722748c6491be9f7a0cf9f24e634be65689fbd8c55a57b5e9a0d3", size = 517557, upload-time = "2025-10-29T05:54:09.025Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d3/cd/a81e0eb5e960a30dadf06a19e9b0a998af951d35a692f953859bbc3f76e0/vnpy_riskmanager-2.0.0-cp313-cp313-win_amd64.whl", hash = "sha256:43934f4f319b06c1fde7b644b88c9b34f495ef26d0221ec843d42cfa183fdb8e", size = 713309, upload-time = "2025-10-29T05:54:06.759Z" },
+]
+
+[[package]]
+name = "vnpy-spreadtrading"
+version = "1.3.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "plotly" },
+    { name = "vnpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e3/f5/9a5fdcb8eeef168a58e324ed04754808d56e338c0acc62f4ac21675411b0/vnpy_spreadtrading-1.3.1.tar.gz", hash = "sha256:2026e644d7fdbcb71dee5e2c38f8c3d85b9d0cb6690f9775f0dbb47a861bfe61", size = 36121, upload-time = "2025-10-18T13:08:47.075Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/52/50/f8022fe74654bf9853ca98ee24ba2af27b0215c81d8c56c61a7f5c951b11/vnpy_spreadtrading-1.3.1-py3-none-any.whl", hash = "sha256:cdd16041e9bb2a8c28272f08437f5dcdd84a16ea4c77d6a96c1139e39163e6bb", size = 39485, upload-time = "2025-10-18T13:08:45.788Z" },
 ]
 
 [[package]]
