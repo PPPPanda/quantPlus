@@ -187,6 +187,12 @@ class CtaChanPivotStrategy(CtaTemplate):
 
     variables: list[str] = [
         "bar_count", "bi_count", "pivot_count", "signal",
+        "atr_ui", "diff_5m_ui", "dea_5m_ui", "diff_15m_ui", "dea_15m_ui",
+        "position_ui", "entry_price_ui", "stop_price_ui", "initial_stop_ui",
+        "bars_since_entry_ui", "trailing_active_ui",
+        "cooldown_remaining_ui", "consecutive_losses_ui",
+        "active_pivot_state_ui", "active_pivot_zg_ui", "active_pivot_zd_ui", "active_pivot_entry_count_ui",
+        "pending_signal_type_ui", "pending_signal_trigger_ui", "pending_signal_stop_ui",
     ]
 
     def __init__(
@@ -264,6 +270,28 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._trailing_active: bool = False
         self._bars_since_entry: int = 0  # S5: 开仓后经过的5m bar数
 
+        # GUI 调试显示变量（CTA 界面右下角信息区）
+        self.atr_ui: float = 0.0
+        self.diff_5m_ui: float = 0.0
+        self.dea_5m_ui: float = 0.0
+        self.diff_15m_ui: float = 0.0
+        self.dea_15m_ui: float = 0.0
+        self.position_ui: int = 0
+        self.entry_price_ui: float = 0.0
+        self.stop_price_ui: float = 0.0
+        self.initial_stop_ui: float = 0.0
+        self.bars_since_entry_ui: int = 0
+        self.trailing_active_ui: bool = False
+        self.cooldown_remaining_ui: int = 0
+        self.consecutive_losses_ui: int = 0
+        self.active_pivot_state_ui: str = ""
+        self.active_pivot_zg_ui: float = 0.0
+        self.active_pivot_zd_ui: float = 0.0
+        self.active_pivot_entry_count_ui: int = 0
+        self.pending_signal_type_ui: str = ""
+        self.pending_signal_trigger_ui: float = 0.0
+        self.pending_signal_stop_ui: float = 0.0
+
         # B02: 连亏冷却状态
         self._consecutive_losses: int = 0
         self._cooldown_remaining: int = 0  # 剩余冷却 5m bar 数
@@ -293,6 +321,45 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._signal_type: str = ""  # 当前信号类型(用于debug)
 
         logger.info("策略初始化: %s", strategy_name)
+
+    def _sync_gui_debug_vars(self) -> None:
+        """同步调试变量到 CTA GUI 右下角信息区。"""
+        self.atr_ui = round(self.atr, 2) if self.atr else 0.0
+        self.diff_5m_ui = round(self.diff_5m, 2)
+        self.dea_5m_ui = round(self.dea_5m, 2)
+        self.diff_15m_ui = round(self._prev_diff_15m, 2)
+        self.dea_15m_ui = round(self._prev_dea_15m, 2)
+
+        self.position_ui = self._position
+        self.entry_price_ui = round(self._entry_price, 2) if self._entry_price else 0.0
+        self.stop_price_ui = round(self._stop_price, 2) if self._stop_price else 0.0
+        self.initial_stop_ui = round(self._initial_stop, 2) if self._initial_stop else 0.0
+        self.bars_since_entry_ui = self._bars_since_entry
+        self.trailing_active_ui = self._trailing_active
+
+        self.cooldown_remaining_ui = self._cooldown_remaining
+        self.consecutive_losses_ui = self._consecutive_losses
+
+        if self._active_pivot:
+            self.active_pivot_state_ui = str(self._active_pivot.get("state", ""))
+            self.active_pivot_zg_ui = round(float(self._active_pivot.get("zg", 0.0)), 2)
+            self.active_pivot_zd_ui = round(float(self._active_pivot.get("zd", 0.0)), 2)
+            self.active_pivot_entry_count_ui = int(self._active_pivot.get("entry_count", 0))
+        else:
+            self.active_pivot_state_ui = ""
+            self.active_pivot_zg_ui = 0.0
+            self.active_pivot_zd_ui = 0.0
+            self.active_pivot_entry_count_ui = 0
+
+        if self._pending_signal:
+            self.pending_signal_type_ui = str(self._pending_signal.get("type", ""))
+            self.pending_signal_trigger_ui = round(float(self._pending_signal.get("trigger_price", 0.0)), 2)
+            stop_value = self._pending_signal.get("stop_base", self._pending_signal.get("stop_price", 0.0))
+            self.pending_signal_stop_ui = round(float(stop_value or 0.0), 2)
+        else:
+            self.pending_signal_type_ui = ""
+            self.pending_signal_trigger_ui = 0.0
+            self.pending_signal_stop_ui = 0.0
 
     def on_init(self) -> None:
         self.write_log(f"策略初始化: {self.strategy_name}")
@@ -329,9 +396,11 @@ class CtaChanPivotStrategy(CtaTemplate):
         self.load_bar(60)
 
         self.write_log("策略初始化完成")
+        self._sync_gui_debug_vars()
 
     def on_start(self) -> None:
         self.write_log("策略启动")
+        self._sync_gui_debug_vars()
         self.put_event()
 
     def on_stop(self) -> None:
@@ -339,6 +408,7 @@ class CtaChanPivotStrategy(CtaTemplate):
         # 保存debug摘要
         if self._debugger:
             self._debugger.close()
+        self._sync_gui_debug_vars()
         self.put_event()
 
     def on_tick(self, tick: TickData) -> None:
@@ -400,6 +470,7 @@ class CtaChanPivotStrategy(CtaTemplate):
         if bar_5m:
             self._on_5m_bar(bar_5m)
 
+        self._sync_gui_debug_vars()
         self.put_event()
 
     def _on_1m_bar(self, bar: BarData) -> None:
@@ -1602,6 +1673,7 @@ class CtaChanPivotStrategy(CtaTemplate):
             f"{trade.volume}手 @ {trade.price:.0f}"
         )
         self.sync_data()
+        self._sync_gui_debug_vars()
         self.put_event()
 
     def on_order(self, order: OrderData) -> None:
