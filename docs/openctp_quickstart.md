@@ -131,6 +131,30 @@ uv run python -m qp.runtime.trader_app --gateway tts --profile all
 # 3. 加载策略并测试
 ```
 
+### 依赖安装（重要）
+
+TTS(OpenCTP) 网关对应的 Python 包是：
+- 安装包名：`vnpy-tts`
+- 导入模块名：`vnpy_tts`
+
+如果项目环境已经按文档执行：
+
+```bash
+uv sync --all-extras
+```
+
+则应自动安装 `vnpy-tts`。如果启动 TTS 时仍报：
+
+```text
+No module named 'vnpy_tts'
+```
+
+请在**已激活的项目虚拟环境**中执行：
+
+```bash
+uv pip install vnpy-tts
+```
+
 ### 场景 2：7x24 回测验证
 
 ```python

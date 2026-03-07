@@ -578,6 +578,34 @@ A: 这是可选依赖，ChartWizard 和 DataRecorder 会自动跳过。如需启
 uv add vnpy-spreadtrading
 ```
 
+### Q: 启动 TTS(OpenCTP) 时提示 `No module named 'vnpy_tts'`
+
+A: 这说明当前环境里**没有安装 `vnpy-tts` 依赖**。
+
+现在项目已经把 `vnpy-tts` 纳入 `trade` 依赖组，所以推荐做法是：
+
+**Windows（PowerShell）**
+```powershell
+.\.venv-win\Scripts\Activate.ps1
+uv sync --all-extras --active
+uv run --active python -m qp.runtime.trader_app --gateway tts --profile all
+```
+
+**WSL（bash）**
+```bash
+source .venv-linux/bin/activate
+uv sync --all-extras --active
+uv run --active python -m qp.runtime.trader_app --gateway tts --profile all
+```
+
+如果仍然缺失，可以手动补装：
+
+```bash
+uv pip install vnpy-tts
+```
+
+> 注意：安装包名是 **`vnpy-tts`**，但 Python 导入名是 **`vnpy_tts`**。
+
 ### Q: Windows 下中文乱码
 
 A: 终端编码问题，不影响功能。可尝试设置 `chcp 65001` 或使用 Windows Terminal。

@@ -59,7 +59,9 @@ def main() -> None:
             gateway_name = "TTS (OpenCTP 7x24)"
         except ImportError as e:
             logger.error("无法导入 vnpy_tts.TtsGateway: %s", e)
-            logger.error("请确保已安装 vnpy_tts 模块: pip install vnpy_tts")
+            logger.error("请确保已安装 vnpy-tts 依赖（import 名为 vnpy_tts）")
+            logger.error("推荐：先激活项目环境，再执行 `uv sync --all-extras --active`")
+            logger.error("若仍缺失，可手动执行：`uv pip install vnpy-tts`")
             sys.exit(1)
     elif args.gateway == "ctptest":
         try:
