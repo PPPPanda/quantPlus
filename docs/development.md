@@ -140,34 +140,80 @@ uv sync --all-extras
 
 ### 运行 Trader GUI
 
+#### Windows / WSL 命令规范（统一适用于本文件所有 `uv run python ...`）
+
+**Windows（PowerShell）**
+```powershell
+uv run --python .venv-win\Scripts\python.exe python ...
+```
+
+**WSL（bash）**
 ```bash
+uv run --python .venv-linux/bin/python python ...
+```
+
+> 除非特别说明，本文后续所有 `uv run python ...` 示例都应替换成上面对应平台的前缀。
+
+**Windows（PowerShell）**
+```powershell
 # 全功能模式（实盘 + 回测 + 数据管理），默认 CTP 网关
-uv run python -m qp.runtime.trader_app --profile all
+uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --profile all
 
 # 仅投研/回测（加载 CtaBacktesterApp, DataManagerApp）
-uv run python -m qp.runtime.trader_app --profile research
+uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --profile research
 
 # 仅实盘交易（加载 CtaStrategyApp, RiskManagerApp）
-uv run python -m qp.runtime.trader_app --profile trade
+uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --profile trade
 
 # 模拟盘（PaperAccount 本地模拟成交，含风控）
-uv run python -m qp.runtime.trader_app --profile paper
+uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --profile paper
 
 # 使用 OpenCTP TTS 网关（7x24 模拟环境）
-uv run python -m qp.runtime.trader_app --gateway tts
+uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --gateway tts
 
 # 穿透式认证测试（必须使用 trade 或 all，不能用 paper）
-uv run python -m qp.runtime.trader_app --gateway ctptest --profile all
+uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --gateway ctptest --profile all
 
 # 组合使用：TTS 网关 + 投研模式
-uv run python -m qp.runtime.trader_app --gateway tts --profile research
+uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --gateway tts --profile research
+```
+
+**WSL（bash）**
+```bash
+# 全功能模式（实盘 + 回测 + 数据管理），默认 CTP 网关
+uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --profile all
+
+# 仅投研/回测（加载 CtaBacktesterApp, DataManagerApp）
+uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --profile research
+
+# 仅实盘交易（加载 CtaStrategyApp, RiskManagerApp）
+uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --profile trade
+
+# 模拟盘（PaperAccount 本地模拟成交，含风控）
+uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --profile paper
+
+# 使用 OpenCTP TTS 网关（7x24 模拟环境）
+uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --gateway tts
+
+# 穿透式认证测试（必须使用 trade 或 all，不能用 paper）
+uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --gateway ctptest --profile all
+
+# 组合使用：TTS 网关 + 投研模式
+uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --gateway tts --profile research
 ```
 
 ### 脚本化回测
 
+**Windows（PowerShell）**
+```powershell
+# 批量回测入口（将来采用该入口）
+uv run --python .venv-win\Scripts\python.exe python -m qp.backtest.run_cta_backtest
+```
+
+**WSL（bash）**
 ```bash
 # 批量回测入口（将来采用该入口）
-uv run python -m qp.backtest.run_cta_backtest
+uv run --python .venv-linux/bin/python python -m qp.backtest.run_cta_backtest
 ```
 
 ---
