@@ -10,7 +10,9 @@
 
 from pathlib import Path
 from vnpy.trader.app import BaseApp
-from vnpy_chartwizard.engine import ChartWizardEngine, APP_NAME
+from vnpy_chartwizard.engine import APP_NAME
+
+from .engine import EnhancedChartWizardEngine
 
 __all__ = ["EnhancedChartWizardApp"]
 
@@ -24,6 +26,6 @@ class EnhancedChartWizardApp(BaseApp):
     app_module: str = __module__
     app_path: Path = Path(__file__).parent
     display_name: str = "增强K线图表"
-    engine_class: type[ChartWizardEngine] = ChartWizardEngine  # 复用官方 Engine
+    engine_class = EnhancedChartWizardEngine
     widget_name: str = "EnhancedChartWizardWidget"
     icon_name: str = str(app_path.joinpath("ui", "enhanced_cw.ico"))

@@ -9,7 +9,7 @@ from vnpy.chart import ChartWidget
 from vnpy.trader.engine import MainEngine
 from vnpy.trader.ui import QtWidgets, QtCore
 from vnpy.trader.constant import Interval
-from vnpy.trader.utility import ZoneInfo
+from vnpy.trader.utility import ZoneInfo, BarGenerator
 from vnpy.trader.object import ContractData
 
 # 继承官方 Widget
@@ -63,6 +63,14 @@ class EnhancedChartWizardWidget(ChartWizardWidget):
         self.interval_combo.setCurrentText("1分钟")
         self.interval_combo.currentTextChanged.connect(self.on_interval_changed)
         toolbar_layout.addWidget(self.interval_combo)
+
+        # 历史天数
+        toolbar_layout.addWidget(QtWidgets.QLabel("历史天数:"))
+        self.history_days_spin = QtWidgets.QSpinBox()
+        self.history_days_spin.setRange(1, 365)
+        self.history_days_spin.setValue(5)
+        self.history_days_spin.setToolTip("新建图表时加载的历史数据天数")
+        toolbar_layout.addWidget(self.history_days_spin)
 
         # 指标菜单按钮
         self.indicator_button = QtWidgets.QPushButton("添加指标")
@@ -310,14 +318,26 @@ class EnhancedChartWizardWidget(ChartWizardWidget):
             if not contract:
                 return
 
-        # 调用父类的 new_chart（会创建图表并查询历史数据）
-        # 这里暂时使用 Interval.MINUTE，未来可扩展
-        super().new_chart()
+        # 自己创建图表并查询历史数据（不再写死最近 5 天）
+        self.bgs[vt_symbol] = self.bgs.get(vt_symbol) or BarGenerator(self.on_bar)
+
+        chart = self.create_chart()
+        self.charts[vt_symbol] = chart
+        self.tab.addTab(chart, vt_symbol)
+
+        # 按 UI 配置的历史天数查询；默认 5 天，可调整
+        end: datetime = datetime.now(ZoneInfo(get_localzone_name()))
+        start: datetime = end - timedelta(days=self.history_days_spin.value())
+
+        self.chart_engine.query_history(
+            vt_symbol,
+            Interval.MINUTE,
+            start,
+            end,
+        )
 
         # 为新创建的图表添加 MACD 图例
-        chart = self.charts.get(vt_symbol)
-        if chart:
-            self._add_macd_legend(chart, vt_symbol)
+        self._add_macd_legend(chart, vt_symbol)
 
         # 可以在这里根据 self.current_interval 重新查询数据
         # if chart and self.current_interval != Interval.MINUTE:
