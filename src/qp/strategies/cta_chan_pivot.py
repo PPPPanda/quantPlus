@@ -29,7 +29,7 @@ import pandas as pd
 
 from vnpy.trader.object import BarData, TickData, TradeData, OrderData
 from vnpy.trader.utility import BarGenerator
-from vnpy.trader.constant import Interval
+from vnpy.trader.constant import Interval, Offset, Status, Direction
 from vnpy_ctastrategy import CtaTemplate
 from vnpy_ctastrategy.base import StopOrder
 
@@ -264,6 +264,10 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._trailing_active: bool = False
         self._bars_since_entry: int = 0  # S5: 开仓后经过的5m bar数
 
+        # Live safety: 挂单状态跟踪（防重复下单 + 手动平仓检测）
+        self._pending_open: bool = False    # 开仓单已发出
+        self._pending_close: bool = False   # 平仓单已发出
+
         # B02: 连亏冷却状态
         self._consecutive_losses: int = 0
         self._cooldown_remaining: int = 0  # 剩余冷却 5m bar 数
@@ -374,6 +378,9 @@ class CtaChanPivotStrategy(CtaTemplate):
         # Debug: 记录1分钟K线（仅实盘模式）
         if self._debugger and self.trading:
             self._debugger.log_kline_1m(bar_dict)
+
+        # Live safety: 手动平仓检测在 on_trade() 中处理
+        # (通过检测非策略发出的平仓成交来同步状态)
 
         # 1. 持仓管理：检查止损（1分钟级别，仅实盘模式）
         if self.trading and self._position != 0:
@@ -1371,8 +1378,8 @@ class CtaChanPivotStrategy(CtaTemplate):
 
         elif signal['type'] == 'CloseLong':
             # B09: 平多仓信号
-            if self._position != 1:
-                # 已无多仓，信号失效
+            if self._position != 1 or self._pending_close:
+                # 已无多仓或平仓单已发出，信号失效
                 self._pending_signal = None
                 self.signal = ""
                 return
@@ -1396,6 +1403,7 @@ class CtaChanPivotStrategy(CtaTemplate):
                     )
                 self._position = 0
                 self._trailing_active = False
+                self._pending_close = True  # Live safety: 标记平仓单已发出
                 self._pending_signal = None
                 self.signal = "平多"
                 # B02/R2: 更新连亏计数
@@ -1421,8 +1429,14 @@ class CtaChanPivotStrategy(CtaTemplate):
         return pricetick
 
     def _open_position(self, direction: int, price: float, stop_base: float) -> None:
-        """开仓."""
+        """开仓. 状态在信号时刻即刻设置（保持回测语义）."""
+        # Live safety: 防止重复开仓
+        if self._pending_open:
+            self.write_log("⚠️ 已有待成交开仓单，跳过新开仓")
+            return
+
         buffer = self._calc_stop_buffer()
+        self._pending_open = True  # 标记已发单
         if direction == 1:
             self.buy(price, self.fixed_volume)
             self._stop_price = stop_base - buffer
@@ -1465,6 +1479,10 @@ class CtaChanPivotStrategy(CtaTemplate):
 
     def _check_stop_loss_1m(self, bar: dict) -> bool:
         """1分钟级别检查止损."""
+        # Live safety: 已发出平仓单时跳过（防重复下单）
+        if self._pending_close:
+            return False
+
         sl_hit = False
         exit_price = 0.0
 
@@ -1513,6 +1531,7 @@ class CtaChanPivotStrategy(CtaTemplate):
 
             self._position = 0
             self._trailing_active = False
+            self._pending_close = True  # Live safety: 标记平仓单已发出
             self.signal = "止损"
 
             # B02/R2: 更新连亏计数
@@ -1596,17 +1615,67 @@ class CtaChanPivotStrategy(CtaTemplate):
                     self._stop_price = lock_stop
 
     def on_trade(self, trade: TradeData) -> None:
-        """成交回调."""
+        """成交回调 — 清理挂单标记 + 手动平仓检测."""
         self.write_log(
             f"成交: {trade.direction.value} {trade.offset.value} "
             f"{trade.volume}手 @ {trade.price:.0f}"
         )
+
+        if trade.offset == Offset.OPEN:
+            if self._pending_open:
+                self._pending_open = False
+                self.write_log(f"✅ 开仓确认: 实际价={trade.price:.0f}")
+            else:
+                # 非策略发出的开仓 — 同步状态
+                self.write_log(f"⚠️ 检测到非策略开仓, 同步状态")
+                self._position = 1 if trade.direction == Direction.LONG else -1
+                self._entry_price = trade.price
+
+        elif trade.offset in (Offset.CLOSE, Offset.CLOSETODAY, Offset.CLOSEYESTERDAY):
+            if self._pending_close:
+                self._pending_close = False
+                self.write_log(f"✅ 平仓确认: 实际价={trade.price:.0f}")
+            elif self._position != 0:
+                # 非策略发出的平仓 — 手动平仓检测
+                self.write_log(
+                    f"⚠️ 检测到手动平仓: price={trade.price:.0f}, "
+                    f"策略持仓={self._position}"
+                )
+                pnl = 0.0
+                if self._position == 1:
+                    pnl = trade.price - self._entry_price
+                elif self._position == -1:
+                    pnl = self._entry_price - trade.price
+                self._position = 0
+                self._trailing_active = False
+                self._pending_signal = None
+                self.signal = "手动平仓"
+                self._update_loss_streak(pnl)
+
         self.sync_data()
         self.put_event()
 
     def on_order(self, order: OrderData) -> None:
-        """订单状态更新回调."""
-        pass
+        """订单状态回调 — 处理拒单/撤单清理挂单标记."""
+        if order.status in (Status.CANCELLED, Status.REJECTED):
+            if self._pending_open:
+                self.write_log(
+                    f"⚠️ 开仓订单{order.status.value}: {order.vt_orderid}, "
+                    f"撤销状态 _position={self._position}→0"
+                )
+                # 撤销信号时刻设置的状态（订单不会成交）
+                self._position = 0
+                self._entry_price = 0.0
+                self._stop_price = 0.0
+                self._trailing_active = False
+                self._pending_open = False
+                self.signal = ""
+            if self._pending_close:
+                self.write_log(
+                    f"⚠️ 平仓订单{order.status.value}: {order.vt_orderid}, "
+                    f"清除 _pending_close"
+                )
+                self._pending_close = False
 
     def on_stop_order(self, stop_order: StopOrder) -> None:
         """停止单回调."""
