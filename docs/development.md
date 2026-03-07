@@ -144,76 +144,95 @@ uv sync --all-extras
 
 **Windows（PowerShell）**
 ```powershell
-uv run --python .venv-win\Scripts\python.exe python ...
+uv venv .venv-win
+.\.venv-win\Scripts\Activate.ps1
+uv sync --all-extras --active
+uv run --active python ...
 ```
 
 **WSL（bash）**
 ```bash
-uv run --python .venv-linux/bin/python python ...
+uv venv .venv-linux
+source .venv-linux/bin/activate
+uv sync --all-extras --active
+uv run --active python ...
 ```
 
 > 除非特别说明，本文后续所有 `uv run python ...` 示例都应替换成上面对应平台的前缀。
+> 不推荐使用 `uv run --python .venv-win\Scripts\python.exe ...` 作为项目主流程；对当前项目，uv 仍可能把默认项目环境识别为 `.venv`，从而额外创建新的 `.venv` 并导致依赖缺失。
 
 **Windows（PowerShell）**
 ```powershell
+# 先激活环境（每个新终端都要做一次）
+.\.venv-win\Scripts\Activate.ps1
+
 # 全功能模式（实盘 + 回测 + 数据管理），默认 CTP 网关
-uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --profile all
+uv run --active python -m qp.runtime.trader_app --profile all
 
 # 仅投研/回测（加载 CtaBacktesterApp, DataManagerApp）
-uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --profile research
+uv run --active python -m qp.runtime.trader_app --profile research
 
 # 仅实盘交易（加载 CtaStrategyApp, RiskManagerApp）
-uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --profile trade
+uv run --active python -m qp.runtime.trader_app --profile trade
 
 # 模拟盘（PaperAccount 本地模拟成交，含风控）
-uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --profile paper
+uv run --active python -m qp.runtime.trader_app --profile paper
 
 # 使用 OpenCTP TTS 网关（7x24 模拟环境）
-uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --gateway tts
+uv run --active python -m qp.runtime.trader_app --gateway tts
 
 # 穿透式认证测试（必须使用 trade 或 all，不能用 paper）
-uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --gateway ctptest --profile all
+uv run --active python -m qp.runtime.trader_app --gateway ctptest --profile all
 
 # 组合使用：TTS 网关 + 投研模式
-uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --gateway tts --profile research
+uv run --active python -m qp.runtime.trader_app --gateway tts --profile research
 ```
 
 **WSL（bash）**
 ```bash
+# 先激活环境（每个新终端都要做一次）
+source .venv-linux/bin/activate
+
 # 全功能模式（实盘 + 回测 + 数据管理），默认 CTP 网关
-uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --profile all
+uv run --active python -m qp.runtime.trader_app --profile all
 
 # 仅投研/回测（加载 CtaBacktesterApp, DataManagerApp）
-uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --profile research
+uv run --active python -m qp.runtime.trader_app --profile research
 
 # 仅实盘交易（加载 CtaStrategyApp, RiskManagerApp）
-uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --profile trade
+uv run --active python -m qp.runtime.trader_app --profile trade
 
 # 模拟盘（PaperAccount 本地模拟成交，含风控）
-uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --profile paper
+uv run --active python -m qp.runtime.trader_app --profile paper
 
 # 使用 OpenCTP TTS 网关（7x24 模拟环境）
-uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --gateway tts
+uv run --active python -m qp.runtime.trader_app --gateway tts
 
 # 穿透式认证测试（必须使用 trade 或 all，不能用 paper）
-uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --gateway ctptest --profile all
+uv run --active python -m qp.runtime.trader_app --gateway ctptest --profile all
 
 # 组合使用：TTS 网关 + 投研模式
-uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --gateway tts --profile research
+uv run --active python -m qp.runtime.trader_app --gateway tts --profile research
 ```
 
 ### 脚本化回测
 
 **Windows（PowerShell）**
 ```powershell
+# 先激活环境（每个新终端都要做一次）
+.\.venv-win\Scripts\Activate.ps1
+
 # 批量回测入口（将来采用该入口）
-uv run --python .venv-win\Scripts\python.exe python -m qp.backtest.run_cta_backtest
+uv run --active python -m qp.backtest.run_cta_backtest
 ```
 
 **WSL（bash）**
 ```bash
+# 先激活环境（每个新终端都要做一次）
+source .venv-linux/bin/activate
+
 # 批量回测入口（将来采用该入口）
-uv run --python .venv-linux/bin/python python -m qp.backtest.run_cta_backtest
+uv run --active python -m qp.backtest.run_cta_backtest
 ```
 
 ---
@@ -1637,13 +1656,17 @@ error: failed to remove file `E:\work\quant\quantPlus\.venv\lib64`: 拒绝访问
 ```powershell
 # Windows
 uv venv .venv-win
-uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --gateway ctp --profile all
+.\.venv-win\Scripts\Activate.ps1
+uv sync --all-extras --active
+uv run --active python -m qp.runtime.trader_app --gateway ctp --profile all
 ```
 
 ```bash
 # WSL / Linux
 uv venv .venv-linux
-.venv-linux/bin/python -m qp.backtest.run_cta_backtest --help
+source .venv-linux/bin/activate
+uv sync --all-extras --active
+uv run --active python -m qp.backtest.run_cta_backtest --help
 ```
 
 **如果仓库已经被 WSL 的 `.venv` 污染**：

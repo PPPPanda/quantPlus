@@ -58,74 +58,92 @@ uv sync --extra research
 
 ### Windows / WSL 命令规范（统一说明）
 
-本仓库所有 `uv run python ...` 命令，统一按下面两种前缀执行：
+本仓库**不要**再依赖默认项目环境 `.venv` 在 Windows / WSL 间切换。
+
+推荐做法是：
+- Windows 使用：`.venv-win`
+- WSL 使用：`.venv-linux`
+- 先 **activate** 对应环境，再使用 `uv ... --active`
 
 **Windows（PowerShell）**
 ```powershell
-uv run --python .venv-win\Scripts\python.exe python ...
+uv venv .venv-win
+.\.venv-win\Scripts\Activate.ps1
+uv sync --all-extras --active
+uv run --active python ...
 ```
 
 **WSL（bash）**
 ```bash
-uv run --python .venv-linux/bin/python python ...
+uv venv .venv-linux
+source .venv-linux/bin/activate
+uv sync --all-extras --active
+uv run --active python ...
 ```
 
-> 下面文档中的 `uv run python ...` 示例，如果你在 Windows / WSL 中运行，请替换成对应前缀。
+> 不推荐使用 `uv run --python .venv-win\Scripts\python.exe ...` 作为项目主流程。
+> 对当前项目来说，uv 仍可能把项目环境识别为默认 `.venv`，从而偷偷创建新的 `.venv` 并导致依赖缺失。
 
 ### Trader GUI
 
 **Windows（PowerShell）**
 ```powershell
+# 先激活环境（每个新终端都要做一次）
+.\.venv-win\Scripts\Activate.ps1
+
 # 全功能模式（实盘 + 回测 + 数据管理，不含模拟盘）
-uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --profile all
+uv run --active python -m qp.runtime.trader_app --profile all
 
 # 投研/回测模式（CtaBacktester + DataManager）
-uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --profile research
+uv run --active python -m qp.runtime.trader_app --profile research
 
 # 实盘交易模式（CtaStrategy + RiskManager + K线图）
-uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --profile trade
+uv run --active python -m qp.runtime.trader_app --profile trade
 
 # 模拟盘（PaperAccount 本地模拟成交，含风控）
-uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --profile paper
+uv run --active python -m qp.runtime.trader_app --profile paper
 
 # 使用 OpenCTP TTS（7x24 模拟环境）
-uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --gateway tts
+uv run --active python -m qp.runtime.trader_app --gateway tts
 
 # 使用 CTP (SimNow，默认)
-uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --gateway ctp
+uv run --active python -m qp.runtime.trader_app --gateway ctp
 
 # 穿透式认证测试（必须使用 trade 或 all，不能用 paper）
-uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --gateway ctptest --profile all
+uv run --active python -m qp.runtime.trader_app --gateway ctptest --profile all
 
 # 查看帮助
-uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --help
+uv run --active python -m qp.runtime.trader_app --help
 ```
 
 **WSL（bash）**
 ```bash
+# 先激活环境（每个新终端都要做一次）
+source .venv-linux/bin/activate
+
 # 全功能模式（实盘 + 回测 + 数据管理，不含模拟盘）
-uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --profile all
+uv run --active python -m qp.runtime.trader_app --profile all
 
 # 投研/回测模式（CtaBacktester + DataManager）
-uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --profile research
+uv run --active python -m qp.runtime.trader_app --profile research
 
 # 实盘交易模式（CtaStrategy + RiskManager + K线图）
-uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --profile trade
+uv run --active python -m qp.runtime.trader_app --profile trade
 
 # 模拟盘（PaperAccount 本地模拟成交，含风控）
-uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --profile paper
+uv run --active python -m qp.runtime.trader_app --profile paper
 
 # 使用 OpenCTP TTS（7x24 模拟环境）
-uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --gateway tts
+uv run --active python -m qp.runtime.trader_app --gateway tts
 
 # 使用 CTP (SimNow，默认)
-uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --gateway ctp
+uv run --active python -m qp.runtime.trader_app --gateway ctp
 
 # 穿透式认证测试（必须使用 trade 或 all，不能用 paper）
-uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --gateway ctptest --profile all
+uv run --active python -m qp.runtime.trader_app --gateway ctptest --profile all
 
 # 查看帮助
-uv run --python .venv-linux/bin/python python -m qp.runtime.trader_app --help
+uv run --active python -m qp.runtime.trader_app --help
 ```
 
 ### Profile 说明
@@ -578,13 +596,17 @@ A: **不可以。**
 **Windows（PowerShell）**
 ```powershell
 uv venv .venv-win
-.\.venv-win\Scripts\python.exe -m qp.runtime.trader_app --gateway ctp --profile all
+.\.venv-win\Scripts\Activate.ps1
+uv sync --all-extras --active
+uv run --active python -m qp.runtime.trader_app --gateway ctp --profile all
 ```
 
 **WSL（bash）**
 ```bash
 uv venv .venv-linux
-.venv-linux/bin/python -m qp.runtime.trader_app --gateway ctp --profile all
+source .venv-linux/bin/activate
+uv sync --all-extras --active
+uv run --active python -m qp.runtime.trader_app --gateway ctp --profile all
 ```
 
 如果误把 WSL 创建的 `.venv` 留在仓库里，Windows 侧常见报错是：
