@@ -1497,7 +1497,8 @@ class CtaChanPivotStrategy(CtaTemplate):
                         volume=self.fixed_volume,
                         position=0,
                         pnl=pnl,
-                        signal_type=self._signal_type
+                        signal_type=self._signal_type,
+                        note="signal_exit"
                     )
                 self._position = 0
                 self._trailing_active = False
@@ -1568,7 +1569,8 @@ class CtaChanPivotStrategy(CtaTemplate):
                 volume=self.fixed_volume,
                 position=direction,
                 pnl=0,
-                signal_type=self._signal_type
+                signal_type=self._signal_type,
+                note="signal_entry"
             )
 
     def _check_stop_loss_1m(self, bar: dict) -> bool:
@@ -1616,7 +1618,8 @@ class CtaChanPivotStrategy(CtaTemplate):
                     volume=self.fixed_volume,
                     position=0,
                     pnl=pnl,
-                    signal_type=self._signal_type
+                    signal_type=self._signal_type,
+                    note="stop_exit"
                 )
 
             self._position = 0
@@ -1709,13 +1712,21 @@ class CtaChanPivotStrategy(CtaTemplate):
             f"成交: {trade.direction.value} {trade.offset.value} "
             f"{trade.volume}手 @ {trade.price:.0f} | pos={self.pos} _position={self._position} signal={self.signal}"
         )
+        if self._debugger and self.trading:
+            self._debugger.log_fill_event(
+                trade=trade,
+                engine_pos=self.pos,
+                logic_position=self._position,
+                signal=self.signal,
+            )
         self.sync_data()
         self._sync_gui_debug_vars()
         self.put_event()
 
     def on_order(self, order: OrderData) -> None:
         """订单状态更新回调."""
-        pass
+        if self._debugger and self.trading:
+            self._debugger.log_order_event(order)
 
     def on_stop_order(self, stop_order: StopOrder) -> None:
         """停止单回调."""

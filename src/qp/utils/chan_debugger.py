@@ -132,7 +132,10 @@ class ChanDebugger:
         self.bi_file = self.debug_dir / "chan_bi.csv"
         self.pivot_file = self.debug_dir / "chan_pivot.csv"
         self.signal_file = self.debug_dir / "signals.csv"
-        self.trade_file = self.debug_dir / "trades.csv"
+        self.trade_file = self.debug_dir / "trades.csv"          # 兼容旧分析口径（逻辑交易）
+        self.logic_trade_file = self.debug_dir / "logic_trades.csv"
+        self.order_file = self.debug_dir / "orders.csv"
+        self.fill_file = self.debug_dir / "fills.csv"
 
         # 写入CSV头
         self._write_csv_header(self.kline_1m_file, [
@@ -157,6 +160,18 @@ class ChanDebugger:
         self._write_csv_header(self.trade_file, [
             "datetime", "action", "price", "volume", "position",
             "pnl", "cum_pnl", "signal_type"
+        ])
+        self._write_csv_header(self.logic_trade_file, [
+            "datetime", "action", "price", "volume", "logic_position",
+            "pnl", "cum_pnl", "signal_type", "note"
+        ])
+        self._write_csv_header(self.order_file, [
+            "datetime", "vt_orderid", "direction", "offset", "price", "volume",
+            "traded", "status", "gateway_name", "note"
+        ])
+        self._write_csv_header(self.fill_file, [
+            "datetime", "vt_tradeid", "vt_orderid", "direction", "offset", "price", "volume",
+            "engine_pos", "logic_position", "signal", "note"
         ])
 
     def _write_csv_header(self, filepath: Path, headers: List[str]) -> None:
@@ -426,26 +441,30 @@ class ChanDebugger:
         volume: int,
         position: int,
         pnl: float = 0,
-        signal_type: str = ""
+        signal_type: str = "",
+        note: str = "logic",
     ) -> None:
-        """
-        记录交易执行.
+        """兼容旧接口：记录逻辑交易（非真实成交）。"""
+        self.log_logic_trade(action, price, volume, position, pnl, signal_type, note)
 
-        Args:
-            action: 动作 (OPEN_LONG, OPEN_SHORT, CLOSE_LONG, CLOSE_SHORT)
-            price: 成交价格
-            volume: 成交数量
-            position: 当前持仓
-            pnl: 本次盈亏
-            signal_type: 信号类型
-        """
+    def log_logic_trade(
+        self,
+        action: str,
+        price: float,
+        volume: int,
+        position: int,
+        pnl: float = 0,
+        signal_type: str = "",
+        note: str = "",
+    ) -> None:
+        """记录策略逻辑层交易：表示“策略决定交易”，不等于真实成交。"""
         if not self.enabled:
             return
 
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.stats['total_pnl'] += pnl
 
-        self._append_csv(self.trade_file, [
+        row = [
             now,
             action,
             f"{price:.2f}",
@@ -453,13 +472,16 @@ class ChanDebugger:
             position,
             f"{pnl:.2f}",
             f"{self.stats['total_pnl']:.2f}",
-            signal_type
-        ])
+            signal_type,
+            note,
+        ]
+        # 旧文件保留，避免现有分析脚本断裂
+        self._append_csv(self.trade_file, row[:-1])
+        self._append_csv(self.logic_trade_file, row)
 
         if 'OPEN' in action:
             self.stats['total_trades'] += 1
 
-        # 醒目打印交易
         action_cn = {
             'OPEN_LONG': '开多',
             'OPEN_SHORT': '开空',
@@ -468,8 +490,70 @@ class ChanDebugger:
         }.get(action, action)
 
         self.logger.warning(
-            f"[交易] {action_cn} @ {price:.0f} x {volume} | "
-            f"持仓={position} | 盈亏={pnl:+.0f} | 累计={self.stats['total_pnl']:+.0f}"
+            f"[逻辑交易] {action_cn} @ {price:.0f} x {volume} | "
+            f"逻辑持仓={position} | 盈亏={pnl:+.0f} | 累计={self.stats['total_pnl']:+.0f}"
+            + (f" | note={note}" if note else "")
+        )
+
+    def log_order_event(self, order: Any, note: str = "") -> None:
+        """记录真实委托回报（on_order）。"""
+        if not self.enabled:
+            return
+
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self._append_csv(self.order_file, [
+            now,
+            getattr(order, 'vt_orderid', ''),
+            getattr(getattr(order, 'direction', None), 'value', ''),
+            getattr(getattr(order, 'offset', None), 'value', ''),
+            f"{getattr(order, 'price', 0):.2f}",
+            getattr(order, 'volume', 0),
+            getattr(order, 'traded', 0),
+            getattr(getattr(order, 'status', None), 'value', ''),
+            getattr(order, 'gateway_name', ''),
+            note,
+        ])
+        self.logger.info(
+            f"[委托回报] id={getattr(order, 'vt_orderid', '')} "
+            f"{getattr(getattr(order, 'direction', None), 'value', '')}/"
+            f"{getattr(getattr(order, 'offset', None), 'value', '')} "
+            f"price={getattr(order, 'price', 0):.0f} vol={getattr(order, 'volume', 0)} "
+            f"traded={getattr(order, 'traded', 0)} status={getattr(getattr(order, 'status', None), 'value', '')}"
+            + (f" | note={note}" if note else "")
+        )
+
+    def log_fill_event(
+        self,
+        trade: Any,
+        engine_pos: float,
+        logic_position: int,
+        signal: str = "",
+        note: str = "",
+    ) -> None:
+        """记录真实成交回报（on_trade）。"""
+        if not self.enabled:
+            return
+
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self._append_csv(self.fill_file, [
+            now,
+            getattr(trade, 'vt_tradeid', ''),
+            getattr(trade, 'vt_orderid', ''),
+            getattr(getattr(trade, 'direction', None), 'value', ''),
+            getattr(getattr(trade, 'offset', None), 'value', ''),
+            f"{getattr(trade, 'price', 0):.2f}",
+            getattr(trade, 'volume', 0),
+            engine_pos,
+            logic_position,
+            signal,
+            note,
+        ])
+        self.logger.warning(
+            f"[真实成交] trade={getattr(trade, 'vt_tradeid', '')} order={getattr(trade, 'vt_orderid', '')} "
+            f"{getattr(getattr(trade, 'direction', None), 'value', '')}/"
+            f"{getattr(getattr(trade, 'offset', None), 'value', '')} @ {getattr(trade, 'price', 0):.0f} x {getattr(trade, 'volume', 0)} "
+            f"| 引擎持仓={engine_pos} | 逻辑持仓={logic_position} | signal={signal}"
+            + (f" | note={note}" if note else "")
         )
 
     # =========================================================================
