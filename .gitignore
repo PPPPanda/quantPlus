@@ -12,6 +12,8 @@ MANIFEST
 
 # ===== Virtual Environments =====
 .venv/
+.venv-win/
+.venv-linux/
 venv/
 ENV/
 env/

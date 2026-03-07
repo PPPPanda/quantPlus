@@ -1562,6 +1562,57 @@ Remove-Item -Recurse -Force .venv
 uv sync --all-extras
 ```
 
+#### 问题 4：Windows / WSL 共用同一个 `.venv` 导致 `uv run` 失败
+
+**现象**：在 Windows PowerShell 中运行 `uv run ...` 时，报错类似：
+
+```text
+error: failed to remove file `E:\work\quant\quantPlus\.venv\lib64`: 拒绝访问。 (os error 5)
+```
+
+**已确认根因**：
+- 仓库中的 `.venv` 是在 **WSL/Linux** 下创建的
+- 其中会包含 Linux 专用结构，例如：
+  - `.venv/lib64 -> lib`（Linux symlink）
+  - `pyvenv.cfg` 指向 Linux Python 路径
+- Windows 侧的 `uv` 无法正确复用/清理这个 Linux venv，于是会在删除 `.venv/lib64` 时失败
+
+**规则（必须遵守）**：
+- **不要让 Windows 和 WSL 共用同一个 `.venv`**
+- Windows 使用：`.venv-win`
+- WSL 使用：`.venv-linux`
+
+**推荐命令**：
+
+Windows（PowerShell）：
+```powershell
+uv venv .venv-win
+.\.venv-win\Scripts\python.exe -m qp.runtime.trader_app --gateway ctp --profile all
+```
+
+WSL（bash）：
+```bash
+uv venv .venv-linux
+.venv-linux/bin/python -m qp.runtime.trader_app --gateway ctp --profile all
+```
+
+**如果仓库里已经混入了 WSL 生成的 `.venv`**：
+
+```powershell
+# 用 WSL 删除最稳
+wsl bash -lc "rm -rf /mnt/e/work/quant/quantPlus/.venv"
+```
+
+然后分别重建：
+
+```powershell
+uv venv .venv-win
+```
+
+```bash
+uv venv .venv-linux
+```
+
 ### 策略/模块导入失败
 
 #### 问题：ModuleNotFoundError: No module named 'vnpy'

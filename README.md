@@ -520,6 +520,43 @@ uv add vnpy-spreadtrading
 
 A: 终端编码问题，不影响功能。可尝试设置 `chcp 65001` 或使用 Windows Terminal。
 
+### Q: Windows 和 WSL 可以共用同一个 `.venv` 吗？
+
+A: **不可以。**
+
+本项目如果同时在 Windows 和 WSL 中开发，必须使用**分离虚拟环境**：
+
+- Windows：`.venv-win`
+- WSL：`.venv-linux`
+
+推荐命令：
+
+**Windows（PowerShell）**
+```powershell
+uv venv .venv-win
+.\.venv-win\Scripts\python.exe -m qp.runtime.trader_app --gateway ctp --profile all
+```
+
+**WSL（bash）**
+```bash
+uv venv .venv-linux
+.venv-linux/bin/python -m qp.runtime.trader_app --gateway ctp --profile all
+```
+
+如果误把 WSL 创建的 `.venv` 留在仓库里，Windows 侧常见报错是：
+
+```text
+error: failed to remove file `...\.venv\lib64`: 拒绝访问。 (os error 5)
+```
+
+原因是 WSL 会创建 Linux 专用结构（例如 `.venv/lib64 -> lib`），Windows 的 `uv` 无法正确清理。此时应先用 WSL 删除：
+
+```powershell
+wsl bash -lc "rm -rf /mnt/e/work/quant/quantPlus/.venv"
+```
+
+然后分别重建 `.venv-win` / `.venv-linux`。
+
 ### Q: 如何配置 CTP (SimNow) 账号？
 
 A: SimNow 是上期技术官方提供的 CTP 仿真环境，支持期货和期权模拟交易。
