@@ -363,6 +363,16 @@ class CtaChanPivotStrategy(CtaTemplate):
 
     def on_init(self) -> None:
         self.write_log(f"策略初始化: {self.strategy_name}")
+        self.write_log(
+            f"参数摘要: vt_symbol={self.vt_symbol}, macd={self.macd_fast}/{self.macd_slow}/{self.macd_signal}, "
+            f"atr_window={self.atr_window}, trail={self.atr_trailing_mult}, activate={self.atr_activate_mult}, "
+            f"entry_filter={self.atr_entry_filter}, fixed_volume={self.fixed_volume}"
+        )
+        self.write_log(
+            f"风控摘要: cooldown={self.cooldown_losses}/{self.cooldown_bars}, "
+            f"circuit_breaker={self.circuit_breaker_losses}/{self.circuit_breaker_bars}, "
+            f"min_hold_bars={self.min_hold_bars}, max_pullback_atr={self.max_pullback_atr}, div={self.div_mode}/{self.div_threshold}"
+        )
 
         # 创建 BarGenerator（实盘 Tick -> 1m Bar）
         self.bg = BarGenerator(self._on_1m_bar)
@@ -393,6 +403,7 @@ class CtaChanPivotStrategy(CtaTemplate):
             })
 
         # 加载历史数据（1 分钟）
+        self.write_log("开始预热历史数据: load_bar(60)")
         self.load_bar(60)
 
         self.write_log("策略初始化完成")
@@ -400,11 +411,19 @@ class CtaChanPivotStrategy(CtaTemplate):
 
     def on_start(self) -> None:
         self.write_log("策略启动")
+        self.write_log(
+            f"启动状态: inited={self.inited}, trading={self.trading}, pos={self.pos}, "
+            f"_position={self._position}, bi_count={len(self._bi_points)}, pivot_count={len(self._pivots)}"
+        )
         self._sync_gui_debug_vars()
         self.put_event()
 
     def on_stop(self) -> None:
         self.write_log("策略停止")
+        self.write_log(
+            f"停止摘要: pos={self.pos}, _position={self._position}, signal={self.signal}, "
+            f"cooldown={self._cooldown_remaining}, losses={self._consecutive_losses}, atr={self.atr:.2f}"
+        )
         # 保存debug摘要
         if self._debugger:
             self._debugger.close()
@@ -933,6 +952,7 @@ class CtaChanPivotStrategy(CtaTemplate):
                     ap['state'] = 'left_up'
                     ap['leave_bi_idx'] = len(self._bi_points) - 1
                     ap['leave_price'] = latest_bi['price']
+                    self.write_log(f"[中枢] 向上离开: ZG={zg:.0f}, ZD={zd:.0f}, leave_price={latest_bi['price']:.0f}")
                     if self._debugger and self.trading:
                         self._debugger.log_pivot(ap, pivot_idx=len(self._pivots), status="left_up")
                     return
@@ -941,13 +961,17 @@ class CtaChanPivotStrategy(CtaTemplate):
                     ap['state'] = 'left_down'
                     ap['leave_bi_idx'] = len(self._bi_points) - 1
                     ap['leave_price'] = latest_bi['price']
+                    self.write_log(f"[中枢] 向下离开: ZG={zg:.0f}, ZD={zd:.0f}, leave_price={latest_bi['price']:.0f}")
                     if self._debugger and self.trading:
                         self._debugger.log_pivot(ap, pivot_idx=len(self._pivots), status="left_down")
                     return
                 else:
                     # 仍在中枢范围内，延伸
+                    prev_state = ap['state']
                     ap['state'] = 'active'
                     ap['end_bi_idx'] = len(self._bi_points) - 1
+                    if prev_state != 'active':
+                        self.write_log(f"[中枢] 激活: ZG={zg:.0f}, ZD={zd:.0f}, bi_range={ap['start_bi_idx']}->{ap['end_bi_idx']}")
                     # 入场计数不变
                     return
 
@@ -973,6 +997,7 @@ class CtaChanPivotStrategy(CtaTemplate):
             # 归档旧中枢
             if ap is not None:
                 self._pivots.append(ap)
+                self.write_log(f"[中枢] 归档旧中枢: state={ap.get('state','')}, ZG={ap.get('zg',0):.0f}, ZD={ap.get('zd',0):.0f}")
 
             new_pivot = {
                 'zg': zg,
@@ -985,6 +1010,10 @@ class CtaChanPivotStrategy(CtaTemplate):
                 'entry_count': 0,  # R6: 同中枢入场计数
             }
             self._active_pivot = new_pivot
+            self.write_log(
+                f"[中枢] 新中枢形成: ZG={zg:.0f}, ZD={zd:.0f}, ZZ={(zg + zd) / 2:.0f}, "
+                f"bi_range={new_pivot['start_bi_idx']}->{new_pivot['end_bi_idx']}"
+            )
 
             if self._debugger and self.trading:
                 self._debugger.log_pivot(
@@ -1423,6 +1452,7 @@ class CtaChanPivotStrategy(CtaTemplate):
 
         # S1: 冷却期间冻结 Buy 信号（CloseLong 仍允许，避免持仓风险）
         if self._cooldown_remaining > 0 and signal['type'] == 'Buy':
+            self.write_log(f"[信号] 冷却中忽略 Buy: type={signal['type']}, cooldown_remaining={self._cooldown_remaining}")
             self._pending_signal = None
             self.signal = ""
             return
@@ -1430,6 +1460,9 @@ class CtaChanPivotStrategy(CtaTemplate):
         if signal['type'] == 'Buy':
             # 检查是否已经破止损（信号失效）
             if bar['low'] < signal['stop_base']:
+                self.write_log(
+                    f"[信号] Buy失效: low={bar['low']:.0f} < stop_base={signal['stop_base']:.0f}, type={signal.get('type','')}"
+                )
                 self._pending_signal = None
                 self.signal = ""
                 return
@@ -1444,6 +1477,7 @@ class CtaChanPivotStrategy(CtaTemplate):
             # B09: 平多仓信号
             if self._position != 1:
                 # 已无多仓，信号失效
+                self.write_log(f"[信号] CloseLong失效: 当前 _position={self._position}")
                 self._pending_signal = None
                 self.signal = ""
                 return
@@ -1475,6 +1509,9 @@ class CtaChanPivotStrategy(CtaTemplate):
         elif signal['type'] == 'Sell':
             # 保留 Sell 逻辑以防万一（当前不应该被触发）
             if bar['high'] > signal['stop_base']:
+                self.write_log(
+                    f"[信号] Sell失效: high={bar['high']:.0f} > stop_base={signal['stop_base']:.0f}"
+                )
                 self._pending_signal = None
                 self.signal = ""
                 return
@@ -1670,7 +1707,7 @@ class CtaChanPivotStrategy(CtaTemplate):
         """成交回调."""
         self.write_log(
             f"成交: {trade.direction.value} {trade.offset.value} "
-            f"{trade.volume}手 @ {trade.price:.0f}"
+            f"{trade.volume}手 @ {trade.price:.0f} | pos={self.pos} _position={self._position} signal={self.signal}"
         )
         self.sync_data()
         self._sync_gui_debug_vars()
