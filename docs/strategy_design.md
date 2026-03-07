@@ -384,7 +384,149 @@ seg_enabled=False, hist_gate=0               # S8/S9 禁用
 
 ---
 
-## 九、已知局限与未来方向
+## 九、当前回测框架与实盘时序图
+
+### 9.1 回测框架（1m Bar 驱动）
+
+当前回测的外部驱动频率是 **1 分钟 Bar**。在 vn.py 的 BAR backtesting 模式下，每来一根 1m Bar，回测引擎会先撮合上一时点挂着的订单，再调用策略的 `on_bar()`。
+
+```mermaid
+sequenceDiagram
+    participant CSV as 1m历史数据/数据库
+    participant BT as BacktestingEngine
+    participant Strat as CtaChanPivotStrategy
+    participant M5 as 5m聚合逻辑
+    participant M15 as 15m聚合逻辑
+
+    CSV->>BT: 提供下一根 1m Bar
+    BT->>BT: cross_limit_order()
+    BT->>Strat: on_order()/on_trade()（如有成交）
+    BT->>BT: cross_stop_order()
+    BT->>Strat: on_order()/on_trade()（如有触发）
+    BT->>Strat: on_bar(bar_1m)
+
+    Note over Strat: 1m层：session过滤 → 止损检查 → pending signal触发
+
+    Strat->>M15: _update_15m_bar(bar_1m)
+    M15-->>Strat: 15m完成时更新MACD过滤
+
+    Strat->>M5: _update_5m_bar(bar_1m)
+    M5-->>Strat: 5m完成时触发 _on_5m_bar()
+
+    Note over M5,Strat: 5m层：包含处理 → 分型/笔 → 中枢 → ATR → trailing → 信号生成
+    Strat->>Strat: _check_signal() 生成 pending_signal
+    Strat-->>BT: buy/sell/short/cover（如满足条件）
+```
+
+**关键点：**
+- 回测不是 Tick 驱动，而是 **1m Bar 驱动**。
+- 订单不会在当前 `on_bar()` 内立即成交；最早在**下一根 1m Bar** 到来时，由引擎先撮合，再进入新的 `on_bar()`。
+- 策略核心信号不是 1m 直接决策，而是 **1m 驱动 + 内部 5m/15m 聚合**。
+
+### 9.2 实盘框架（Tick 输入，1m Bar 决策）
+
+当前实盘的行情输入是 **Tick 级**，但策略本身不是 Tick 策略，而是通过 `BarGenerator` 将 Tick 聚合成 1m Bar 后，再进入和回测相同的 `on_bar()` 主逻辑。
+
+```mermaid
+sequenceDiagram
+    participant Ex as 交易所/柜台Tick
+    participant CTA as CTA Engine
+    participant Strat as CtaChanPivotStrategy
+    participant BG as BarGenerator
+    participant M5 as 5m聚合逻辑
+    participant M15 as 15m聚合逻辑
+    participant Broker as 柜台/撮合回报
+
+    Ex->>CTA: Tick
+    CTA->>Strat: on_tick(tick)
+    Strat->>BG: update_tick(tick)
+
+    alt 形成新的1m Bar
+        BG->>Strat: on_bar(bar_1m)
+        Note over Strat: 1m层：session过滤 → 止损检查 → pending signal触发
+        Strat->>M15: _update_15m_bar(bar_1m)
+        Strat->>M5: _update_5m_bar(bar_1m)
+        M5-->>Strat: _on_5m_bar()
+        Note over M5,Strat: 5m层：包含处理 → 分型/笔 → 中枢 → ATR → trailing → 信号生成
+        Strat-->>Broker: buy/sell/short/cover（发单）
+    end
+
+    Broker-->>Strat: on_order()（异步）
+    Broker-->>Strat: on_trade()（异步）
+```
+
+**关键点：**
+- 实盘是 **Tick 输入**，但策略决策仍然是 **1m Bar 驱动**。
+- 因此当前策略属于：
+  - **行情输入层：Tick**
+  - **主决策层：1m Bar**
+  - **结构/趋势层：内部 5m / 15m 聚合**
+- `on_order()` / `on_trade()` 与 `on_bar()` 不在同一个时钟内，它们是**异步回报**。
+
+### 9.3 当前状态机时序（含 Live Safety）
+
+当前代码在保持历史回测盈利时序的前提下，叠加了一层 Live Safety 保护：
+
+- `_pending_open`：防止开仓单在途时重复开仓
+- `_pending_close`：防止平仓单在途时重复平仓/重复止损
+- `on_trade()`：用于清理 pending 标记，并检测**手动/外部平仓**
+- `on_order()`：用于 reject/cancel 时做**状态回滚**
+- `on_bar()`：在 live 模式下做轻量级 `self.pos` 与 `_position` 对账（仅在无 pending 中间态时）
+
+```mermaid
+sequenceDiagram
+    participant Bar as 新1m Bar
+    participant Strat as Strategy State
+    participant Broker as Broker/Engine
+
+    Bar->>Strat: on_bar(bar_1m)
+    Strat->>Strat: 检查 _pending_open/_pending_close
+    Strat->>Strat: 止损 / pending signal / 5m&15m聚合
+
+    alt 触发开仓
+        Strat->>Strat: 立即设置逻辑持仓状态
+        Strat->>Strat: _pending_open = True
+        Strat-->>Broker: buy()/short()
+    end
+
+    alt 触发平仓/止损
+        Strat->>Strat: 立即设置逻辑平仓状态
+        Strat->>Strat: _pending_close = True
+        Strat-->>Broker: sell()/cover()
+    end
+
+    Broker-->>Strat: on_order()
+    alt reject/cancel
+        Strat->>Strat: 从 snapshot 回滚 pre-open / pre-close 状态
+        Strat->>Strat: 清 pending 标记
+    end
+
+    Broker-->>Strat: on_trade()
+    alt 策略发出的成交
+        Strat->>Strat: 清 pending 标记
+    else 手动/外部平仓
+        Strat->>Strat: 检测 manual close
+        Strat->>Strat: 同步内部仓位与风控状态
+    end
+```
+
+### 9.4 当前框架的结论
+
+1. **回测不是 Tick 级驱动**，而是 **1m Bar 驱动**。
+2. **实盘不是 Tick 级决策**，而是 **Tick 输入 + 1m Bar 决策**。
+3. 这套策略的时序敏感点，不在于“是不是 Tick 策略”，而在于：
+   - `on_bar()`（1m 主时钟）
+   - `_on_5m_bar()`（结构/风控主时钟）
+   - `on_order()/on_trade()`（异步执行回报）
+   三套时钟如何保持一致。
+4. 当前实现选择：
+   - 保留历史可盈利的 **signal-time 状态语义**
+   - 再叠加 **pending + rollback + reconciliation** 做 live safety
+   - 以尽量避免因纯粹执行时序修复而破坏回测收益。
+
+---
+
+## 十、已知局限与未来方向
 
 ### 9.1 架构天花板
 除p2209 约4180 pts，距目标5600仍差~1420。弱合约（p2301, p2509）的根本问题是行情特征（低波动震荡）不适合该策略的趋势跟随框架。
