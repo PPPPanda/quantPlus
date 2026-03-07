@@ -16,7 +16,10 @@ data/
         ├── chan_bi.csv          # 笔数据记录
         ├── chan_pivot.csv       # 中枢数据记录
         ├── signals.csv          # 信号记录
-        ├── trades.csv           # 交易记录
+        ├── trades.csv           # 逻辑交易记录（兼容旧分析口径）
+        ├── logic_trades.csv     # 逻辑交易记录（新）
+        ├── orders.csv           # 真实委托回报
+        └── fills.csv            # 真实成交回报
         ├── strategy.log         # 详细策略日志
         └── summary.json         # 运行摘要
 ```
@@ -230,59 +233,69 @@ class ChanDebugger:
         )
 ```
 
-### 3.4 信号和交易记录
+### 3.4 信号和交易记录（已重构）
 
-```python
-    def log_signal(self, signal: Dict, reason: str = ""):
-        """记录交易信号"""
-        if not self.enabled:
-            return
+当前调试结构已经从单一 `trades.csv`，重构为“**信号层 / 逻辑交易层 / 真实委托层 / 真实成交层**”四层。
 
-        self._append_csv(self.signal_file, [
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            signal.get('signal_type', 'Unknown'),
-            signal['type'],  # 'Buy' or 'Sell'
-            signal['trig'],
-            signal['stop'],
-            reason
-        ])
-        self.stats['total_signals'] += 1
+#### 3.4.1 `signals.csv`
+记录信号生成：
+- 信号类型（2B / 3B / 3S ...）
+- 方向
+- 触发价
+- 止损价
+- ATR
+- 原因
 
-        # 醒目打印信号
-        direction = "做多" if signal['type'] == 'Buy' else "做空"
-        self.logger.warning(
-            f"{'='*50}\n"
-            f"[信号] {signal.get('signal_type', '')} {direction}\n"
-            f"  触发价: {signal['trig']:.0f}\n"
-            f"  止损价: {signal['stop']:.0f}\n"
-            f"  原因: {reason}\n"
-            f"{'='*50}"
-        )
+#### 3.4.2 `logic_trades.csv`
+记录**策略逻辑层**认为发生的交易：
+- `signal_entry`
+- `signal_exit`
+- `stop_exit`
 
-    def log_trade(self, action: str, price: float, position: int,
-                  pnl: float = 0, signal_type: str = ""):
-        """记录交易执行"""
-        if not self.enabled:
-            return
+含义是：
+> 策略内部决定应该开/平仓
 
-        self._append_csv(self.trade_file, [
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            action,  # 'OPEN_LONG', 'OPEN_SHORT', 'CLOSE_LONG', 'CLOSE_SHORT'
-            price,
-            position,
-            pnl,
-            signal_type
-        ])
+不等于真实成交。
 
-        if 'OPEN' in action:
-            self.stats['total_trades'] += 1
+#### 3.4.3 `trades.csv`
+保留旧文件名以兼容旧分析脚本，口径与 `logic_trades.csv` 相同。
 
-        # 醒目打印交易
-        self.logger.warning(
-            f"[交易] {action} @ {price:.0f} | "
-            f"持仓={position} | PnL={pnl:+.0f}"
-        )
-```
+#### 3.4.4 `orders.csv`
+记录 `on_order()` 收到的**真实委托回报**：
+- `vt_orderid`
+- direction / offset
+- price / volume / traded
+- status
+- gateway_name
+
+#### 3.4.5 `fills.csv`
+记录 `on_trade()` 收到的**真实成交回报**：
+- `vt_tradeid`
+- `vt_orderid`
+- direction / offset
+- price / volume
+- `engine_pos`
+- `logic_position`
+- `signal`
+
+### 排查顺序（必须遵守）
+
+以后不要再直接把 `strategy.log / trades.csv` 当成“真实成交证明”。
+
+正确顺序：
+1. `signals.csv`：有没有信号
+2. `logic_trades.csv`：策略有没有决定开/平仓
+3. `orders.csv`：主引擎有没有真实发出委托
+4. `fills.csv`：主引擎有没有真实成交
+5. GUI 主界面的委托 / 成交 / 持仓：是否与 `orders.csv / fills.csv` 对得上
+
+### 核心教训
+
+- `logic_trades.csv / trades.csv` = **策略逻辑层**
+- `orders.csv` = **真实委托层**
+- `fills.csv` = **真实成交层**
+
+如果 GUI 主界面没有看到真实委托/成交，但 `logic_trades.csv` 有记录，不要立刻判定“GUI坏了”——先判断是不是策略逻辑触发了，但执行层没有闭环。
 
 ### 3.5 状态监控和摘要
 

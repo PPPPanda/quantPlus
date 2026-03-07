@@ -525,6 +525,11 @@ sequenceDiagram
    - 不要把 live-only 的保护逻辑直接塞进策略主文件的回测路径
    - 尤其不要依赖 `self.trading` 作为“live/backtest”区分开关，因为它在两边都可能为真
    - 任何实盘安全逻辑如果要加入，必须明确隔离在 live-only 层，或完全放在策略文件之外
+   - 调试产物必须区分：
+     - `logic_trades.csv / trades.csv`（策略逻辑层）
+     - `orders.csv`（真实委托层）
+     - `fills.csv`（真实成交层）
+     否则极易误把“策略认为发生了交易”当成“主引擎确认成交”
 
 ---
 
