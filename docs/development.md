@@ -395,6 +395,15 @@ class MyStrategy(CtaTemplate):
 - 实盘时 CTA 引擎只推送 `on_tick()`，**不会自动调用 `on_bar()`**
 - 因此策略**必须**实现 `BarGenerator` 来支持实盘交易
 
+**重要工程警告（已踩坑）**：
+- 不要把 **live-only 安全逻辑**（如手动平仓检测、仓位强制对账、pending 订单防重入、snapshot rollback）直接混进策略主文件的回测路径
+- 不要使用 `self.trading` 作为“live/backtest”区分条件：在回测中它也可能为真
+- 这类逻辑如果写进策略主路径，会污染基线语义，导致交易数、PnL、回撤大幅偏离历史基线
+- 正确做法：
+  1. 基线策略文件保持纯净、可复现
+  2. 实盘安全逻辑显式隔离为 live-only
+  3. 最好放在策略外层（wrapper / executor / gateway adapter）处理
+
 **BarGenerator 工作原理**：
 ```
 Tick 数据 → BarGenerator.update_tick() → 1 分钟 Bar → on_bar()

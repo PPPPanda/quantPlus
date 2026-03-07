@@ -463,15 +463,23 @@ sequenceDiagram
   - **结构/趋势层：内部 5m / 15m 聚合**
 - `on_order()` / `on_trade()` 与 `on_bar()` 不在同一个时钟内，它们是**异步回报**。
 
-### 9.3 当前状态机时序（含 Live Safety）
+### 9.3 当前状态机时序（基线实现）
 
-当前代码在保持历史回测盈利时序的前提下，叠加了一层 Live Safety 保护：
+**当前策略文件已经回退到 iter14 / `d1e4dd0` 的基线实现。**
 
-- `_pending_open`：防止开仓单在途时重复开仓
-- `_pending_close`：防止平仓单在途时重复平仓/重复止损
-- `on_trade()`：用于清理 pending 标记，并检测**手动/外部平仓**
-- `on_order()`：用于 reject/cancel 时做**状态回滚**
-- `on_bar()`：在 live 模式下做轻量级 `self.pos` 与 `_position` 对账（仅在无 pending 中间态时）
+也就是说，策略主路径只保留了对回测语义真正有意义的部分：
+- 信号生成与执行
+- 1m 止损检查
+- 5m/15m 聚合后的结构与风控逻辑
+- 简单的 `on_trade()` 日志与同步
+
+策略文件中**不再**包含此前尝试加入的下列“Live Safety”机制：
+- `_pending_open` / `_pending_close`
+- `on_trade()` 内的“手动/外部平仓检测”
+- `on_bar()` 内基于 `self.pos` 与 `_position` 的强制对账
+- `on_order()` 内的 snapshot rollback
+
+移除原因：这些机制会污染回测主路径，破坏 iter14 基线语义；而且它们**并不能正确解决真正外部手动平仓**（因为 vn.py CTA engine 只会把映射到当前策略订单的 `order/trade` 事件路由到策略实例）。
 
 ```mermaid
 sequenceDiagram
@@ -480,34 +488,25 @@ sequenceDiagram
     participant Broker as Broker/Engine
 
     Bar->>Strat: on_bar(bar_1m)
-    Strat->>Strat: 检查 _pending_open/_pending_close
-    Strat->>Strat: 止损 / pending signal / 5m&15m聚合
+    Strat->>Strat: session过滤 → 1m止损检查 → pending_signal触发
+    Strat->>Strat: 更新15m聚合
+    Strat->>Strat: 更新5m聚合并执行结构/风控逻辑
 
     alt 触发开仓
-        Strat->>Strat: 立即设置逻辑持仓状态
-        Strat->>Strat: _pending_open = True
+        Strat->>Strat: 立即设置策略内部持仓状态
         Strat-->>Broker: buy()/short()
     end
 
     alt 触发平仓/止损
-        Strat->>Strat: 立即设置逻辑平仓状态
-        Strat->>Strat: _pending_close = True
+        Strat->>Strat: 立即设置策略内部平仓状态
         Strat-->>Broker: sell()/cover()
     end
 
     Broker-->>Strat: on_order()
-    alt reject/cancel
-        Strat->>Strat: 从 snapshot 回滚 pre-open / pre-close 状态
-        Strat->>Strat: 清 pending 标记
-    end
+    Note over Strat: 当前基线实现中 on_order() 不修改策略状态
 
     Broker-->>Strat: on_trade()
-    alt 策略发出的成交
-        Strat->>Strat: 清 pending 标记
-    else 手动/外部平仓
-        Strat->>Strat: 检测 manual close
-        Strat->>Strat: 同步内部仓位与风控状态
-    end
+    Note over Strat: 当前基线实现中 on_trade() 仅记录成交并 sync_data
 ```
 
 ### 9.4 当前框架的结论
@@ -519,26 +518,29 @@ sequenceDiagram
    - `_on_5m_bar()`（结构/风控主时钟）
    - `on_order()/on_trade()`（异步执行回报）
    三套时钟如何保持一致。
-4. 当前实现选择：
-   - 保留历史可盈利的 **signal-time 状态语义**
-   - 再叠加 **pending + rollback + reconciliation** 做 live safety
-   - 以尽量避免因纯粹执行时序修复而破坏回测收益。
+4. **基线结论**：
+   - iter14 的正式可复现基线来自 `d1e4dd0`
+   - 在同一脚本、同一参数、同一数据口径下，该基线已被直接复现验证
+5. **工程教训**：
+   - 不要把 live-only 的保护逻辑直接塞进策略主文件的回测路径
+   - 尤其不要依赖 `self.trading` 作为“live/backtest”区分开关，因为它在两边都可能为真
+   - 任何实盘安全逻辑如果要加入，必须明确隔离在 live-only 层，或完全放在策略文件之外
 
 ---
 
 ## 十、已知局限与未来方向
 
-### 9.1 架构天花板
+### 10.1 架构天花板
 除p2209 约4180 pts，距目标5600仍差~1420。弱合约（p2301, p2509）的根本问题是行情特征（低波动震荡）不适合该策略的趋势跟随框架。
 
-### 9.2 已验证无效的方向
+### 10.2 已验证无效的方向
 - 段背驰（入场/出场/过滤）：信号质量差
 - histogram 确认门：过滤过猛
 - 紧trailing（activate<2.0）：杀p2601
 - 全局降频（trade_interval）：伤趋势合约
 - 15m diff>0 硬过滤：杀p2209
 
-### 9.3 可能的突破方向
+### 10.3 可能的突破方向
 1. **更高级别信号**：在15m/60m层面识别买卖点，而非仅用15m做过滤
 2. **多策略组合**：缠论策略覆盖趋势市，另一套策略覆盖震荡市
 3. **动态参数切换**：根据ATR分位数/中枢宽度自动切换参数组
@@ -546,22 +548,31 @@ sequenceDiagram
 
 ---
 
-## 十、复现指南
+## 十一、复现指南
 
-### 10.1 回测脚本
+### 11.1 回测脚本
+
+**iter14 正式基线复现：**
+```bash
+cd work/quant/quantPlus
+.venv/bin/python scripts/run_iter14_all.py
+# 期望（d1e4dd0 基线口径）：TOTAL ≈ 13668.0 pts
+```
+
+**其他回测脚本：**
 ```bash
 cd work/quant/quantPlus
 .venv/Scripts/python.exe scripts/run_7bench.py
 # 输出: TOTAL=11117.3 pts, STATUS=PASS
 ```
 
-### 10.2 GUI 回测
+### 11.2 GUI 回测
 1. 确保数据库有归一化数据（运行 `run_7bench.py` 或手动导入）
 2. 打开 vnpy CTA回测 GUI
 3. 选择 CtaChanPivotStrategy，设置合约/日期/参数
 4. 回测参数：slippage=1.0, rate=0.0001, size=10.0, pricetick=2.0, capital=1000000
 
-### 10.3 参数覆盖
+### 11.3 参数覆盖
 ```bash
 # 单参数测试
 .venv/Scripts/python.exe scripts/run_7bench.py circuit_breaker_losses=8
@@ -575,7 +586,7 @@ cd work/quant/quantPlus
 
 
 
-## 十一  备注：
+## 十二、备注
 1. 工作日 节假日之前需要平仓 （（受马来影响）注意开盘容易跳水）
 2. 连输冷却器太简单
 3. 研究一个止盈策略，目前只看到止损策略
