@@ -31,7 +31,7 @@ from vnpy.trader.object import BarData, TickData, TradeData, OrderData
 from vnpy.trader.utility import BarGenerator
 from vnpy.trader.constant import Interval
 from vnpy_ctastrategy import CtaTemplate
-from vnpy_ctastrategy.base import StopOrder
+from vnpy_ctastrategy.base import StopOrder, EngineType
 
 from qp.datafeed.normalizer import (
     PALM_OIL_SESSIONS, compute_window_end, get_session_key, _get_session_for_time,
@@ -79,6 +79,9 @@ class CtaChanPivotStrategy(CtaTemplate):
 
     # 合约参数
     fixed_volume: int = 1            # 固定手数
+
+    # Live 预热参数
+    live_warmup_days: int = 5        # 实盘启动时从数据库预热的自然日天数
 
     # =========================================================================
     # iter14 基线参数（已验证：TOTAL=13667.9 pts, 12/13合约通过）
@@ -159,7 +162,7 @@ class CtaChanPivotStrategy(CtaTemplate):
     parameters: list[str] = [
         "macd_fast", "macd_slow", "macd_signal",
         "atr_window", "atr_trailing_mult", "atr_activate_mult", "atr_entry_filter",
-        "min_bi_gap", "pivot_valid_range", "fixed_volume",
+        "min_bi_gap", "pivot_valid_range", "fixed_volume", "live_warmup_days",
         "cooldown_losses", "cooldown_bars",
         "circuit_breaker_losses", "circuit_breaker_bars",
         "lock_profit_atr",
@@ -403,14 +406,42 @@ class CtaChanPivotStrategy(CtaTemplate):
             })
 
         # 加载历史数据（1 分钟）
-        self.write_log("开始预热历史数据: load_bar(60)")
-        self.load_bar(60)
+        engine_type = self.get_engine_type()
+        if engine_type == EngineType.LIVE:
+            self.write_log(f"开始预热历史数据（实盘/数据库）: load_bar({self.live_warmup_days}, use_database=True)")
+            self.load_bar(self.live_warmup_days, use_database=True)
+        else:
+            self.write_log("开始预热历史数据（回测）: load_bar(60)")
+            self.load_bar(60)
 
         self.write_log("策略初始化完成")
         self._sync_gui_debug_vars()
 
     def on_start(self) -> None:
         self.write_log("策略启动")
+
+        # Live-only: 启动时清空持仓相关脏状态，保留刚刚由历史数据预热出的结构/指标缓存
+        if self.get_engine_type() == EngineType.LIVE:
+            self.write_log(
+                f"启动前状态: pos={self.pos}, _position={self._position}, signal={self.signal}, "
+                f"bi_count={len(self._bi_points)}, pivot_count={len(self._pivots)}"
+            )
+            self.pos = 0
+            self._position = 0
+            self._entry_price = 0.0
+            self._stop_price = 0.0
+            self._initial_stop = 0.0
+            self._trailing_active = False
+            self._bars_since_entry = 0
+            self.signal = ""
+            # bar/bi/pivot 计数与预热后的真实结构保持一致，覆盖持久化残留值
+            self.bi_count = len(self._bi_points)
+            self.pivot_count = len(self._pivots)
+            self.write_log(
+                f"已清空持仓脏状态: pos={self.pos}, _position={self._position}, signal={self.signal}, "
+                f"保留预热结构 bi_count={self.bi_count}, pivot_count={self.pivot_count}"
+            )
+
         self.write_log(
             f"启动状态: inited={self.inited}, trading={self.trading}, pos={self.pos}, "
             f"_position={self._position}, bi_count={len(self._bi_points)}, pivot_count={len(self._pivots)}"
