@@ -1564,6 +1564,62 @@ uv sync --all-extras
 
 #### 问题 4：Windows / WSL 共用同一个 `.venv` 导致 `uv run` 失败
 
+**现象**：在 Windows PowerShell 中运行：
+
+```powershell
+uv run python -m qp.runtime.trader_app --gateway ctp --profile all
+```
+
+报错类似：
+
+```text
+error: failed to remove file `E:\work\quant\quantPlus\.venv\lib64`: 拒绝访问。 (os error 5)
+```
+
+**根因**：
+- 仓库里的 `.venv` 是 **WSL/Linux 创建的虚拟环境**
+- 其中常见特征是存在 Linux 符号链接：
+  - `.venv/lib64 -> lib`
+- Windows 侧的 `uv` 会尝试删除并重建 `.venv`，但在处理 Linux symlink 时失败
+
+**结论**：
+- **不要让 Windows 和 WSL 共用同一个 `.venv`**
+- 必须使用分离的虚拟环境目录
+
+**推荐规范**：
+
+```powershell
+# Windows
+uv venv .venv-win
+uv run --python .venv-win\Scripts\python.exe python -m qp.runtime.trader_app --gateway ctp --profile all
+```
+
+```bash
+# WSL / Linux
+uv venv .venv-linux
+.venv-linux/bin/python -m qp.backtest.run_cta_backtest --help
+```
+
+**如果仓库已经被 WSL 的 `.venv` 污染**：
+
+```powershell
+# 让 WSL 删除 Linux venv（最稳）
+wsl bash -lc "rm -rf /mnt/e/work/quant/quantPlus/.venv"
+```
+
+然后重新创建 Windows 专用虚拟环境：
+
+```powershell
+uv venv .venv-win
+```
+
+**额外建议**：
+- Windows 只使用 `.venv-win`
+- WSL 只使用 `.venv-linux`
+- 仓库 `.gitignore` 应忽略这两个目录
+
+#### 问题 4：Windows / WSL 共用同一个 `.venv` 导致 `uv run` 失败
+
 **现象**：在 Windows PowerShell 中运行 `uv run ...` 时，报错类似：
 
 ```text
