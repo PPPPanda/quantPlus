@@ -491,13 +491,16 @@ class CtaChanAllSignalsStrategy(CtaTemplate):
                 self.put_event()
                 return
 
-        # 2. 信号管理：检查待触发信号（入场/平仓，仅实盘模式）
+        # 2. 信号管理：检查待触发信号（全信号版，支持双向+链式）
         if self.trading and self._pending_signal:
-            # Buy 信号仅在无仓时触发；CloseLong 信号仅在持多仓时触发
             sig_type = self._pending_signal.get('type', '')
-            if (sig_type == 'Buy' and self._position == 0) or \
-               (sig_type == 'CloseLong' and self._position == 1) or \
-               (sig_type == 'Sell' and self._position == 0):
+            can_exec = (
+                (sig_type == 'Buy' and self._position == 0) or
+                (sig_type == 'Sell' and self._position == 0) or
+                (sig_type == 'CloseLong' and self._position == 1) or
+                (sig_type == 'CloseShort' and self._position == -1)
+            )
+            if can_exec:
                 self._check_entry_1m(bar_dict)
 
         # 3. 增量更新 15m K 线
@@ -1238,252 +1241,172 @@ class CtaChanAllSignalsStrategy(CtaTemplate):
         return ratio <= ratio_th
 
     def _check_signal(self, curr_bar: dict, new_bi: dict) -> None:
-        """R2: 检查交易信号（使用中枢状态机）."""
+        """全信号版：1B/1S/2B/2S/3B/3S 全部生成，无过滤。"""
         # 1. 尝试更新中枢
         self._update_pivots()
 
         if len(self._bi_points) < 5:
             return
 
-        # B02: 冷却期间不生成新信号
-        if self._cooldown_remaining > 0:
-            return
-
-        # S26: 极端跳空冷却期间不生成新信号
-        if self._gap_cooldown_remaining > 0:
-            return
+        # [移除] 冷却/断路器/跳空冷却 — 全部不检查
 
         # 获取笔端点
         p_now = self._bi_points[-1]   # 当前回踩点
         p_last = self._bi_points[-2]  # 前一极值点（离开段端点）
         p_prev = self._bi_points[-3]  # 再前一点（背驰比较用）
 
-        is_bull = self._prev_diff_15m > self._prev_dea_15m
-        is_bear = self._prev_diff_15m < self._prev_dea_15m
+        # [移除] 15m 趋势过滤 — 不区分 is_bull/is_bear，全部放行
 
         sig = None
+        sig_type = ''  # 1B/1S/2B/2S/3B/3S
         stop_base = 0.0
         trigger_price = 0.0
 
-        # R2: 使用活跃中枢状态机
         ap = self._active_pivot
-        # 同时保留对历史中枢的 fallback（兼容性）
         last_pivot = ap if ap else (self._pivots[-1] if self._pivots else None)
 
-        # --------------------------------------------------------
-        # 核心逻辑：Pivot 3B/3S（R2: 状态机驱动）
-        # --------------------------------------------------------
+        # ============================================================
+        # 3B/3S：中枢离开后回试（优先级最高）
+        # ============================================================
         if ap and ap['state'] in ('left_up', 'left_down'):
-            # --- 3B 买点 ---
-            # R2: 向上离开中枢 + 回踩不破 ZG（状态机确认离开段）
+            # 3B：向上离开 + 回踩不破ZG
             if ap['state'] == 'left_up' and p_now['type'] == 'bottom':
-                # 回踩点在 ZG 之上 = 回踩不破中枢高点
-                # S4: 且回踩点不能离ZG太远（确保是真正的"回踩"而非追高）
-                pullback_ok = True
-                if self.max_pullback_atr > 0 and self.atr > 0:
-                    pullback_ok = p_now['price'] < ap['zg'] + self.max_pullback_atr * self.atr
-                if p_now['price'] > ap['zg'] and pullback_ok:
-                    if is_bull:
-                        # R1: 同中枢入场去重 — 检查是否超限
-                        if self.max_pivot_entries > 0 and ap['entry_count'] >= self.max_pivot_entries:
-                            # 超限后需要更强突破: 触发价 > ZG + pivot_reentry_atr * ATR
-                            breakout_threshold = ap['zg'] + self.pivot_reentry_atr * self.atr
-                            if p_now['data']['high'] <= breakout_threshold:
-                                pass  # 不满足强突破条件，跳过
-                            else:
-                                sig = 'Buy'
-                                trigger_price = p_now['data']['high']
-                                stop_base = p_now['price']
-                        else:
-                            sig = 'Buy'
-                            trigger_price = p_now['data']['high']
-                            stop_base = p_now['price']
-
-            # --- 3S 卖点 ---
-            # R2: 向下离开中枢 + 回抽不破 ZD
+                if p_now['price'] > ap['zg']:
+                    sig = 'Buy'
+                    sig_type = '3B'
+                    trigger_price = p_now['data']['high']
+                    stop_base = p_now['price']
+            # 3S：向下离开 + 回抽不破ZD
             elif ap['state'] == 'left_down' and p_now['type'] == 'top':
                 if p_now['price'] < ap['zd']:
-                    if is_bear:
-                        sig = 'CloseLong'
-                        trigger_price = p_now['data']['low']
-                        stop_base = p_now['price']
-
-        elif last_pivot:
-            # Fallback: 中枢处于 forming/active 时，使用旧逻辑（价格阈值）
-            if p_now['type'] == 'bottom':
-                if p_now['price'] > last_pivot['zg']:
-                    if p_last['price'] > last_pivot['zg']:
-                        age = len(self._bi_points) - 1 - last_pivot.get('end_bi_idx', 0)
-                        if age <= self.pivot_valid_range:
-                            if is_bull:
-                                # R1: 同中枢入场去重
-                                if self.max_pivot_entries > 0 and last_pivot.get('entry_count', 0) >= self.max_pivot_entries:
-                                    breakout_threshold = last_pivot['zg'] + self.pivot_reentry_atr * self.atr
-                                    if p_now['data']['high'] <= breakout_threshold:
-                                        pass  # 跳过
-                                    else:
-                                        sig = 'Buy'
-                                        trigger_price = p_now['data']['high']
-                                        stop_base = p_now['price']
-                                else:
-                                    sig = 'Buy'
-                                    trigger_price = p_now['data']['high']
-                                    stop_base = p_now['price']
-            elif p_now['type'] == 'top':
-                if p_now['price'] < last_pivot['zd']:
-                    if p_last['price'] < last_pivot['zd']:
-                        age = len(self._bi_points) - 1 - last_pivot.get('end_bi_idx', 0)
-                        if age <= self.pivot_valid_range:
-                            if is_bear:
-                                sig = 'CloseLong'
-                                trigger_price = p_now['data']['low']
-                                stop_base = p_now['price']
-
-        # --------------------------------------------------------
-        # 辅助逻辑：2B/2S（趋势延续）
-        # S2: 结构闸门 — 需要活跃中枢且处于 active/forming
-        # B10: 支持面积背驰混合模式
-        # --------------------------------------------------------
-        has_active_structure = (ap is not None and ap['state'] in ('forming', 'active'))
-        if not sig and has_active_structure:
-            if p_now['type'] == 'bottom':
-                # 原始2B：低点抬高 + 动能增强/面积背驰（趋势延续）
-                diff_ok = p_now['data']['diff'] > p_prev['data']['diff']
-                price_ok = p_now['price'] > p_prev['price']
-                cond = self._eval_div_condition(diff_ok)
-                if price_ok and cond and is_bull:
-                    # S9: histogram 确认门
-                    hist_ok = True
-                    if self.hist_gate > 0:
-                        hist_now = self.diff_5m - self.dea_5m
-                        if self.hist_gate == 1:
-                            hist_ok = hist_now > 0  # histogram > 0
-                        elif self.hist_gate == 2:
-                            hist_prev_val = p_prev['data']['diff'] - p_prev['data'].get('dea', self.dea_5m)
-                            hist_ok = hist_now > hist_prev_val  # histogram 上拐
-                    if hist_ok:
-                        sig = 'Buy'  # 2B
-                        trigger_price = p_now['data']['high']
-                        stop_base = p_now['price']
-
-            elif p_now['type'] == 'top':
-                diff_ok = p_now['data']['diff'] < p_prev['data']['diff']
-                price_ok = p_now['price'] < p_prev['price']
-                cond = self._eval_div_condition(diff_ok)
-                if price_ok and cond and is_bear:
-                    sig = 'CloseLong'  # 2S
+                    sig = 'Sell'
+                    sig_type = '3S'
                     trigger_price = p_now['data']['low']
                     stop_base = p_now['price']
 
-        # (S8: 段背驰入场信号已验证无效，已移除)
+        # ============================================================
+        # 2B/2S：中枢内趋势延续（低点抬高/高点降低 + MACD变化）
+        # [移除] S2b结构闸门 — 不要求活跃中枢处于forming/active
+        # [移除] 15m趋势过滤
+        # ============================================================
+        if not sig:
+            if p_now['type'] == 'bottom' and p_now['price'] > p_prev['price']:
+                # 低点抬高 = 2B买入
+                sig = 'Buy'
+                sig_type = '2B'
+                trigger_price = p_now['data']['high']
+                stop_base = p_now['price']
+            elif p_now['type'] == 'top' and p_now['price'] < p_prev['price']:
+                # 高点降低 = 2S卖出
+                sig = 'Sell'
+                sig_type = '2S'
+                trigger_price = p_now['data']['low']
+                stop_base = p_now['price']
 
-        # --------------------------------------------------------
-        # S6: 单笔面积背驰补充路径（与S8共存）
-        # --------------------------------------------------------
-        if not sig and has_active_structure and len(self._bi_macd_areas) >= 3:
-            if p_now['type'] == 'bottom':
-                price_lower = p_now['price'] <= p_prev['price']
-                area_div = self._has_area_divergence()
-                if price_lower and area_div is True and is_bull:
-                    sig = 'Buy'  # 底背驰2B
+        # ============================================================
+        # 1B/1S：趋势背驰（价格创新极值 + MACD面积/diff背驰）
+        # 缠论第一类买卖点：趋势末端背驰反转
+        # ============================================================
+        if not sig:
+            if p_now['type'] == 'bottom' and p_now['price'] <= p_prev['price']:
+                # 价格创新低（或等低）— 检查MACD背驰
+                diff_diverge = abs(p_now['data']['diff']) < abs(p_prev['data']['diff'])
+                area_div = self._has_area_divergence() if len(self._bi_macd_areas) >= 3 else False
+                if diff_diverge or area_div:
+                    sig = 'Buy'
+                    sig_type = '1B'
                     trigger_price = p_now['data']['high']
                     stop_base = p_now['price']
+            elif p_now['type'] == 'top' and p_now['price'] >= p_prev['price']:
+                # 价格创新高（或等高）— 检查MACD背驰
+                diff_diverge = abs(p_now['data']['diff']) < abs(p_prev['data']['diff'])
+                area_div = self._has_area_divergence() if len(self._bi_macd_areas) >= 3 else False
+                if diff_diverge or area_div:
+                    sig = 'Sell'
+                    sig_type = '1S'
+                    trigger_price = p_now['data']['low']
+                    stop_base = p_now['price']
 
-        # --------------------------------------------------------
-        # 信号过滤与设置
-        # --------------------------------------------------------
-        if sig and self.atr > 0:
-            # R1: 入场去重 — 检查近期是否在相同价格区域入过场
-            if sig == 'Buy' and self.dedup_bars > 0 and self._recent_entries:
-                dedup_dist = self.dedup_atr_mult * self.atr
-                for entry in reversed(self._recent_entries):
-                    bars_ago = self._bar_5m_count - entry['bar_5m_count']
-                    if bars_ago > self.dedup_bars:
-                        break  # 超出时间窗口
-                    if abs(trigger_price - entry['price']) < dedup_dist:
-                        sig = None  # 太近，去重
-                        break
+        # ============================================================
+        # 信号设置（无过滤，直接挂 pending）
+        # [移除] ATR入场距离过滤
+        # [移除] 入场去重
+        # [移除] 中枢限次
+        # ============================================================
+        if sig:
+            self._signal_type = sig_type
+            reason = f"{sig_type}: {'买入' if sig == 'Buy' else '卖出'}"
 
-            # B09: CloseLong 信号仅在持有多仓时有效
-            if sig == 'CloseLong':
+            # Sell信号：先平多仓（如有），再开空
+            if sig == 'Sell':
                 if self._position == 1:
-                    # 有多仓，设置平仓信号
-                    self._signal_type = "3S" if (self._pivots and last_pivot and
-                        p_now['price'] < last_pivot['zd']) else "2S"
-                    reason = f"{self._signal_type}: 平多信号"
+                    # 先平多
                     self._pending_signal = {
                         'type': 'CloseLong',
                         'trigger_price': trigger_price,
-                        'stop_base': stop_base
+                        'stop_base': stop_base,
+                        '_next_short': True,  # 平完后继续开空
                     }
-                    self.signal = f"待平多({self._signal_type})"
-                    if self._debugger and self.trading:
-                        self._debugger.log_signal(
-                            signal_type=self._signal_type,
-                            direction="CloseLong",
-                            trigger_price=trigger_price,
-                            stop_price=stop_base,
-                            atr=self.atr,
-                            reason=reason
-                        )
-                # 无多仓时忽略 CloseLong 信号
-                return
+                    self.signal = f"待平多后开空({sig_type})"
+                elif self._position == 0:
+                    # 空仓，直接开空
+                    self._pending_signal = {
+                        'type': 'Sell',
+                        'trigger_price': trigger_price,
+                        'stop_base': stop_base,
+                    }
+                    self.signal = f"待开空({sig_type})"
+                elif self._position == -1:
+                    # 已空仓，忽略
+                    return
+            elif sig == 'Buy':
+                if self._position == -1:
+                    # 先平空
+                    self._pending_signal = {
+                        'type': 'CloseShort',
+                        'trigger_price': trigger_price,
+                        'stop_base': stop_base,
+                        '_next_long': True,  # 平完后继续开多
+                    }
+                    self.signal = f"待平空后开多({sig_type})"
+                elif self._position == 0:
+                    # 空仓，直接开多
+                    self._pending_signal = {
+                        'type': 'Buy',
+                        'trigger_price': trigger_price,
+                        'stop_base': stop_base,
+                    }
+                    self.signal = f"待开多({sig_type})"
+                elif self._position == 1:
+                    # 已持多，忽略
+                    return
 
-            # 入场过滤：触发价与止损距离不超过 N 倍 ATR
-            distance = abs(trigger_price - stop_base)
-            if distance < self.atr_entry_filter * self.atr:
-                # 判断信号类型（只有 Buy 信号能到这里）
-                if self._pivots and last_pivot:
-                    if p_now['type'] == 'bottom' and p_now['price'] > last_pivot['zg']:
-                        self._signal_type = "3B"
-                        reason = f"3B买点: 回踩不破中枢ZG={last_pivot['zg']:.0f}"
-                    else:
-                        self._signal_type = "2B"
-                        reason = f"{self._signal_type}: 趋势延续确认"
-                else:
-                    self._signal_type = "2B"
-                    reason = f"{self._signal_type}: 趋势延续确认"
+            if self._debugger and self.trading:
+                self._debugger.log_signal(
+                    signal_type=sig_type,
+                    direction=sig,
+                    trigger_price=trigger_price,
+                    stop_price=stop_base,
+                    atr=self.atr,
+                    reason=reason,
+                )
 
-                self._pending_signal = {
-                    'type': sig,
-                    'trigger_price': trigger_price,
-                    'stop_base': stop_base
-                }
-                self.signal = f"待触发{sig}"
-
-                # Debug: 记录信号（仅实盘模式）
-                if self._debugger and self.trading:
-                    self._debugger.log_signal(
-                        signal_type=self._signal_type,
-                        direction=sig,
-                        trigger_price=trigger_price,
-                        stop_price=stop_base,
-                        atr=self.atr,
-                        reason=reason
-                    )
-
-                if self.debug:
-                    self.write_log(f"[DEBUG] 信号生成: {sig}, trigger={trigger_price:.0f}, stop={stop_base:.0f}")
+            if self.debug:
+                self.write_log(f"[ALLSIG] {sig_type} {sig}: trigger={trigger_price:.0f}, stop={stop_base:.0f}")
 
     def _check_entry_1m(self, bar: dict) -> None:
-        """1分钟级别检查入场/平仓（待触发信号）."""
+        """1分钟级别检查入场/平仓（全信号版，支持双向交易）."""
         signal = self._pending_signal
         if not signal:
             return
 
-        # S1: 冷却期间冻结 Buy 信号（CloseLong 仍允许，避免持仓风险）
-        if self._cooldown_remaining > 0 and signal['type'] == 'Buy':
-            self.write_log(f"[信号] 冷却中忽略 Buy: type={signal['type']}, cooldown_remaining={self._cooldown_remaining}")
-            self._pending_signal = None
-            self.signal = ""
-            return
+        # [移除] 冷却检查 — 全部不检查
 
-        if signal['type'] == 'Buy':
+        sig_type = signal['type']
+
+        if sig_type == 'Buy':
             # 检查是否已经破止损（信号失效）
             if bar['low'] < signal['stop_base']:
-                self.write_log(
-                    f"[信号] Buy失效: low={bar['low']:.0f} < stop_base={signal['stop_base']:.0f}, type={signal.get('type','')}"
-                )
                 self._pending_signal = None
                 self.signal = ""
                 return
@@ -1494,46 +1417,9 @@ class CtaChanAllSignalsStrategy(CtaTemplate):
                     fill_price = bar['close']
                 self._open_position(1, fill_price, signal['stop_base'])
 
-        elif signal['type'] == 'CloseLong':
-            # B09: 平多仓信号
-            if self._position != 1:
-                # 已无多仓，信号失效
-                self.write_log(f"[信号] CloseLong失效: 当前 _position={self._position}")
-                self._pending_signal = None
-                self.signal = ""
-                return
-            # 检查是否触发平仓（价格跌破触发价）
-            if bar['low'] < signal['trigger_price']:
-                fill_price = min(signal['trigger_price'], bar['open'])
-                if fill_price < bar['low']:
-                    fill_price = bar['close']
-                # 平多仓
-                pnl = fill_price - self._entry_price
-                self.sell(fill_price, abs(self.pos))
-                self.write_log(f"3S/2S平多: price={fill_price:.0f}, pnl={pnl:.0f}")
-                if self._debugger and self.trading:
-                    self._debugger.log_trade(
-                        action="CLOSE_LONG",
-                        price=fill_price,
-                        volume=self.fixed_volume,
-                        position=0,
-                        pnl=pnl,
-                        signal_type=self._signal_type,
-                        note="signal_exit"
-                    )
-                self._position = 0
-                self._trailing_active = False
-                self._pending_signal = None
-                self.signal = "平多"
-                # B02/R2: 更新连亏计数
-                self._update_loss_streak(pnl)
-
-        elif signal['type'] == 'Sell':
-            # 保留 Sell 逻辑以防万一（当前不应该被触发）
+        elif sig_type == 'Sell':
+            # 开空信号
             if bar['high'] > signal['stop_base']:
-                self.write_log(
-                    f"[信号] Sell失效: high={bar['high']:.0f} > stop_base={signal['stop_base']:.0f}"
-                )
                 self._pending_signal = None
                 self.signal = ""
                 return
@@ -1542,6 +1428,66 @@ class CtaChanAllSignalsStrategy(CtaTemplate):
                 if fill_price < bar['low']:
                     fill_price = bar['close']
                 self._open_position(-1, fill_price, signal['stop_base'])
+
+        elif sig_type == 'CloseLong':
+            if self._position != 1:
+                self._pending_signal = None
+                self.signal = ""
+                return
+            if bar['low'] < signal['trigger_price']:
+                fill_price = min(signal['trigger_price'], bar['open'])
+                if fill_price < bar['low']:
+                    fill_price = bar['close']
+                pnl = fill_price - self._entry_price
+                self.sell(fill_price, abs(self.pos))
+                self.write_log(f"平多: price={fill_price:.0f}, pnl={pnl:.0f}, signal={self._signal_type}")
+                if self._debugger and self.trading:
+                    self._debugger.log_trade(
+                        action="CLOSE_LONG", price=fill_price, volume=self.fixed_volume,
+                        position=0, pnl=pnl, signal_type=self._signal_type, note="signal_exit")
+                self._position = 0
+                self._trailing_active = False
+                self._pending_signal = None
+                self.signal = f"平多({self._signal_type})"
+                self._update_loss_streak(pnl)
+                # 链式开空：平多后立即挂开空信号
+                if signal.get('_next_short'):
+                    self._pending_signal = {
+                        'type': 'Sell',
+                        'trigger_price': signal['trigger_price'],
+                        'stop_base': signal['stop_base'],
+                    }
+                    self.signal = f"待开空({self._signal_type})"
+
+        elif sig_type == 'CloseShort':
+            if self._position != -1:
+                self._pending_signal = None
+                self.signal = ""
+                return
+            if bar['high'] > signal['trigger_price']:
+                fill_price = max(signal['trigger_price'], bar['open'])
+                if fill_price > bar['high']:
+                    fill_price = bar['close']
+                pnl = self._entry_price - fill_price
+                self.cover(fill_price, abs(self.pos))
+                self.write_log(f"平空: price={fill_price:.0f}, pnl={pnl:.0f}, signal={self._signal_type}")
+                if self._debugger and self.trading:
+                    self._debugger.log_trade(
+                        action="CLOSE_SHORT", price=fill_price, volume=self.fixed_volume,
+                        position=0, pnl=pnl, signal_type=self._signal_type, note="signal_exit")
+                self._position = 0
+                self._trailing_active = False
+                self._pending_signal = None
+                self.signal = f"平空({self._signal_type})"
+                self._update_loss_streak(pnl)
+                # 链式开多：平空后立即挂开多信号
+                if signal.get('_next_long'):
+                    self._pending_signal = {
+                        'type': 'Buy',
+                        'trigger_price': signal['trigger_price'],
+                        'stop_base': signal['stop_base'],
+                    }
+                    self.signal = f"待开多({self._signal_type})"
 
     def _calc_stop_buffer(self) -> float:
         """B11: 计算止损 buffer，自适应 ATR."""
@@ -1556,14 +1502,14 @@ class CtaChanAllSignalsStrategy(CtaTemplate):
         if direction == 1:
             self.buy(price, self.fixed_volume)
             self._stop_price = stop_base - buffer
-            self.signal = "3B/2B买入"
-            self.write_log(f"开多: price={price:.0f}, stop={self._stop_price:.0f}, buffer={buffer:.1f}")
+            self.signal = f"{self._signal_type}买入"
+            self.write_log(f"开多({self._signal_type}): price={price:.0f}, stop={self._stop_price:.0f}")
             action = "OPEN_LONG"
         else:
             self.short(price, self.fixed_volume)
             self._stop_price = stop_base + buffer
-            self.signal = "3S/2S卖出"
-            self.write_log(f"开空: price={price:.0f}, stop={self._stop_price:.0f}, buffer={buffer:.1f}")
+            self.signal = f"{self._signal_type}卖出"
+            self.write_log(f"开空({self._signal_type}): price={price:.0f}, stop={self._stop_price:.0f}")
             action = "OPEN_SHORT"
 
         self._position = direction
