@@ -166,8 +166,8 @@ class ChanDebugger:
             "pnl", "cum_pnl", "signal_type", "note"
         ])
         self._write_csv_header(self.order_file, [
-            "datetime", "vt_orderid", "direction", "offset", "price", "volume",
-            "traded", "status", "gateway_name", "note"
+            "datetime", "order_datetime", "vt_orderid", "reference", "direction", "offset", "price", "volume",
+            "traded", "status", "active", "gateway_name", "note"
         ])
         self._write_csv_header(self.fill_file, [
             "datetime", "vt_tradeid", "vt_orderid", "direction", "offset", "price", "volume",
@@ -501,24 +501,31 @@ class ChanDebugger:
             return
 
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        order_dt = getattr(order, 'datetime', None)
+        order_dt_str = order_dt.strftime("%Y-%m-%d %H:%M:%S") if order_dt else ""
+        active = order.is_active() if hasattr(order, 'is_active') else ""
         self._append_csv(self.order_file, [
             now,
+            order_dt_str,
             getattr(order, 'vt_orderid', ''),
+            getattr(order, 'reference', ''),
             getattr(getattr(order, 'direction', None), 'value', ''),
             getattr(getattr(order, 'offset', None), 'value', ''),
             f"{getattr(order, 'price', 0):.2f}",
             getattr(order, 'volume', 0),
             getattr(order, 'traded', 0),
             getattr(getattr(order, 'status', None), 'value', ''),
+            active,
             getattr(order, 'gateway_name', ''),
             note,
         ])
         self.logger.info(
             f"[委托回报] id={getattr(order, 'vt_orderid', '')} "
+            f"ref={getattr(order, 'reference', '')} "
             f"{getattr(getattr(order, 'direction', None), 'value', '')}/"
             f"{getattr(getattr(order, 'offset', None), 'value', '')} "
             f"price={getattr(order, 'price', 0):.0f} vol={getattr(order, 'volume', 0)} "
-            f"traded={getattr(order, 'traded', 0)} status={getattr(getattr(order, 'status', None), 'value', '')}"
+            f"traded={getattr(order, 'traded', 0)} status={getattr(getattr(order, 'status', None), 'value', '')} active={active}"
             + (f" | note={note}" if note else "")
         )
 

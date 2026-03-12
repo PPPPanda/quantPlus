@@ -93,3 +93,6 @@ credentials.json
 .cache/
 tmpclaude-*
 .claude/
+
+# Headless Recorder 录制数据（CSV ground truth，不进 git）
+data/recordings/
