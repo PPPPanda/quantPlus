@@ -57,12 +57,12 @@ class CtaChanAllSignalsStrategy(CtaTemplate):
 
     # ATR 参数
     atr_window: int = 14
-    atr_trailing_mult: float = 3.0   # ATR 移动止损倍数
-    atr_activate_mult: float = 2.5   # 激活移动止损的浮盈 ATR 倍数
+    atr_trailing_mult: float = 1.5   # ATR 移动止损倍数（收紧，加快平仓周期）
+    atr_activate_mult: float = 1.5   # 激活移动止损的浮盈 ATR 倍数（收紧，加快平仓周期）
     atr_entry_filter: float = 2.0    # 入场过滤：触发价与止损距离不超过 N 倍 ATR
 
     # 笔构建参数
-    min_bi_gap: int = 4              # 严格笔端点最小间隔（包含处理后的K线数）
+    min_bi_gap: int = 2              # 严格笔端点最小间隔（减小=更多笔=更多信号）
 
     # 中枢参数
     pivot_valid_range: int = 6       # 中枢有效范围（笔端点数）
