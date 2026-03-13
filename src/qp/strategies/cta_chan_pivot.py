@@ -27,9 +27,11 @@ from typing import Any, Optional
 import numpy as np
 import pandas as pd
 
+import time as _time
+
 from vnpy.trader.object import BarData, TickData, TradeData, OrderData
 from vnpy.trader.utility import BarGenerator
-from vnpy.trader.constant import Interval
+from vnpy.trader.constant import Interval, Status
 from vnpy_ctastrategy import CtaTemplate
 from vnpy_ctastrategy.base import StopOrder, EngineType
 
@@ -323,6 +325,18 @@ class CtaChanPivotStrategy(CtaTemplate):
         self._debugger: Optional[ChanDebugger] = None
         self._signal_type: str = ""  # 当前信号类型(用于debug)
 
+        # ── 实盘追单(aggressive order) ──
+        self._last_tick: Optional[TickData] = None   # 缓存最新tick
+        self._active_orderids: list[str] = []        # 当前活跃委托
+        self._order_submit_time: float = 0.0         # 下单时间戳
+        self._order_direction: int = 0               # 1=买 / -1=卖
+        self._order_offset: str = ""                 # "open" / "close"
+        self._order_volume: float = 0.0              # 委托数量
+        self._order_chase_count: int = 0             # 已追单次数
+        self.ORDER_TIMEOUT_SECONDS: float = 5.0      # 超时秒数
+        self.ORDER_MAX_CHASE: int = 3                # 最大追单次数
+        self.ORDER_SLIPPAGE_TICKS: int = 2           # 滑点跳数
+
         logger.info("策略初始化: %s", strategy_name)
 
     def _sync_gui_debug_vars(self) -> None:
@@ -463,6 +477,10 @@ class CtaChanPivotStrategy(CtaTemplate):
 
     def on_tick(self, tick: TickData) -> None:
         """Tick 数据回调（实盘时由 CTA 引擎调用）."""
+        self._last_tick = tick
+        # 追单超时检查
+        if self._active_orderids:
+            self._check_order_timeout(tick)
         if self.bg:
             self.bg.update_tick(tick)
 
@@ -1519,7 +1537,7 @@ class CtaChanPivotStrategy(CtaTemplate):
                     fill_price = bar['close']
                 # 平多仓
                 pnl = fill_price - self._entry_price
-                self.sell(fill_price, abs(self.pos))
+                self._send_order_aggressive(-1, "close", fill_price, abs(self.pos))
                 self.write_log(f"3S/2S平多: price={fill_price:.0f}, pnl={pnl:.0f}")
                 if self._debugger and self.trading:
                     self._debugger.log_trade(
@@ -1553,6 +1571,88 @@ class CtaChanPivotStrategy(CtaTemplate):
                     fill_price = bar['close']
                 self._open_position(-1, fill_price, signal['stop_base'])
 
+    # ────────────────────────────────────────────────────
+    # 实盘追单: 吃对手价 + 超时撤单重挂
+    # ────────────────────────────────────────────────────
+
+    def _get_aggressive_price(self, direction: int, fallback: float) -> float:
+        """实盘：吃对手价+滑点；回测：原价."""
+        if self.get_engine_type() != EngineType.LIVE:
+            return fallback
+        tick = self._last_tick
+        if not tick or not tick.ask_price_1 or not tick.bid_price_1:
+            return fallback
+        pricetick = 2.0  # 棕榈油 pricetick
+        if direction == 1:  # 买入方向 → 吃 ask
+            return tick.ask_price_1 + self.ORDER_SLIPPAGE_TICKS * pricetick
+        else:  # 卖出方向 → 吃 bid
+            return tick.bid_price_1 - self.ORDER_SLIPPAGE_TICKS * pricetick
+
+    def _send_order_aggressive(
+        self, direction: int, offset: str, price: float, volume: float
+    ) -> list[str]:
+        """统一下单入口：实盘吃对手价，回测用原价."""
+        actual_price = self._get_aggressive_price(direction, price)
+        if direction == 1 and offset == "open":
+            vt_ids = self.buy(actual_price, volume)
+        elif direction == 1 and offset == "close":
+            vt_ids = self.cover(actual_price, volume)
+        elif direction == -1 and offset == "open":
+            vt_ids = self.short(actual_price, volume)
+        else:  # direction == -1, offset == "close"
+            vt_ids = self.sell(actual_price, volume)
+
+        # 实盘：记录追单状态
+        if self.get_engine_type() == EngineType.LIVE and vt_ids:
+            self._active_orderids = list(vt_ids)
+            self._order_submit_time = _time.time()
+            self._order_direction = direction
+            self._order_offset = offset
+            self._order_volume = volume
+            self._order_chase_count = 0
+            self.write_log(
+                f"[追单] 首次下单: dir={direction} offset={offset} "
+                f"fallback={price:.0f} actual={actual_price:.0f} vol={volume}"
+            )
+        return vt_ids or []
+
+    def _check_order_timeout(self, tick: TickData) -> None:
+        """Tick级检查挂单超时，撤单后用最新盘口重挂."""
+        if not self._active_orderids:
+            return
+        elapsed = _time.time() - self._order_submit_time
+        if elapsed < self.ORDER_TIMEOUT_SECONDS:
+            return
+        if self._order_chase_count >= self.ORDER_MAX_CHASE:
+            self.write_log(
+                f"[追单] 达到最大追单次数 {self.ORDER_MAX_CHASE}，停止追单"
+            )
+            self._active_orderids.clear()
+            return
+        # 撤单
+        for oid in list(self._active_orderids):
+            self.cancel_order(oid)
+        self.write_log(
+            f"[追单] 超时 {elapsed:.1f}s，撤单重挂 (chase={self._order_chase_count + 1})"
+        )
+        # 用最新盘口重挂
+        new_price = self._get_aggressive_price(self._order_direction, tick.last_price)
+        d = self._order_direction
+        o = self._order_offset
+        v = self._order_volume
+        if d == 1 and o == "open":
+            vt_ids = self.buy(new_price, v)
+        elif d == 1 and o == "close":
+            vt_ids = self.cover(new_price, v)
+        elif d == -1 and o == "open":
+            vt_ids = self.short(new_price, v)
+        else:
+            vt_ids = self.sell(new_price, v)
+        if vt_ids:
+            self._active_orderids = list(vt_ids)
+        self._order_submit_time = _time.time()
+        self._order_chase_count += 1
+
     def _calc_stop_buffer(self) -> float:
         """B11: 计算止损 buffer，自适应 ATR."""
         pricetick = 2.0  # 棕榈油 pricetick
@@ -1564,13 +1664,13 @@ class CtaChanPivotStrategy(CtaTemplate):
         """开仓."""
         buffer = self._calc_stop_buffer()
         if direction == 1:
-            self.buy(price, self.fixed_volume)
+            self._send_order_aggressive(1, "open", price, self.fixed_volume)
             self._stop_price = stop_base - buffer
             self.signal = "3B/2B买入"
             self.write_log(f"开多: price={price:.0f}, stop={self._stop_price:.0f}, buffer={buffer:.1f}")
             action = "OPEN_LONG"
         else:
-            self.short(price, self.fixed_volume)
+            self._send_order_aggressive(-1, "open", price, self.fixed_volume)
             self._stop_price = stop_base + buffer
             self.signal = "3S/2S卖出"
             self.write_log(f"开空: price={price:.0f}, stop={self._stop_price:.0f}, buffer={buffer:.1f}")
@@ -1632,12 +1732,12 @@ class CtaChanPivotStrategy(CtaTemplate):
             # 计算盈亏
             if self._position == 1:
                 pnl = exit_price - self._entry_price
-                self.sell(exit_price, abs(self.pos))
+                self._send_order_aggressive(-1, "close", exit_price, abs(self.pos))
                 self.write_log(f"多头止损: price={exit_price:.0f}, pnl={pnl:.0f}")
                 action = "CLOSE_LONG"
             else:
                 pnl = self._entry_price - exit_price
-                self.cover(exit_price, abs(self.pos))
+                self._send_order_aggressive(1, "close", exit_price, abs(self.pos))
                 self.write_log(f"空头止损: price={exit_price:.0f}, pnl={pnl:.0f}")
                 action = "CLOSE_SHORT"
 
@@ -1756,6 +1856,12 @@ class CtaChanPivotStrategy(CtaTemplate):
 
     def on_order(self, order: OrderData) -> None:
         """订单状态更新回调."""
+        # 追单跟踪：清理已终态委托
+        if order.vt_orderid in self._active_orderids:
+            if order.status in (Status.ALLTRADED, Status.CANCELLED, Status.REJECTED):
+                self._active_orderids.remove(order.vt_orderid)
+                if not self._active_orderids:
+                    self.write_log(f"[追单] 委托完成: {order.status.value}")
         if self._debugger and self.trading:
             self._debugger.log_order_event(order)
 
