@@ -2472,6 +2472,7 @@ trade = [
     { name = "vnpy-riskmanager" },
     { name = "vnpy-spreadtrading" },
     { name = "vnpy-sqlite" },
+    { name = "vnpy-tts" },
 ]
 
 [package.metadata]
@@ -2497,6 +2498,7 @@ requires-dist = [
     { name = "vnpy-riskmanager", marker = "extra == 'trade'", specifier = ">=2.0.0" },
     { name = "vnpy-spreadtrading", marker = "extra == 'trade'", specifier = ">=1.1.0" },
     { name = "vnpy-sqlite", marker = "extra == 'trade'", specifier = ">=1.1.0" },
+    { name = "vnpy-tts", marker = "extra == 'trade'", specifier = ">=6.7.2" },
     { name = "xtquant", marker = "extra == 'datafeed'", specifier = ">=1.0.0" },
 ]
 provides-extras = ["gui", "trade", "research", "datafeed", "test"]
@@ -3228,6 +3230,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/87/76/39b4c7207ed8603354530ac1228f6ad8073db8fcb1a200c5b5b4b02bebff/vnpy_sqlite-1.1.3.tar.gz", hash = "sha256:ed7d76f255b1acd335f479bb8a5ff14931eeec436147ef275ed834208bfd592c", size = 6592, upload-time = "2025-10-02T14:42:21.39Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/13/81/5acf1010985d725e0733c40f591f89a60cf752311ef22e6bb06f37d19af0/vnpy_sqlite-1.1.3-py3-none-any.whl", hash = "sha256:50f80c45737ef9a491aeebb9bfac0cec57f087461b6d7867838ef678cfbe67bb", size = 6482, upload-time = "2025-10-02T14:42:20.118Z" },
+]
+
+[[package]]
+name = "vnpy-tts"
+version = "6.7.2.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "vnpy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/96/24/55e00069aa9ba3744d413c0a46d7b5aba9e041ed603de669a9a2225edaee/vnpy_tts-6.7.2.3.tar.gz", hash = "sha256:2c02ee44374c867090fa17eb35d05fc18dec007a3fc3afe0ab458f507ab2c4b5", size = 1944758, upload-time = "2025-10-18T11:28:37.062Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/22/a3/57bf9af579fb2df3d6f5a8ad8c40a757ff49d20c74e4040e62aae8db02e9/vnpy_tts-6.7.2.3-cp313-cp313-win_amd64.whl", hash = "sha256:fbb599b2203979d6023ebe612de84871394613d308e17ff656bf0b33dd1b5a21", size = 1240787, upload-time = "2025-10-18T11:28:33.759Z" },
 ]
 
 [[package]]

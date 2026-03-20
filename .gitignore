@@ -96,3 +96,4 @@ tmpclaude-*
 
 # Headless Recorder 录制数据（CSV ground truth，不进 git）
 data/recordings/
+.vntrader/ctp_md/
